@@ -1,6 +1,6 @@
 Current Module
 
-Sprint 3 — Course Curriculum (next)
+Sprint 4 — Lessons (Nuggets) & Video Streaming (next)
 
 Completed
 
@@ -10,6 +10,8 @@ Sprint 1 — Authentication Core
 
 Sprint 2 — User Profiles & Role Management
 
+Sprint 3 — Course Curriculum Structures
+
 User
 
 Course
@@ -18,7 +20,7 @@ Lesson
 
 Pending
 
-Sprint 3 — Course Curriculum Structures
+Sprint 4 — Lessons (Nuggets) & Video Streaming
 
 Quiz
 
@@ -34,7 +36,7 @@ main
 
 Current Database Version
 
-v1.1 (users, roles, user_roles)
+v1.2 (users, roles, user_roles, courses, cohorts, cohort_enrollments, modules)
 
 Coding Standard
 

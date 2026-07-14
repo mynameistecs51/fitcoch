@@ -31,9 +31,16 @@
   - [x] Dark / Light mode toggle with localStorage persistence
   - [x] Admin edit page table layout + Router int param casting fix
 
+- [x] **Sprint 3** — Course Curriculum Structures
+  - [x] Migration: `courses`, `cohorts`, `cohort_enrollments`, `modules`
+  - [x] Course/Module models, repositories, `CourseService`
+  - [x] Learner views: `/courses`, `/courses/{id}` (table syllabus)
+  - [x] Instructor views: `/instructor/courses` (create/edit/modules)
+  - [x] API: `GET /api/v1/courses`, `GET /api/v1/courses/{id}`
+  - [x] Sample course seed migration
+
 ### Pending
 
-- [ ] **Sprint 3** — Course Curriculum Structures
 - [ ] **Sprint 4** — Lessons (Nuggets) & Video Streaming
 - [ ] **Sprint 5** — Quiz Engine & Readiness Gate
 - [ ] **Sprint 6** — Virtual Classroom & WebRTC Workspace

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 use App\Controllers\AdminController;
 use App\Controllers\AuthController;
+use App\Controllers\CourseController;
+use App\Controllers\InstructorCourseController;
 use App\Controllers\LocaleController;
 use App\Controllers\UserController;
 use App\Middleware\AuthMiddleware;
@@ -28,6 +30,20 @@ $router->get('/dashboard', [AuthController::class, 'dashboard'], $authMiddleware
 $router->get('/profile', [UserController::class, 'showProfile'], $authMiddleware);
 $router->post('/profile', [UserController::class, 'updateProfile'], $authMiddleware);
 
+// Course routes (learner)
+$router->get('/courses', [CourseController::class, 'index'], $authMiddleware);
+$router->get('/courses/{courseId}', [CourseController::class, 'show'], $authMiddleware);
+
+// Instructor course management
+$instructorRoles = ['instructor', 'admin'];
+$router->get('/instructor/courses', [InstructorCourseController::class, 'index'], $authRoleMiddleware, $instructorRoles);
+$router->get('/instructor/courses/create', [InstructorCourseController::class, 'create'], $authRoleMiddleware, $instructorRoles);
+$router->post('/instructor/courses', [InstructorCourseController::class, 'store'], $authRoleMiddleware, $instructorRoles);
+$router->get('/instructor/courses/{courseId}/edit', [InstructorCourseController::class, 'edit'], $authRoleMiddleware, $instructorRoles);
+$router->post('/instructor/courses/{courseId}', [InstructorCourseController::class, 'update'], $authRoleMiddleware, $instructorRoles);
+$router->post('/instructor/courses/{courseId}/modules', [InstructorCourseController::class, 'storeModule'], $authRoleMiddleware, $instructorRoles);
+$router->post('/instructor/courses/{courseId}/modules/{moduleId}/delete', [InstructorCourseController::class, 'deleteModule'], $authRoleMiddleware, $instructorRoles);
+
 // Admin routes (admin only)
 $adminRoles = ['admin'];
 $router->get('/admin/users', [AdminController::class, 'index'], $authRoleMiddleware, $adminRoles);
@@ -42,6 +58,10 @@ $router->post('/api/v1/auth/logout', [AuthController::class, 'logout'], $authMid
 
 // API routes — Users
 $router->get('/api/v1/users/me', [UserController::class, 'me'], $authMiddleware);
+
+// API routes — Courses
+$router->get('/api/v1/courses', [CourseController::class, 'apiList'], $authMiddleware);
+$router->get('/api/v1/courses/{courseId}', [CourseController::class, 'apiShow'], $authMiddleware);
 
 // API routes — RBAC demo (instructor/admin only)
 $router->get('/api/v1/instructor/ping', [UserController::class, 'instructorPing'], $authRoleMiddleware, ['instructor', 'admin']);

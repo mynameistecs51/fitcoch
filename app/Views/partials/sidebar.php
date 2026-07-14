@@ -16,14 +16,16 @@
                 <span><?= escape(__('sidebar.dashboard')) ?></span>
             </a>
 
-            <span class="nav-item flex items-center w-full px-4 py-3 text-sm font-medium rounded-xl text-slate-400 dark:text-slate-500 cursor-not-allowed opacity-60">
-                <i class="fa-solid fa-circle-play w-6 text-slate-400"></i>
+            <a
+                href="<?= escape(url('/courses')) ?>"
+                class="nav-item flex items-center w-full px-4 py-3 text-sm font-medium rounded-xl transition duration-200 <?= $currentNav === 'courses' ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white border-l-4 border-brand-500' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' ?>"
+            >
+                <i class="fa-solid fa-circle-play w-6 <?= $currentNav === 'courses' ? 'text-brand-500' : 'text-slate-400' ?>"></i>
                 <span class="flex-1 text-left">
                     <?= escape(__('sidebar.preclass')) ?>
                     <span class="text-[9px] block text-brand-600 dark:text-brand-accent"><?= escape(__('sidebar.preclass_sub')) ?></span>
                 </span>
-                <span class="px-1.5 py-0.5 text-[9px] font-bold rounded bg-slate-200 dark:bg-slate-800 text-slate-500"><?= escape(__('sidebar.coming_soon')) ?></span>
-            </span>
+            </a>
 
             <span class="nav-item flex items-center w-full px-4 py-3 text-sm font-medium rounded-xl text-slate-400 dark:text-slate-500 cursor-not-allowed opacity-60">
                 <i class="fa-solid fa-person-running w-6 text-slate-400"></i>
@@ -41,6 +43,16 @@
                     <span class="text-[9px] block text-yellow-600 dark:text-yellow-400"><?= escape(__('sidebar.assessment_sub')) ?></span>
                 </span>
             </span>
+
+            <?php if (!empty($isAdmin) || (!empty($roles) && (in_array('instructor', $roles, true) || in_array('admin', $roles, true)))): ?>
+                <a
+                    href="<?= escape(url('/instructor/courses')) ?>"
+                    class="nav-item flex items-center w-full px-4 py-3 text-sm font-medium rounded-xl transition duration-200 <?= ($currentNav ?? '') === 'instructor' ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white border-l-4 border-brand-500' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' ?>"
+                >
+                    <i class="fa-solid fa-chalkboard-user w-6 <?= ($currentNav ?? '') === 'instructor' ? 'text-brand-500' : 'text-slate-400' ?>"></i>
+                    <span><?= escape(__('courses.instructor.nav')) ?></span>
+                </a>
+            <?php endif; ?>
 
             <?php if (!empty($isAdmin)): ?>
                 <div class="h-px bg-slate-200 dark:bg-slate-800 my-4"></div>

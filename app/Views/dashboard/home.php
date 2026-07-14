@@ -20,6 +20,11 @@ ob_start();
             <p class="text-lg font-bold text-brand-600 dark:text-brand-500">
                 <?= escape(__('dashboard.welcome', ['name' => $user->firstName])) ?>
             </p>
+            <div class="flex flex-wrap gap-4 pt-2">
+            <a href="<?= escape(url('/courses')) ?>" class="px-5 py-2.5 rounded-xl bg-brand-500 text-slate-950 font-bold text-sm shadow-lg shadow-brand-500/20 hover:bg-brand-accent transition duration-200">
+                <?= escape(__('courses.title')) ?>
+            </a>
+        </div>
         </div>
     </div>
 

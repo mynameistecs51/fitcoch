@@ -19,14 +19,16 @@ class AdminController
     ) {
     }
 
-    /** @return array{user: ?\App\Models\User, isAdmin: bool} */
+    /** @return array{user: ?\App\Models\User, isAdmin: bool, roles: array<int, string>} */
     private function layoutContext(): array
     {
         $user = $this->authService->currentUser();
+        $roles = $user ? $this->authService->getUserRoles($user->id) : [];
 
         return [
             'user' => $user,
             'isAdmin' => true,
+            'roles' => $roles,
         ];
     }
 

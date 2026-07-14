@@ -3,6 +3,7 @@ $showAuthLinks = $showAuthLinks ?? false;
 $showSidebar = $showSidebar ?? false;
 $currentNav = $currentNav ?? '';
 $isAdmin = $isAdmin ?? false;
+$roles = $roles ?? [];
 $user = $user ?? null;
 ?>
 <!DOCTYPE html>
