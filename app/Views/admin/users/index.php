@@ -30,7 +30,7 @@ ob_start();
             </div>
         <?php endif; ?>
 
-        <div class="overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-800">
+        <div class="table-responsive rounded-2xl border border-slate-200 dark:border-slate-800">
             <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-800">
                 <thead class="bg-slate-50 dark:bg-slate-950">
                     <tr>

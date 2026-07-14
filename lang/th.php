@@ -13,6 +13,10 @@ return [
         'profile' => 'โปรไฟล์',
         'sign_out' => 'ออกจากระบบ',
         'back' => 'กลับ',
+        'menu' => 'เมนู',
+        'open_menu' => 'เปิดเมนู',
+        'close_menu' => 'ปิดเมนู',
+        'mobile_shortcuts' => 'เมนูลัดมือถือ',
     ],
     'admin' => [
         'title' => 'จัดการบัญชีผู้ใช้',

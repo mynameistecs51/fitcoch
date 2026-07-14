@@ -15,7 +15,7 @@ $labelTdClass = 'px-4 py-3 text-sm font-medium text-slate-500 dark:text-slate-40
 ob_start();
 ?>
 <section class="space-y-6">
-    <div class="flex items-center justify-between">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
             <h1 class="text-2xl font-extrabold text-slate-900 dark:text-white">
                 <?= escape($isEdit ? __('courses.instructor.edit_title') : __('courses.instructor.create_title')) ?>
@@ -46,7 +46,7 @@ ob_start();
         <form method="POST" action="<?= escape(url($isEdit ? '/instructor/courses/' . $course->id : '/instructor/courses')) ?>">
             <input type="hidden" name="csrf_token" value="<?= escape(csrf_token()) ?>">
 
-            <div class="overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-800 mb-4">
+            <div class="table-responsive rounded-2xl border border-slate-200 dark:border-slate-800 mb-4">
                 <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-800">
                     <thead class="bg-slate-50 dark:bg-slate-950">
                         <tr>
@@ -98,7 +98,7 @@ ob_start();
                 <h2 class="text-sm font-bold text-slate-900 dark:text-white mb-4"><?= escape(__('courses.modules_title')) ?></h2>
 
                 <?php if ($modules !== []): ?>
-                    <div class="overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-800 mb-4">
+                    <div class="table-responsive rounded-2xl border border-slate-200 dark:border-slate-800 mb-4">
                         <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-800">
                             <thead class="bg-slate-50 dark:bg-slate-950">
                                 <tr>

@@ -17,7 +17,7 @@ $tdClass = 'px-4 py-3 text-sm text-slate-700 dark:text-slate-300';
         <?php if ($courses === []): ?>
             <p class="text-sm text-slate-500 dark:text-slate-400 text-center py-8"><?= escape(__('courses.empty')) ?></p>
         <?php else: ?>
-            <div class="overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-800">
+            <div class="table-responsive rounded-2xl border border-slate-200 dark:border-slate-800">
                 <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-800">
                     <thead class="bg-slate-50 dark:bg-slate-950">
                         <tr>

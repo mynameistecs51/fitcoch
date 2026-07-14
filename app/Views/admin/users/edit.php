@@ -11,7 +11,7 @@ $labelTdClass = 'px-4 py-3 text-sm font-medium text-slate-500 dark:text-slate-40
 ob_start();
 ?>
 <section class="space-y-6">
-    <div class="flex items-center justify-between">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
             <h1 class="text-2xl font-extrabold text-slate-900 dark:text-white flex items-center">
                 <i class="fa-solid fa-user-pen text-brand-500 mr-3"></i>
@@ -37,7 +37,7 @@ ob_start();
 
         <div>
             <h2 class="text-sm font-bold text-slate-900 dark:text-white mb-3"><?= escape(__('admin.edit_title')) ?></h2>
-            <div class="overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-800">
+            <div class="table-responsive rounded-2xl border border-slate-200 dark:border-slate-800">
                 <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-800">
                     <thead class="bg-slate-50 dark:bg-slate-950">
                         <tr>
@@ -77,7 +77,7 @@ ob_start();
             <input type="hidden" name="csrf_token" value="<?= escape(csrf_token()) ?>">
 
             <h2 class="text-sm font-bold text-slate-900 dark:text-white mb-3"><?= escape(__('admin.assign_roles')) ?></h2>
-            <div class="overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-800">
+            <div class="table-responsive rounded-2xl border border-slate-200 dark:border-slate-800">
                 <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-800">
                     <thead class="bg-slate-50 dark:bg-slate-950">
                         <tr>
@@ -121,7 +121,7 @@ ob_start();
 
         <div>
             <h2 class="text-sm font-bold text-slate-900 dark:text-white mb-3"><?= escape(__('admin.account_status')) ?></h2>
-            <div class="overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-800">
+            <div class="table-responsive rounded-2xl border border-slate-200 dark:border-slate-800">
                 <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-800">
                     <thead class="bg-slate-50 dark:bg-slate-950">
                         <tr>

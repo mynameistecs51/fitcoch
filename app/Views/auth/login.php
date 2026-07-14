@@ -8,9 +8,9 @@ $labelClass = 'block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1
 
 ob_start();
 ?>
-<div class="flex items-center justify-center px-6 py-12 md:py-16 min-h-[calc(100vh-8rem)]">
+<div class="flex items-center justify-center px-4 sm:px-6 py-8 sm:py-12 md:py-16 min-h-[calc(100dvh-8rem)]">
     <div class="w-full max-w-md">
-        <div class="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none">
+        <div class="auth-card bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none">
             <div class="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-brand-500 to-brand-accent shadow-lg shadow-brand-500/20 mb-6 mx-auto">
                 <i class="fa-solid fa-dumbbell text-slate-950 text-lg"></i>
             </div>

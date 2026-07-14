@@ -13,6 +13,10 @@ return [
         'profile' => 'Profile',
         'sign_out' => 'Sign Out',
         'back' => 'Back',
+        'menu' => 'Menu',
+        'open_menu' => 'Open menu',
+        'close_menu' => 'Close menu',
+        'mobile_shortcuts' => 'Mobile shortcuts',
     ],
     'admin' => [
         'title' => 'Account Management',
