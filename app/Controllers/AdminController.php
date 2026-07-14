@@ -7,23 +7,37 @@ namespace App\Controllers;
 use App\Core\Request;
 use App\Core\Response;
 use App\Services\AdminService;
+use App\Services\AuthService;
 use App\Services\ValidationException;
 use Exception;
 
 class AdminController
 {
-    public function __construct(private readonly AdminService $adminService)
+    public function __construct(
+        private readonly AdminService $adminService,
+        private readonly AuthService $authService,
+    ) {
+    }
+
+    /** @return array{user: ?\App\Models\User, isAdmin: bool} */
+    private function layoutContext(): array
     {
+        $user = $this->authService->currentUser();
+
+        return [
+            'user' => $user,
+            'isAdmin' => true,
+        ];
     }
 
     public function index(Request $request): Response
     {
-        return Response::view('admin/users/index', [
+        return Response::view('admin/users/index', array_merge($this->layoutContext(), [
             'title' => __('admin.title'),
             'accounts' => $this->adminService->listAccounts(),
             'success' => $request->query()['success'] ?? null,
             'error' => $request->query()['error'] ?? null,
-        ]);
+        ]));
     }
 
     public function edit(Request $request, int $id): Response
@@ -42,13 +56,13 @@ class AdminController
             return Response::redirect('/admin/users?error=not_found');
         }
 
-        return Response::view('admin/users/edit', [
+        return Response::view('admin/users/edit', array_merge($this->layoutContext(), [
             'title' => __('admin.edit_title'),
             'account' => $account,
             'availableRoles' => $this->adminService->listAvailableRoles(),
             'errors' => [],
             'error' => $request->query()['error'] ?? null,
-        ]);
+        ]));
     }
 
     public function updateRoles(Request $request, int $id): Response
@@ -137,12 +151,12 @@ class AdminController
 
         $account['roles'] = array_map('strval', $selectedRoles);
 
-        return Response::view('admin/users/edit', [
+        return Response::view('admin/users/edit', array_merge($this->layoutContext(), [
             'title' => __('admin.edit_title'),
             'account' => $account,
             'availableRoles' => $this->adminService->listAvailableRoles(),
             'errors' => $errors,
             'error' => null,
-        ]);
+        ]));
     }
 }

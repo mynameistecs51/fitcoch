@@ -27,6 +27,9 @@
   - [x] `GET /api/v1/instructor/ping` (RBAC demo: instructor/admin only)
   - [x] AuthorizationService unit tests (7 tests total passing)
   - [x] Admin account management (`/admin/users`) — role & status control
+  - [x] FIT-FLIPPED UI redesign (sidebar, header, dashboard hero)
+  - [x] Dark / Light mode toggle with localStorage persistence
+  - [x] Admin edit page table layout + Router int param casting fix
 
 ### Pending
 
@@ -50,7 +53,7 @@
 ### MEDIUM
 
 - [x] Bilingual UI (Thai / English) — language switcher, `lang/en.php`, `lang/th.php`
-- [ ] Dark Mode
+- [x] Dark Mode — header toggle, Tailwind `dark:` classes, localStorage
 
 ### LOW
 

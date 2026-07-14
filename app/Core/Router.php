@@ -90,10 +90,57 @@ class Router
 
         [$class, $method] = $handler;
         $controller = $this->container->get($class);
+        $resolvedParams = $this->castRouteParams($class, $method, $params);
 
-        return function (Request $request) use ($controller, $method, $params) {
-            return $controller->{$method}($request, ...array_values($params));
+        return function (Request $request) use ($controller, $method, $resolvedParams) {
+            return $controller->{$method}($request, ...$resolvedParams);
         };
+    }
+
+    /**
+     * @param class-string $class
+     * @param array<string, string> $params
+     * @return array<int, mixed>
+     */
+    private function castRouteParams(string $class, string $method, array $params): array
+    {
+        $reflection = new \ReflectionMethod($class, $method);
+        $arguments = [];
+
+        foreach ($reflection->getParameters() as $parameter) {
+            $type = $parameter->getType();
+
+            if ($type instanceof \ReflectionNamedType && $type->getName() === Request::class) {
+                continue;
+            }
+
+            $name = $parameter->getName();
+
+            if (!array_key_exists($name, $params)) {
+                if ($parameter->isDefaultValueAvailable()) {
+                    $arguments[] = $parameter->getDefaultValue();
+                }
+
+                continue;
+            }
+
+            $value = $params[$name];
+
+            if ($type instanceof \ReflectionNamedType && $type->isBuiltin()) {
+                $arguments[] = match ($type->getName()) {
+                    'int' => (int) $value,
+                    'float' => (float) $value,
+                    'bool' => filter_var($value, FILTER_VALIDATE_BOOLEAN),
+                    default => $value,
+                };
+
+                continue;
+            }
+
+            $arguments[] = $value;
+        }
+
+        return $arguments;
     }
 
     /** @param array<int, string> $middleware */

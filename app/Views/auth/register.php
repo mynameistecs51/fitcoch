@@ -3,16 +3,22 @@ $form = $form ?? [];
 $error = $error ?? null;
 $errors = $errors ?? [];
 
+$inputClass = 'w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-200 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20';
+$labelClass = 'block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1';
+
 ob_start();
 ?>
-<div class="flex items-center justify-center px-6 py-16">
+<div class="flex items-center justify-center px-6 py-12 md:py-16 min-h-[calc(100vh-8rem)]">
     <div class="w-full max-w-md">
-        <div class="bg-white/80 backdrop-blur-md p-8 rounded-2xl border border-slate-200 shadow-sm">
-            <h1 class="text-2xl font-bold text-slate-900 mb-2"><?= escape(__('auth.register_title')) ?></h1>
-            <p class="text-slate-500 mb-6"><?= escape(__('auth.register_subtitle')) ?></p>
+        <div class="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none">
+            <div class="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-brand-500 to-brand-accent shadow-lg shadow-brand-500/20 mb-6 mx-auto">
+                <i class="fa-solid fa-dumbbell text-slate-950 text-lg"></i>
+            </div>
+            <h1 class="text-2xl font-bold text-slate-900 dark:text-white mb-2 text-center"><?= escape(__('auth.register_title')) ?></h1>
+            <p class="text-slate-500 dark:text-slate-400 mb-6 text-center text-sm"><?= escape(__('auth.register_subtitle')) ?></p>
 
             <?php if ($error): ?>
-                <div class="mb-4 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">
+                <div class="mb-4 p-4 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-red-700 dark:text-red-400 text-sm">
                     <?= escape($error) ?>
                 </div>
             <?php endif; ?>
@@ -22,63 +28,35 @@ ob_start();
 
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label for="first_name" class="block text-sm font-medium text-slate-700 mb-1"><?= escape(__('auth.first_name')) ?></label>
-                        <input
-                            type="text"
-                            id="first_name"
-                            name="first_name"
-                            value="<?= escape($form['first_name'] ?? '') ?>"
-                            required
-                            class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
-                        >
+                        <label for="first_name" class="<?= escape($labelClass) ?>"><?= escape(__('auth.first_name')) ?></label>
+                        <input type="text" id="first_name" name="first_name" value="<?= escape($form['first_name'] ?? '') ?>" required class="<?= escape($inputClass) ?>">
                         <?php if (!empty($errors['first_name'])): ?>
-                            <p class="mt-1 text-sm text-red-600"><?= escape($errors['first_name'][0]) ?></p>
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400"><?= escape($errors['first_name'][0]) ?></p>
                         <?php endif; ?>
                     </div>
-
                     <div>
-                        <label for="last_name" class="block text-sm font-medium text-slate-700 mb-1"><?= escape(__('auth.last_name')) ?></label>
-                        <input
-                            type="text"
-                            id="last_name"
-                            name="last_name"
-                            value="<?= escape($form['last_name'] ?? '') ?>"
-                            required
-                            class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
-                        >
+                        <label for="last_name" class="<?= escape($labelClass) ?>"><?= escape(__('auth.last_name')) ?></label>
+                        <input type="text" id="last_name" name="last_name" value="<?= escape($form['last_name'] ?? '') ?>" required class="<?= escape($inputClass) ?>">
                         <?php if (!empty($errors['last_name'])): ?>
-                            <p class="mt-1 text-sm text-red-600"><?= escape($errors['last_name'][0]) ?></p>
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400"><?= escape($errors['last_name'][0]) ?></p>
                         <?php endif; ?>
                     </div>
                 </div>
 
                 <div>
-                    <label for="email" class="block text-sm font-medium text-slate-700 mb-1"><?= escape(__('auth.email')) ?></label>
-                    <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        value="<?= escape($form['email'] ?? '') ?>"
-                        required
-                        class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
-                    >
+                    <label for="email" class="<?= escape($labelClass) ?>"><?= escape(__('auth.email')) ?></label>
+                    <input type="email" id="email" name="email" value="<?= escape($form['email'] ?? '') ?>" required class="<?= escape($inputClass) ?>">
                     <?php if (!empty($errors['email'])): ?>
-                        <p class="mt-1 text-sm text-red-600"><?= escape($errors['email'][0]) ?></p>
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400"><?= escape($errors['email'][0]) ?></p>
                     <?php endif; ?>
                 </div>
 
                 <div>
-                    <label for="password" class="block text-sm font-medium text-slate-700 mb-1"><?= escape(__('auth.password')) ?></label>
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        required
-                        class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
-                    >
+                    <label for="password" class="<?= escape($labelClass) ?>"><?= escape(__('auth.password')) ?></label>
+                    <input type="password" id="password" name="password" required class="<?= escape($inputClass) ?>">
                     <?php if (!empty($errors['password'])): ?>
                         <?php foreach ($errors['password'] as $passwordError): ?>
-                            <p class="mt-1 text-sm text-red-600"><?= escape($passwordError) ?></p>
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400"><?= escape($passwordError) ?></p>
                         <?php endforeach; ?>
                     <?php else: ?>
                         <p class="mt-1 text-xs text-slate-400"><?= escape(__('auth.password_hint')) ?></p>
@@ -86,34 +64,25 @@ ob_start();
                 </div>
 
                 <div>
-                    <label for="timezone" class="block text-sm font-medium text-slate-700 mb-1"><?= escape(__('auth.timezone')) ?></label>
-                    <select
-                        id="timezone"
-                        name="timezone"
-                        class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
-                    >
+                    <label for="timezone" class="<?= escape($labelClass) ?>"><?= escape(__('auth.timezone')) ?></label>
+                    <select id="timezone" name="timezone" class="<?= escape($inputClass) ?>">
                         <?php foreach (['UTC', 'America/New_York', 'America/Los_Angeles', 'Europe/London', 'Asia/Bangkok'] as $tz): ?>
-                            <option value="<?= escape($tz) ?>" <?= ($form['timezone'] ?? 'UTC') === $tz ? 'selected' : '' ?>>
-                                <?= escape($tz) ?>
-                            </option>
+                            <option value="<?= escape($tz) ?>" <?= ($form['timezone'] ?? 'UTC') === $tz ? 'selected' : '' ?>><?= escape($tz) ?></option>
                         <?php endforeach; ?>
                     </select>
                     <?php if (!empty($errors['timezone'])): ?>
-                        <p class="mt-1 text-sm text-red-600"><?= escape($errors['timezone'][0]) ?></p>
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400"><?= escape($errors['timezone'][0]) ?></p>
                     <?php endif; ?>
                 </div>
 
-                <button
-                    type="submit"
-                    class="w-full py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition-colors"
-                >
+                <button type="submit" class="w-full py-3 bg-brand-500 text-slate-950 font-bold rounded-xl hover:bg-brand-accent transition duration-200 shadow-lg shadow-brand-500/20">
                     <?= escape(__('auth.create_account')) ?>
                 </button>
             </form>
 
-            <p class="mt-6 text-center text-sm text-slate-500">
+            <p class="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
                 <?= escape(__('auth.has_account')) ?>
-                <a href="<?= escape(url('/login')) ?>" class="text-indigo-600 hover:text-indigo-700 font-medium"><?= escape(__('auth.sign_in')) ?></a>
+                <a href="<?= escape(url('/login')) ?>" class="text-brand-600 dark:text-brand-500 hover:text-brand-accent font-medium"><?= escape(__('auth.sign_in')) ?></a>
             </p>
         </div>
     </div>
@@ -121,4 +90,5 @@ ob_start();
 <?php
 $content = ob_get_clean();
 $showAuthLinks = true;
+$showSidebar = false;
 require base_path('app/Views/layouts/app.php');

@@ -44,6 +44,7 @@ class UserController
             'title' => __('profile.title'),
             'user' => $user,
             'roles' => $roles,
+            'isAdmin' => in_array('admin', $roles, true),
             'success' => $request->query()['success'] ?? null,
         ]);
     }
@@ -59,10 +60,13 @@ class UserController
         $data = $request->all();
 
         if (!verify_csrf_token($data['csrf_token'] ?? null)) {
+            $roles = $this->authService->getUserRoles($user->id);
+
             return Response::view('auth/profile', [
                 'title' => __('profile.title'),
                 'user' => $user,
-                'roles' => $this->authService->getUserRoles($user->id),
+                'roles' => $roles,
+                'isAdmin' => in_array('admin', $roles, true),
                 'error' => __('errors.invalid_csrf'),
             ]);
         }
@@ -70,16 +74,21 @@ class UserController
         try {
             $updatedUser = $this->userService->updateProfile($user->id, $data);
         } catch (ValidationException $e) {
+            $roles = $this->authService->getUserRoles($user->id);
+
             return Response::view('auth/profile', [
                 'title' => __('profile.title'),
                 'user' => $user,
-                'roles' => $this->authService->getUserRoles($user->id),
+                'roles' => $roles,
+                'isAdmin' => in_array('admin', $roles, true),
                 'errors' => $e->errors(),
                 'form' => $data,
             ]);
         }
 
         return Response::redirect('/profile?' . http_build_query(['success' => 1]));
+    }
+
     public function instructorPing(Request $request): Response
     {
         return Response::apiSuccess(['message' => __('api.instructor_granted')]);
