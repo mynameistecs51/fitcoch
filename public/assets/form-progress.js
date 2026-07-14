@@ -241,7 +241,15 @@
 
         form.dataset.progressSubmitting = '1';
         startIndeterminate(labels.label, labels.processingText);
-        disableForm(form, true);
+
+        // Defer disabling the submit button only. Disabling inputs during submit
+        // (capture phase) omits them from the POST body and breaks registration.
+        window.setTimeout(function () {
+            const submitButton = form.querySelector('button[type="submit"], input[type="submit"]');
+            if (submitButton instanceof HTMLButtonElement || submitButton instanceof HTMLInputElement) {
+                submitButton.disabled = true;
+            }
+        }, 0);
     }
 
     document.addEventListener('submit', handleSubmit, true);

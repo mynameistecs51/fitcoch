@@ -46,4 +46,34 @@ class CohortRepository implements RepositoryInterface
 
         return Cohort::fromArray($row);
     }
+
+    public function findActiveEnrollmentForUser(int $userId, int $courseId): ?Cohort
+    {
+        $stmt = $this->db->prepare(
+            'SELECT co.*
+             FROM cohorts co
+             INNER JOIN cohort_enrollments ce ON ce.cohort_id = co.id
+             WHERE ce.user_id = :user_id
+               AND co.course_id = :course_id
+               AND ce.status = \'active\'
+             ORDER BY ce.enrolled_at DESC
+             LIMIT 1'
+        );
+        $stmt->execute([
+            'user_id' => $userId,
+            'course_id' => $courseId,
+        ]);
+        $row = $stmt->fetch();
+
+        return $row ? Cohort::fromArray($row) : null;
+    }
+
+    public function findById(int $id): ?Cohort
+    {
+        $stmt = $this->db->prepare('SELECT * FROM cohorts WHERE id = :id LIMIT 1');
+        $stmt->execute(['id' => $id]);
+        $row = $stmt->fetch();
+
+        return $row ? Cohort::fromArray($row) : null;
+    }
 }

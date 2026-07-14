@@ -7,13 +7,16 @@ namespace App\Controllers;
 use App\Core\Request;
 use App\Core\Response;
 use App\Services\AuthService;
+use App\Services\PasswordResetService;
 use App\Services\ValidationException;
 use Exception;
 
 class AuthController
 {
-    public function __construct(private readonly AuthService $authService)
-    {
+    public function __construct(
+        private readonly AuthService $authService,
+        private readonly PasswordResetService $passwordResetService,
+    ) {
     }
 
     public function showLogin(Request $request): Response
@@ -25,6 +28,7 @@ class AuthController
         return Response::view('auth/login', [
             'title' => __('auth.sign_in'),
             'error' => $request->query()['error'] ?? null,
+            'success' => $request->query()['success'] ?? null,
         ]);
     }
 
@@ -107,6 +111,103 @@ class AuthController
         }
 
         return Response::redirect('/dashboard');
+    }
+
+    public function showForgotPassword(Request $request): Response
+    {
+        if ($this->authService->currentUser() !== null) {
+            return Response::redirect('/dashboard');
+        }
+
+        return Response::view('auth/forgot-password', [
+            'title' => __('auth.forgot_password_title'),
+            'success' => $request->query()['success'] ?? null,
+            'reset_url' => $request->query()['reset_url'] ?? null,
+            'error' => $request->query()['error'] ?? null,
+            'email' => $request->query()['email'] ?? '',
+        ]);
+    }
+
+    public function sendForgotPassword(Request $request): Response
+    {
+        if (!verify_csrf_token($request->input('csrf_token'))) {
+            return Response::view('auth/forgot-password', [
+                'title' => __('auth.forgot_password_title'),
+                'error' => __('errors.invalid_csrf'),
+                'email' => (string) $request->input('email', ''),
+            ]);
+        }
+
+        $email = (string) $request->input('email', '');
+
+        if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return Response::view('auth/forgot-password', [
+                'title' => __('auth.forgot_password_title'),
+                'errors' => ['email' => [__('validation.email_required')]],
+                'email' => $email,
+            ]);
+        }
+
+        $result = $this->passwordResetService->requestReset($email);
+        $query = 'success=1';
+
+        if ($result['reset_url'] !== null) {
+            $query .= '&reset_url=' . urlencode($result['reset_url']);
+        }
+
+        return Response::redirect('/forgot-password?' . $query);
+    }
+
+    public function showResetPassword(Request $request): Response
+    {
+        if ($this->authService->currentUser() !== null) {
+            return Response::redirect('/dashboard');
+        }
+
+        $token = (string) ($request->query()['token'] ?? '');
+
+        if (!$this->passwordResetService->isTokenValid($token)) {
+            return Response::view('auth/forgot-password', [
+                'title' => __('auth.forgot_password_title'),
+                'error' => __('auth.reset_token_invalid'),
+            ]);
+        }
+
+        return Response::view('auth/reset-password', [
+            'title' => __('auth.reset_password_title'),
+            'token' => $token,
+            'errors' => [],
+            'error' => $request->query()['error'] ?? null,
+        ]);
+    }
+
+    public function resetPassword(Request $request): Response
+    {
+        $token = (string) $request->input('token', '');
+
+        if (!verify_csrf_token($request->input('csrf_token'))) {
+            return Response::redirect('/reset-password?token=' . urlencode($token) . '&error=csrf');
+        }
+
+        try {
+            $this->passwordResetService->resetPassword($token, $request->all());
+        } catch (ValidationException $e) {
+            if (!$this->passwordResetService->isTokenValid($token)) {
+                return Response::view('auth/forgot-password', [
+                    'title' => __('auth.forgot_password_title'),
+                    'error' => __('auth.reset_token_invalid'),
+                ]);
+            }
+
+            return Response::view('auth/reset-password', [
+                'title' => __('auth.reset_password_title'),
+                'token' => $token,
+                'errors' => $e->errors(),
+                'error' => null,
+            ]);
+        }
+
+        return Response::redirect('/login?success=password_reset');
     }
 
     public function logout(Request $request): Response

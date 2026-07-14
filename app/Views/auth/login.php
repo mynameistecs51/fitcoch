@@ -1,6 +1,7 @@
 <?php
 $email = $email ?? ($form['email'] ?? '');
 $error = $error ?? null;
+$success = $success ?? null;
 $errors = $errors ?? [];
 
 $inputClass = 'w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-200 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20';
@@ -21,6 +22,10 @@ ob_start();
                 <div class="mb-4 p-4 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-red-700 dark:text-red-400 text-sm">
                     <?= escape($error) ?>
                 </div>
+            <?php elseif ($success === 'password_reset'): ?>
+                <div class="mb-4 p-4 rounded-xl bg-brand-500/10 border border-brand-500/20 text-brand-700 dark:text-brand-accent text-sm">
+                    <?= escape(__('auth.reset_password_success')) ?>
+                </div>
             <?php endif; ?>
 
             <form method="POST" action="<?= escape(url('/login')) ?>" class="space-y-4">
@@ -35,7 +40,12 @@ ob_start();
                 </div>
 
                 <div>
-                    <label for="password" class="<?= escape($labelClass) ?>"><?= escape(__('auth.password')) ?></label>
+                    <div class="flex items-center justify-between mb-1">
+                        <label for="password" class="<?= escape($labelClass) ?>"><?= escape(__('auth.password')) ?></label>
+                        <a href="<?= escape(url('/forgot-password')) ?>" class="text-xs text-brand-600 dark:text-brand-500 hover:text-brand-accent font-medium">
+                            <?= escape(__('auth.forgot_password')) ?>
+                        </a>
+                    </div>
                     <input type="password" id="password" name="password" required class="<?= escape($inputClass) ?>">
                     <?php if (!empty($errors['password'])): ?>
                         <p class="mt-1 text-sm text-red-600 dark:text-red-400"><?= escape($errors['password'][0]) ?></p>

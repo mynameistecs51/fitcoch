@@ -74,6 +74,22 @@ class Response
         );
     }
 
+    public static function download(
+        string $body,
+        string $filename,
+        string $contentType = 'application/octet-stream',
+    ): self {
+        return new self(
+            body: $body,
+            statusCode: 200,
+            headers: [
+                'Content-Type' => $contentType,
+                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+                'Cache-Control' => 'no-store, no-cache, must-revalidate',
+            ],
+        );
+    }
+
     public static function view(string $template, array $data = [], int $statusCode = 200): self
     {
         $viewPath = base_path('app/Views/' . $template . '.php');

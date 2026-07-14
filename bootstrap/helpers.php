@@ -119,3 +119,10 @@ if (!function_exists('url')) {
         return \App\Core\Url::to($path);
     }
 }
+
+if (!function_exists('default_timezone')) {
+    function default_timezone(): string
+    {
+        return (string) config('app.default_timezone', 'Asia/Bangkok');
+    }
+}

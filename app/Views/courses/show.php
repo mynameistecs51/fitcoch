@@ -4,6 +4,8 @@ ob_start();
 $thClass = 'px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase';
 $tdClass = 'px-4 py-3 text-sm text-slate-700 dark:text-slate-300';
 $nuggetsByModule = $nuggetsByModule ?? [];
+$quizzesByModule = $quizzesByModule ?? [];
+$ticketsByModule = $ticketsByModule ?? [];
 ?>
 <section class="space-y-6">
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -39,6 +41,8 @@ $nuggetsByModule = $nuggetsByModule ?? [];
                     <tbody class="divide-y divide-slate-200 dark:divide-slate-800 bg-white dark:bg-slate-900">
                         <?php foreach ($modules as $module): ?>
                             <?php $moduleNuggets = $nuggetsByModule[$module->id] ?? []; ?>
+                            <?php $moduleQuiz = $quizzesByModule[$module->id] ?? null; ?>
+                            <?php $moduleTicket = $ticketsByModule[$module->id] ?? null; ?>
                             <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
                                 <td class="<?= escape($tdClass) ?> font-bold text-brand-600 dark:text-brand-accent">
                                     <?= escape((string) $module->sequenceOrder) ?>
@@ -47,7 +51,7 @@ $nuggetsByModule = $nuggetsByModule ?? [];
                                     <?= escape($module->title) ?>
                                 </td>
                                 <td class="<?= escape($tdClass) ?> text-slate-500 dark:text-slate-400 text-xs">
-                                    <?php if ($moduleNuggets === []): ?>
+                                    <?php if ($moduleNuggets === [] && $moduleQuiz === null): ?>
                                         <?= escape(__('courses.no_nuggets')) ?>
                                     <?php else: ?>
                                         <ul class="space-y-1">
@@ -62,6 +66,19 @@ $nuggetsByModule = $nuggetsByModule ?? [];
                                                     <?php endif; ?>
                                                 </li>
                                             <?php endforeach; ?>
+                                            <?php if ($moduleQuiz !== null): ?>
+                                                <li>
+                                                    <a href="<?= escape(url('/quizzes/' . $moduleQuiz->id)) ?>" class="hover:text-brand-600 dark:hover:text-brand-500 transition font-semibold">
+                                                        <i class="fa-solid fa-clipboard-question text-brand-500 mr-1"></i>
+                                                        <?= escape($moduleQuiz->title) ?>
+                                                    </a>
+                                                    <?php if ($moduleTicket !== null): ?>
+                                                        <span class="ml-1 inline-flex px-1.5 py-0.5 rounded text-[10px] font-bold <?= $moduleTicket->isOpen() ? 'bg-brand-500/15 text-brand-700 dark:text-brand-accent' : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300' ?>">
+                                                            <?= escape(__('quizzes.ticket_status.' . $moduleTicket->status)) ?>
+                                                        </span>
+                                                    <?php endif; ?>
+                                                </li>
+                                            <?php endif; ?>
                                         </ul>
                                     <?php endif; ?>
                                 </td>

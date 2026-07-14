@@ -6,14 +6,18 @@ namespace App\Controllers;
 
 use App\Core\Request;
 use App\Core\Response;
+use App\Repositories\CohortRepository;
 use App\Services\AuthService;
 use App\Services\CourseService;
+use App\Services\QuizService;
 
 class CourseController
 {
     public function __construct(
         private readonly AuthService $authService,
         private readonly CourseService $courseService,
+        private readonly QuizService $quizService,
+        private readonly CohortRepository $cohortRepo,
     ) {
     }
 
@@ -53,6 +57,12 @@ class CourseController
         }
 
         $roles = $this->authService->getUserRoles($user->id);
+        $moduleIds = array_map(static fn ($module) => $module->id, $outline['modules']);
+        $quizzesByModule = $this->quizService->listQuizzesByModuleIds($moduleIds);
+        $cohort = $this->cohortRepo->findActiveEnrollmentForUser($user->id, $courseId);
+        $ticketsByModule = $cohort !== null
+            ? $this->quizService->listTicketsForModules($user->id, $cohort->id, $moduleIds)
+            : [];
 
         return Response::view('courses/show', [
             'title' => $outline['course']->title,
@@ -62,6 +72,8 @@ class CourseController
             'course' => $outline['course'],
             'modules' => $outline['modules'],
             'nuggetsByModule' => $outline['nuggetsByModule'],
+            'quizzesByModule' => $quizzesByModule,
+            'ticketsByModule' => $ticketsByModule,
         ]);
     }
 

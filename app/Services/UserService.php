@@ -27,7 +27,7 @@ class UserService
         return $this->buildProfileResponse($user);
     }
 
-    /** @param array{first_name?: string, last_name?: string, timezone?: string} $data */
+    /** @param array{first_name?: string, last_name?: string} $data */
     public function updateProfile(int $userId, array $data): User
     {
         $errors = $this->validateProfileUpdate($data);
@@ -39,7 +39,6 @@ class UserService
         $user = $this->userRepo->updateProfile($userId, [
             'first_name' => trim((string) ($data['first_name'] ?? '')),
             'last_name' => trim((string) ($data['last_name'] ?? '')),
-            'timezone' => (string) ($data['timezone'] ?? 'UTC'),
         ]);
 
         return $user;
@@ -80,10 +79,6 @@ class UserService
 
         if (empty($data['last_name'])) {
             $errors['last_name'] = [__('validation.last_name_required')];
-        }
-
-        if (empty($data['timezone']) || !in_array($data['timezone'], timezone_identifiers_list(), true)) {
-            $errors['timezone'] = [__('validation.timezone_invalid')];
         }
 
         return $errors;

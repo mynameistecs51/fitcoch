@@ -60,7 +60,7 @@ class AuthService
             'password_hash' => password_hash($data['password'], PASSWORD_ARGON2ID),
             'first_name' => trim($data['first_name']),
             'last_name' => trim($data['last_name']),
-            'timezone' => $data['timezone'] ?? 'UTC',
+            'timezone' => default_timezone(),
         ]);
 
         $this->roleRepo->assignRole($user->id, 'learner');
@@ -167,10 +167,6 @@ class AuthService
 
         if ($passwordErrors !== []) {
             $errors['password'] = $passwordErrors;
-        }
-
-        if (!empty($data['timezone']) && !in_array($data['timezone'], timezone_identifiers_list(), true)) {
-            $errors['timezone'] = [__('validation.timezone_invalid')];
         }
 
         return $errors;

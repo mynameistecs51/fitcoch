@@ -11,4 +11,5 @@ return [
     'jwt_ttl' => (int) env('JWT_TTL', '3600'),
     'session_lifetime' => (int) env('SESSION_LIFETIME', '1800'),
     'version' => '1.0.0',
+    'default_timezone' => env('APP_TIMEZONE', 'Asia/Bangkok'),
 ];

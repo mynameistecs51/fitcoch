@@ -70,18 +70,6 @@ ob_start();
                     <?php endif; ?>
                 </div>
 
-                <div>
-                    <label for="timezone" class="<?= escape($labelClass) ?>"><?= escape(__('auth.timezone')) ?></label>
-                    <select id="timezone" name="timezone" class="<?= escape($inputClass) ?>">
-                        <?php foreach (['UTC', 'America/New_York', 'America/Los_Angeles', 'Europe/London', 'Asia/Bangkok'] as $tz): ?>
-                            <option value="<?= escape($tz) ?>" <?= ($form['timezone'] ?? 'UTC') === $tz ? 'selected' : '' ?>><?= escape($tz) ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                    <?php if (!empty($errors['timezone'])): ?>
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400"><?= escape($errors['timezone'][0]) ?></p>
-                    <?php endif; ?>
-                </div>
-
                 <button type="submit" class="w-full py-3 bg-brand-500 text-slate-950 font-bold rounded-xl hover:bg-brand-accent transition duration-200 shadow-lg shadow-brand-500/20">
                     <?= escape(__('auth.create_account')) ?>
                 </button>

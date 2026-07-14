@@ -143,7 +143,10 @@ ob_start();
                                                 <p class="mt-1 text-xs text-slate-400"><?= escape(__('courses.no_nuggets')) ?></p>
                                             <?php endif; ?>
                                         </td>
-                                        <td class="<?= escape($tdClass) ?> text-right">
+                                        <td class="<?= escape($tdClass) ?> text-right space-x-3">
+                                            <a href="<?= escape(url('/instructor/courses/' . $course->id . '/modules/' . $module->id . '/readiness')) ?>" class="text-xs text-brand-600 dark:text-brand-500 hover:underline font-semibold">
+                                                <?= escape(__('quizzes.instructor.manage_readiness')) ?>
+                                            </a>
                                             <form method="POST" action="<?= escape(url('/instructor/courses/' . $course->id . '/modules/' . $module->id . '/delete')) ?>" class="inline" onsubmit="return confirm('<?= escape(__('courses.instructor.confirm_delete_module')) ?>');">
                                                 <input type="hidden" name="csrf_token" value="<?= escape(csrf_token()) ?>">
                                                 <button type="submit" class="text-xs text-red-600 dark:text-red-400 hover:underline"><?= escape(__('courses.instructor.delete_module')) ?></button>

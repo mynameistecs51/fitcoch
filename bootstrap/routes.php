@@ -6,8 +6,10 @@ use App\Controllers\AdminController;
 use App\Controllers\AuthController;
 use App\Controllers\CourseController;
 use App\Controllers\InstructorCourseController;
+use App\Controllers\InstructorReadinessController;
 use App\Controllers\LocaleController;
 use App\Controllers\NuggetController;
+use App\Controllers\QuizController;
 use App\Controllers\UserController;
 use App\Middleware\AuthMiddleware;
 use App\Middleware\RoleMiddleware;
@@ -24,6 +26,10 @@ $router->get('/lang/{locale}', [LocaleController::class, 'switch']);
 $router->get('/', [AuthController::class, 'showLogin']);
 $router->get('/login', [AuthController::class, 'showLogin']);
 $router->post('/login', [AuthController::class, 'login']);
+$router->get('/forgot-password', [AuthController::class, 'showForgotPassword']);
+$router->post('/forgot-password', [AuthController::class, 'sendForgotPassword']);
+$router->get('/reset-password', [AuthController::class, 'showResetPassword']);
+$router->post('/reset-password', [AuthController::class, 'resetPassword']);
 $router->get('/register', [AuthController::class, 'showRegister']);
 $router->post('/register', [AuthController::class, 'register']);
 $router->post('/logout', [AuthController::class, 'logout'], $authMiddleware);
@@ -39,6 +45,10 @@ $router->get('/courses/{courseId}', [CourseController::class, 'show'], $authMidd
 $router->get('/nuggets/{nuggetId}', [NuggetController::class, 'show'], $authMiddleware);
 $router->get('/nuggets/{nuggetId}/stream', [NuggetController::class, 'stream'], $authMiddleware);
 
+// Quiz routes (learner)
+$router->get('/quizzes/{quizId}', [QuizController::class, 'show'], $authMiddleware);
+$router->post('/quizzes/{quizId}/attempts', [QuizController::class, 'submit'], $authMiddleware);
+
 // Instructor course management
 $instructorRoles = ['instructor', 'admin'];
 $router->get('/instructor/courses', [InstructorCourseController::class, 'index'], $authRoleMiddleware, $instructorRoles);
@@ -48,11 +58,16 @@ $router->get('/instructor/courses/{courseId}/edit', [InstructorCourseController:
 $router->post('/instructor/courses/{courseId}', [InstructorCourseController::class, 'update'], $authRoleMiddleware, $instructorRoles);
 $router->post('/instructor/courses/{courseId}/modules', [InstructorCourseController::class, 'storeModule'], $authRoleMiddleware, $instructorRoles);
 $router->post('/instructor/courses/{courseId}/modules/{moduleId}/delete', [InstructorCourseController::class, 'deleteModule'], $authRoleMiddleware, $instructorRoles);
+$router->get('/instructor/courses/{courseId}/modules/{moduleId}/readiness', [InstructorReadinessController::class, 'show'], $authRoleMiddleware, $instructorRoles);
+$router->post('/instructor/courses/{courseId}/modules/{moduleId}/readiness/{learnerId}/override', [InstructorReadinessController::class, 'override'], $authRoleMiddleware, $instructorRoles);
 
 // Admin routes (admin only)
 $adminRoles = ['admin'];
 $router->get('/admin/users', [AdminController::class, 'index'], $authRoleMiddleware, $adminRoles);
+$router->get('/admin/users/import/template', [AdminController::class, 'downloadImportTemplate'], $authRoleMiddleware, $adminRoles);
+$router->post('/admin/users/import', [AdminController::class, 'importUsers'], $authRoleMiddleware, $adminRoles);
 $router->get('/admin/users/{id}', [AdminController::class, 'edit'], $authRoleMiddleware, $adminRoles);
+$router->post('/admin/users/{id}', [AdminController::class, 'updateAccount'], $authRoleMiddleware, $adminRoles);
 $router->post('/admin/users/{id}/roles', [AdminController::class, 'updateRoles'], $authRoleMiddleware, $adminRoles);
 $router->post('/admin/users/{id}/status', [AdminController::class, 'updateStatus'], $authRoleMiddleware, $adminRoles);
 
@@ -71,6 +86,10 @@ $router->get('/api/v1/courses/{courseId}', [CourseController::class, 'apiShow'],
 // API routes — Nuggets
 $router->get('/api/v1/nuggets/{nuggetId}', [NuggetController::class, 'apiShow'], $authMiddleware);
 $router->post('/api/v1/nuggets/{nuggetId}/progress', [NuggetController::class, 'apiProgress'], $authMiddleware);
+
+// API routes — Quizzes
+$router->get('/api/v1/quizzes/{quizId}', [QuizController::class, 'apiShow'], $authMiddleware);
+$router->post('/api/v1/quizzes/{quizId}/attempts', [QuizController::class, 'apiSubmitAttempt'], $authMiddleware);
 
 // API routes — RBAC demo (instructor/admin only)
 $router->get('/api/v1/instructor/ping', [UserController::class, 'instructorPing'], $authRoleMiddleware, ['instructor', 'admin']);

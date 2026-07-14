@@ -64,12 +64,12 @@ class UserRepository implements RepositoryInterface
         return $user;
     }
 
-    /** @param array{first_name: string, last_name: string, timezone: string} $data */
+    /** @param array{first_name: string, last_name: string} $data */
     public function updateProfile(int $userId, array $data): User
     {
         $stmt = $this->db->prepare(
             'UPDATE users
-             SET first_name = :first_name, last_name = :last_name, timezone = :timezone
+             SET first_name = :first_name, last_name = :last_name
              WHERE id = :id'
         );
 
@@ -77,7 +77,6 @@ class UserRepository implements RepositoryInterface
             'id' => $userId,
             'first_name' => $data['first_name'],
             'last_name' => $data['last_name'],
-            'timezone' => $data['timezone'],
         ]);
 
         $user = $this->findById($userId);
@@ -87,6 +86,46 @@ class UserRepository implements RepositoryInterface
         }
 
         return $user;
+    }
+
+    /** @param array{first_name: string, last_name: string, email: string} $data */
+    public function updateAccount(int $userId, array $data): User
+    {
+        $stmt = $this->db->prepare(
+            'UPDATE users
+             SET first_name = :first_name,
+                 last_name = :last_name,
+                 email = :email
+             WHERE id = :id'
+        );
+
+        $stmt->execute([
+            'id' => $userId,
+            'first_name' => $data['first_name'],
+            'last_name' => $data['last_name'],
+            'email' => $data['email'],
+        ]);
+
+        $user = $this->findById($userId);
+
+        if ($user === null) {
+            throw new \RuntimeException('Failed to update user account.');
+        }
+
+        return $user;
+    }
+
+    public function emailExistsForOtherUser(string $email, int $excludeUserId): bool
+    {
+        $stmt = $this->db->prepare(
+            'SELECT 1 FROM users WHERE email = :email AND id != :id LIMIT 1'
+        );
+        $stmt->execute([
+            'email' => $email,
+            'id' => $excludeUserId,
+        ]);
+
+        return (bool) $stmt->fetchColumn();
     }
 
     /** @return array<int, array{user: User, roles: array<int, string>}> */
@@ -117,6 +156,23 @@ class UserRepository implements RepositoryInterface
         }
 
         return $users;
+    }
+
+    public function updatePassword(int $userId, string $passwordHash): User
+    {
+        $stmt = $this->db->prepare('UPDATE users SET password_hash = :password_hash WHERE id = :id');
+        $stmt->execute([
+            'id' => $userId,
+            'password_hash' => $passwordHash,
+        ]);
+
+        $user = $this->findById($userId);
+
+        if ($user === null) {
+            throw new \RuntimeException('Failed to update user password.');
+        }
+
+        return $user;
     }
 
     public function updateStatus(int $userId, string $status): User

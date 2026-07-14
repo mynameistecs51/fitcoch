@@ -8,6 +8,7 @@ use App\Core\Request;
 use App\Core\Response;
 use App\Services\AdminService;
 use App\Services\AuthService;
+use App\Services\UserImportService;
 use App\Services\ValidationException;
 use Exception;
 
@@ -16,6 +17,7 @@ class AdminController
     public function __construct(
         private readonly AdminService $adminService,
         private readonly AuthService $authService,
+        private readonly UserImportService $userImportService,
     ) {
     }
 
@@ -34,12 +36,54 @@ class AdminController
 
     public function index(Request $request): Response
     {
+        $importResult = $_SESSION['admin_user_import_result'] ?? null;
+        $importError = $_SESSION['admin_user_import_error'] ?? null;
+        unset($_SESSION['admin_user_import_result'], $_SESSION['admin_user_import_error']);
+
         return Response::view('admin/users/index', array_merge($this->layoutContext(), [
             'title' => __('admin.title'),
             'accounts' => $this->adminService->listAccounts(),
             'success' => $request->query()['success'] ?? null,
             'error' => $request->query()['error'] ?? null,
+            'importResult' => is_array($importResult) ? $importResult : null,
+            'importError' => is_string($importError) ? $importError : null,
         ]));
+    }
+
+    public function downloadImportTemplate(Request $request): Response
+    {
+        unset($_SESSION['admin_user_import_error']);
+
+        return Response::download(
+            $this->userImportService->buildTemplateBinary(),
+            $this->userImportService->templateFilename(),
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        );
+    }
+
+    public function importUsers(Request $request): Response
+    {
+        if (!verify_csrf_token($request->input('csrf_token'))) {
+            $_SESSION['admin_user_import_error'] = __('errors.invalid_csrf');
+            return Response::redirect('/admin/users');
+        }
+
+        try {
+            $file = $request->file('user_file');
+
+            if ($file === null) {
+                throw new Exception(__('admin.import.validation.file_required'));
+            }
+
+            $result = $this->userImportService->importUploadedFile($file);
+            $_SESSION['admin_user_import_result'] = $result;
+            unset($_SESSION['admin_user_import_error']);
+        } catch (Exception $e) {
+            $_SESSION['admin_user_import_error'] = $e->getMessage();
+            unset($_SESSION['admin_user_import_result']);
+        }
+
+        return Response::redirect('/admin/users');
     }
 
     public function edit(Request $request, int $id): Response
@@ -64,7 +108,26 @@ class AdminController
             'availableRoles' => $this->adminService->listAvailableRoles(),
             'errors' => [],
             'error' => $request->query()['error'] ?? null,
+            'success' => $request->query()['success'] ?? null,
+            'form' => $this->profileFormData($request, $account['user']),
         ]));
+    }
+
+    public function updateAccount(Request $request, int $id): Response
+    {
+        if (!verify_csrf_token($request->input('csrf_token'))) {
+            return Response::redirect('/admin/users/' . $id . '?error=csrf');
+        }
+
+        try {
+            $this->adminService->updateUserAccount($id, $request->all());
+        } catch (ValidationException $e) {
+            return $this->renderEditWithErrors($id, $e->errors(), $request);
+        } catch (Exception $e) {
+            return Response::redirect('/admin/users/' . $id . '?error=' . urlencode($e->getMessage()));
+        }
+
+        return Response::redirect('/admin/users/' . $id . '?success=profile_updated');
     }
 
     public function updateRoles(Request $request, int $id): Response
@@ -88,7 +151,7 @@ class AdminController
             return Response::redirect('/admin/users/' . $id . '?error=' . urlencode($e->getMessage()));
         }
 
-        return Response::redirect('/admin/users?success=roles_updated');
+        return Response::redirect('/admin/users/' . $id . '?success=roles_updated');
     }
 
     public function updateStatus(Request $request, int $id): Response
@@ -108,7 +171,7 @@ class AdminController
             return Response::redirect('/admin/users/' . $id . '?error=' . urlencode($e->getMessage()));
         }
 
-        return Response::redirect('/admin/users?success=status_updated');
+        return Response::redirect('/admin/users/' . $id . '?success=status_updated');
     }
 
     public function apiListUsers(Request $request): Response
@@ -159,6 +222,20 @@ class AdminController
             'availableRoles' => $this->adminService->listAvailableRoles(),
             'errors' => $errors,
             'error' => null,
+            'success' => null,
+            'form' => $this->profileFormData($request, $account['user']),
         ]));
+    }
+
+    /** @return array<string, string> */
+    private function profileFormData(Request $request, \App\Models\User $user): array
+    {
+        $form = [
+            'first_name' => (string) $request->input('first_name', $user->firstName),
+            'last_name' => (string) $request->input('last_name', $user->lastName),
+            'email' => (string) $request->input('email', $user->email),
+        ];
+
+        return $form;
     }
 }
