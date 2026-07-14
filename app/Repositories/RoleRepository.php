@@ -53,4 +53,53 @@ class RoleRepository implements RepositoryInterface
             'role_id' => $role->id,
         ]);
     }
+
+    public function removeRole(int $userId, string $roleName): void
+    {
+        $role = $this->findByName($roleName);
+
+        if ($role === null) {
+            return;
+        }
+
+        $stmt = $this->db->prepare(
+            'DELETE FROM user_roles WHERE user_id = :user_id AND role_id = :role_id'
+        );
+        $stmt->execute([
+            'user_id' => $userId,
+            'role_id' => $role->id,
+        ]);
+    }
+
+    /** @return array<int, Role> */
+    public function listAll(): array
+    {
+        $stmt = $this->db->prepare('SELECT * FROM roles ORDER BY id');
+        $stmt->execute();
+
+        return array_map(
+            static fn (array $row): Role => Role::fromArray($row),
+            $stmt->fetchAll()
+        );
+    }
+
+    /** @param array<int, string> $roleNames */
+    public function syncRoles(int $userId, array $roleNames): void
+    {
+        $this->db->pdo()->beginTransaction();
+
+        try {
+            $stmt = $this->db->prepare('DELETE FROM user_roles WHERE user_id = :user_id');
+            $stmt->execute(['user_id' => $userId]);
+
+            foreach ($roleNames as $roleName) {
+                $this->assignRole($userId, $roleName);
+            }
+
+            $this->db->pdo()->commit();
+        } catch (\Throwable $e) {
+            $this->db->pdo()->rollBack();
+            throw $e;
+        }
+    }
 }

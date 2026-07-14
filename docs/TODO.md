@@ -26,6 +26,7 @@
   - [x] `GET /api/v1/users/me` (stats placeholder until Sprint 9)
   - [x] `GET /api/v1/instructor/ping` (RBAC demo: instructor/admin only)
   - [x] AuthorizationService unit tests (7 tests total passing)
+  - [x] Admin account management (`/admin/users`) — role & status control
 
 ### Pending
 

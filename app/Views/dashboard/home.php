@@ -10,6 +10,11 @@ ob_start();
                 <p class="text-slate-500 mt-1"><?= escape(__('dashboard.signed_in')) ?></p>
             </div>
             <div class="flex items-center gap-3">
+                <?php if (!empty($isAdmin)): ?>
+                    <a href="<?= escape(url('/admin/users')) ?>" class="px-4 py-2 text-sm border border-indigo-200 text-indigo-700 rounded-lg hover:bg-indigo-50 transition-colors">
+                        <?= escape(__('admin.title')) ?>
+                    </a>
+                <?php endif; ?>
                 <a href="<?= escape(url('/profile')) ?>" class="px-4 py-2 text-sm border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
                     <?= escape(__('nav.profile')) ?>
                 </a>

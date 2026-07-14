@@ -131,10 +131,13 @@ class AuthController
             return Response::redirect('/login');
         }
 
+        $roles = $this->authService->getUserRoles($user->id);
+
         return Response::view('dashboard/home', [
             'title' => __('dashboard.title'),
             'user' => $user,
-            'roles' => $this->authService->getUserRoles($user->id),
+            'roles' => $roles,
+            'isAdmin' => in_array('admin', $roles, true),
         ]);
     }
 

@@ -30,6 +30,7 @@ copy .env.example .env
 ```powershell
 Get-Content database\migrations\001_create_users_table.sql -Raw | D:\xamp\mysql\bin\mysql.exe -u root
 Get-Content database\migrations\002_create_roles_tables.sql -Raw | D:\xamp\mysql\bin\mysql.exe -u root
+Get-Content database\migrations\003_assign_admin_to_first_user.sql -Raw | D:\xamp\mysql\bin\mysql.exe -u root
 ```
 
 **Linux / macOS:**
@@ -74,6 +75,13 @@ http://localhost/fitcoch
 ### API Routes (`/api/v1`)
 - `GET /api/v1/users/me` — Current user profile + stats placeholder
 - `GET /api/v1/instructor/ping` — RBAC test (instructor/admin only)
+- `GET /api/v1/admin/users` — List all users (admin only)
+
+### Admin Web Routes
+- `GET /admin/users` — Account list with roles and status
+- `GET /admin/users/{id}` — Manage roles and suspend/activate
+- `POST /admin/users/{id}/roles` — Update access roles
+- `POST /admin/users/{id}/status` — Update account status
 
 ## Localization
 

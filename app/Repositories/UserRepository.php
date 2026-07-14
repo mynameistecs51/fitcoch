@@ -88,4 +88,55 @@ class UserRepository implements RepositoryInterface
 
         return $user;
     }
+
+    /** @return array<int, array{user: User, roles: array<int, string>}> */
+    public function listWithRoles(): array
+    {
+        $stmt = $this->db->prepare('SELECT * FROM users ORDER BY id ASC');
+        $stmt->execute();
+        $rows = $stmt->fetchAll();
+
+        $users = [];
+
+        foreach ($rows as $row) {
+            $user = User::fromArray($row);
+            $roleStmt = $this->db->prepare(
+                'SELECT r.name
+                 FROM user_roles ur
+                 JOIN roles r ON ur.role_id = r.id
+                 WHERE ur.user_id = :user_id
+                 ORDER BY r.name'
+            );
+            $roleStmt->execute(['user_id' => $user->id]);
+            $roles = array_map('strval', $roleStmt->fetchAll(\PDO::FETCH_COLUMN));
+
+            $users[] = [
+                'user' => $user,
+                'roles' => $roles,
+            ];
+        }
+
+        return $users;
+    }
+
+    public function updateStatus(int $userId, string $status): User
+    {
+        if (!in_array($status, ['active', 'suspended'], true)) {
+            throw new \InvalidArgumentException('Invalid user status.');
+        }
+
+        $stmt = $this->db->prepare('UPDATE users SET status = :status WHERE id = :id');
+        $stmt->execute([
+            'id' => $userId,
+            'status' => $status,
+        ]);
+
+        $user = $this->findById($userId);
+
+        if ($user === null) {
+            throw new \RuntimeException('Failed to update user status.');
+        }
+
+        return $user;
+    }
 }
