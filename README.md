@@ -29,6 +29,7 @@ copy .env.example .env
 
 ```powershell
 Get-Content database\migrations\001_create_users_table.sql -Raw | D:\xamp\mysql\bin\mysql.exe -u root
+Get-Content database\migrations\002_create_roles_tables.sql -Raw | D:\xamp\mysql\bin\mysql.exe -u root
 ```
 
 **Linux / macOS:**
@@ -57,6 +58,16 @@ http://localhost/fitcoch/public
 - `POST /api/v1/auth/login` — Returns JWT + user profile
 - `POST /api/v1/auth/register` — Creates user (201)
 - `POST /api/v1/auth/logout` — Invalidates session/token
+
+## Sprint 2 — Profiles & Roles
+
+### Web Routes
+- `GET /profile` — Profile settings (timezone, name)
+- `POST /profile` — Update profile
+
+### API Routes (`/api/v1`)
+- `GET /api/v1/users/me` — Current user profile + stats placeholder
+- `GET /api/v1/instructor/ping` — RBAC test (instructor/admin only)
 
 ## Tests
 

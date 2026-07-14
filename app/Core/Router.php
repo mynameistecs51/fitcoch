@@ -9,25 +9,30 @@ use Exception;
 
 class Router
 {
-    /** @var array<int, array{method: string, path: string, pattern: string, handler: callable|array, middleware: array<int, string>}> */
+    /** @var array<int, array{method: string, path: string, pattern: string, handler: callable|array, middleware: array<int, string>, roles: array<int, string>}> */
     private array $routes = [];
 
     public function __construct(private readonly Container $container)
     {
     }
 
-    public function get(string $path, callable|array $handler, array $middleware = []): void
+    public function get(string $path, callable|array $handler, array $middleware = [], array $roles = []): void
     {
-        $this->addRoute('GET', $path, $handler, $middleware);
+        $this->addRoute('GET', $path, $handler, $middleware, $roles);
     }
 
-    public function post(string $path, callable|array $handler, array $middleware = []): void
+    public function post(string $path, callable|array $handler, array $middleware = [], array $roles = []): void
     {
-        $this->addRoute('POST', $path, $handler, $middleware);
+        $this->addRoute('POST', $path, $handler, $middleware, $roles);
     }
 
-    private function addRoute(string $method, string $path, callable|array $handler, array $middleware): void
-    {
+    private function addRoute(
+        string $method,
+        string $path,
+        callable|array $handler,
+        array $middleware,
+        array $roles = [],
+    ): void {
         $pattern = preg_replace('/\{([a-zA-Z_][a-zA-Z0-9_]*)\}/', '(?P<$1>[^/]+)', $path);
         $pattern = '#^' . $pattern . '$#';
 
@@ -37,6 +42,7 @@ class Router
             'pattern' => $pattern,
             'handler' => $handler,
             'middleware' => $middleware,
+            'roles' => $roles,
         ];
     }
 
@@ -56,6 +62,10 @@ class Router
                 static fn ($key) => !is_int($key),
                 ARRAY_FILTER_USE_KEY
             );
+
+            if ($route['roles'] !== []) {
+                $request->setAttribute('required_roles', $route['roles']);
+            }
 
             $handler = $this->resolveHandler($route['handler'], $params);
 

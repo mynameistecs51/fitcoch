@@ -1,12 +1,14 @@
 Current Module
 
-Authentication (Sprint 1 complete)
+Sprint 3 — Course Curriculum (next)
 
 Completed
 
 Sprint 0.5 — Design & Diagrams
 
 Sprint 1 — Authentication Core
+
+Sprint 2 — User Profiles & Role Management
 
 User
 
@@ -16,7 +18,7 @@ Lesson
 
 Pending
 
-Sprint 2 — User Profiles & Role Management
+Sprint 3 — Course Curriculum Structures
 
 Quiz
 
@@ -32,7 +34,7 @@ main
 
 Current Database Version
 
-v1.0 (users table)
+v1.1 (users, roles, user_roles)
 
 Coding Standard
 

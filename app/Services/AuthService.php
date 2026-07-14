@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\User;
+use App\Repositories\RoleRepository;
 use App\Repositories\UserRepository;
 use Exception;
 
@@ -12,6 +13,8 @@ class AuthService
 {
     public function __construct(
         private readonly UserRepository $userRepo,
+        private readonly RoleRepository $roleRepo,
+        private readonly AuthorizationService $authzService,
         private readonly JwtService $jwtService,
     ) {
     }
@@ -59,6 +62,8 @@ class AuthService
             'last_name' => trim($data['last_name']),
             'timezone' => $data['timezone'] ?? 'UTC',
         ]);
+
+        $this->roleRepo->assignRole($user->id, 'learner');
 
         $this->startSession($user);
 
@@ -117,6 +122,12 @@ class AuthService
         }
 
         return null;
+    }
+
+    /** @return array<int, string> */
+    public function getUserRoles(int $userId): array
+    {
+        return $this->authzService->getUserRoles($userId);
     }
 
     /** @return array<string, array<int, string>> */

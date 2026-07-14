@@ -63,4 +63,29 @@ class UserRepository implements RepositoryInterface
 
         return $user;
     }
+
+    /** @param array{first_name: string, last_name: string, timezone: string} $data */
+    public function updateProfile(int $userId, array $data): User
+    {
+        $stmt = $this->db->prepare(
+            'UPDATE users
+             SET first_name = :first_name, last_name = :last_name, timezone = :timezone
+             WHERE id = :id'
+        );
+
+        $stmt->execute([
+            'id' => $userId,
+            'first_name' => $data['first_name'],
+            'last_name' => $data['last_name'],
+            'timezone' => $data['timezone'],
+        ]);
+
+        $user = $this->findById($userId);
+
+        if ($user === null) {
+            throw new \RuntimeException('Failed to update user profile.');
+        }
+
+        return $user;
+    }
 }

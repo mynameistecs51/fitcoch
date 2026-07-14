@@ -17,14 +17,18 @@
   - [x] Web views (`/login`, `/register`, `/dashboard`)
   - [x] DI container unit tests (5 tests passing)
   - [x] Database migrated on XAMPP (MariaDB)
+- [x] **Sprint 2** — User Profiles & Role Management
+  - [x] `roles` and `user_roles` tables + seed data
+  - [x] `RoleRepository`, `AuthorizationService`
+  - [x] `RoleMiddleware` (route-level RBAC)
+  - [x] Auto-assign `learner` role on registration
+  - [x] Profile settings view (`/profile`) with timezone update
+  - [x] `GET /api/v1/users/me` (stats placeholder until Sprint 9)
+  - [x] `GET /api/v1/instructor/ping` (RBAC demo: instructor/admin only)
+  - [x] AuthorizationService unit tests (7 tests total passing)
 
 ### Pending
 
-- [ ] **Sprint 2** — User Profiles & Role Management
-  - [ ] `roles` and `user_roles` tables
-  - [ ] `RoleMiddleware`
-  - [ ] Profile settings view (`/profile`)
-  - [ ] `GET /api/v1/users/me`
 - [ ] **Sprint 3** — Course Curriculum Structures
 - [ ] **Sprint 4** — Lessons (Nuggets) & Video Streaming
 - [ ] **Sprint 5** — Quiz Engine & Readiness Gate

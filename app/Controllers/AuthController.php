@@ -60,7 +60,7 @@ class AuthController
                 'access_token' => $this->authService->issueToken($user),
                 'token_type' => 'Bearer',
                 'expires_in' => (int) config('app.jwt_ttl', 3600),
-                'user' => $user->toPublicArray(),
+                'user' => $user->toPublicArray($this->authService->getUserRoles($user->id)),
             ]);
         }
 
@@ -99,7 +99,7 @@ class AuthController
 
         if ($request->isApi()) {
             return Response::apiSuccess([
-                'user' => $user->toPublicArray(),
+                'user' => $user->toPublicArray($this->authService->getUserRoles($user->id)),
                 'access_token' => $this->authService->issueToken($user),
                 'token_type' => 'Bearer',
                 'expires_in' => (int) config('app.jwt_ttl', 3600),
@@ -134,6 +134,7 @@ class AuthController
         return Response::view('dashboard/home', [
             'title' => 'Dashboard',
             'user' => $user,
+            'roles' => $this->authService->getUserRoles($user->id),
         ]);
     }
 
