@@ -75,10 +75,10 @@ class Router
         }
 
         if ($request->isApi()) {
-            return Response::apiError('NOT_FOUND', 'The requested endpoint does not exist.', 404);
+            return Response::apiError('NOT_FOUND', __('errors.page_not_found'), 404);
         }
 
-        return Response::apiError('NOT_FOUND', 'Page not found.', 404);
+        return Response::apiError('NOT_FOUND', __('errors.not_found'), 404);
     }
 
     /** @param array<string, string> $params */

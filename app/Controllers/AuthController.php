@@ -23,7 +23,7 @@ class AuthController
         }
 
         return Response::view('auth/login', [
-            'title' => 'Sign In',
+            'title' => __('auth.sign_in'),
             'error' => $request->query()['error'] ?? null,
         ]);
     }
@@ -34,8 +34,8 @@ class AuthController
 
         if (!$request->isApi() && !verify_csrf_token($data['csrf_token'] ?? null)) {
             return Response::view('auth/login', [
-                'title' => 'Sign In',
-                'error' => 'Invalid security token. Please try again.',
+                'title' => __('auth.sign_in'),
+                'error' => __('errors.invalid_csrf'),
                 'email' => $data['email'] ?? '',
             ]);
         }
@@ -74,7 +74,7 @@ class AuthController
         }
 
         return Response::view('auth/register', [
-            'title' => 'Create Account',
+            'title' => __('auth.create_account'),
             'error' => $request->query()['error'] ?? null,
         ]);
     }
@@ -85,8 +85,8 @@ class AuthController
 
         if (!$request->isApi() && !verify_csrf_token($data['csrf_token'] ?? null)) {
             return Response::view('auth/register', [
-                'title' => 'Create Account',
-                'error' => 'Invalid security token. Please try again.',
+                'title' => __('auth.create_account'),
+                'error' => __('errors.invalid_csrf'),
                 'form' => $data,
             ]);
         }
@@ -116,7 +116,7 @@ class AuthController
         if ($request->isApi()) {
             return Response::json([
                 'success' => true,
-                'message' => 'Session invalidated.',
+                'message' => __('api.session_invalidated'),
             ]);
         }
 
@@ -132,7 +132,7 @@ class AuthController
         }
 
         return Response::view('dashboard/home', [
-            'title' => 'Dashboard',
+            'title' => __('dashboard.title'),
             'user' => $user,
             'roles' => $this->authService->getUserRoles($user->id),
         ]);
@@ -148,14 +148,14 @@ class AuthController
         if ($request->isApi()) {
             return Response::apiError(
                 'VALIDATION_FAILED',
-                'The provided inputs failed validation requirements.',
+                __('errors.validation_failed'),
                 422,
                 $errors
             );
         }
 
         return Response::view("auth/{$view}", [
-            'title' => $view === 'login' ? 'Sign In' : 'Create Account',
+            'title' => $view === 'login' ? __('auth.sign_in') : __('auth.create_account'),
             'errors' => $errors,
             'form' => $data,
             'email' => $data['email'] ?? '',
@@ -170,7 +170,7 @@ class AuthController
         }
 
         return Response::view('auth/login', [
-            'title' => 'Sign In',
+            'title' => __('auth.sign_in'),
             'error' => $message,
             'email' => $data['email'] ?? '',
         ]);

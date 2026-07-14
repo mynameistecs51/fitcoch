@@ -38,10 +38,16 @@ Get-Content database\migrations\002_create_roles_tables.sql -Raw | D:\xamp\mysql
 mysql -u root < database/migrations/001_create_users_table.sql
 ```
 
-4. Point Apache to the `public/` directory, or access via:
+4. Access the application:
 
 ```
 http://localhost/fitcoch/public
+```
+
+Or open the project root (auto-redirects to `public/`):
+
+```
+http://localhost/fitcoch
 ```
 
 ## Sprint 1 — Authentication
@@ -68,6 +74,15 @@ http://localhost/fitcoch/public
 ### API Routes (`/api/v1`)
 - `GET /api/v1/users/me` — Current user profile + stats placeholder
 - `GET /api/v1/instructor/ping` — RBAC test (instructor/admin only)
+
+## Localization
+
+The web UI supports **English** and **Thai**. Use the language switcher in the header, or visit:
+
+- `http://localhost/fitcoch/public/lang/en` — English
+- `http://localhost/fitcoch/public/lang/th` — ไทย
+
+Preference is stored in the session. API error messages follow the active locale.
 
 ## Tests
 

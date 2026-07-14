@@ -33,7 +33,7 @@ class UserService
         $errors = $this->validateProfileUpdate($data);
 
         if ($errors !== []) {
-            throw new ValidationException('The provided inputs failed validation requirements.', $errors);
+            throw new ValidationException(__('errors.validation_failed'), $errors);
         }
 
         $user = $this->userRepo->updateProfile($userId, [
@@ -75,15 +75,15 @@ class UserService
         $errors = [];
 
         if (empty($data['first_name'])) {
-            $errors['first_name'] = ['First name is required.'];
+            $errors['first_name'] = [__('validation.first_name_required')];
         }
 
         if (empty($data['last_name'])) {
-            $errors['last_name'] = ['Last name is required.'];
+            $errors['last_name'] = [__('validation.last_name_required')];
         }
 
         if (empty($data['timezone']) || !in_array($data['timezone'], timezone_identifiers_list(), true)) {
-            $errors['timezone'] = ['The provided timezone is invalid.'];
+            $errors['timezone'] = [__('validation.timezone_invalid')];
         }
 
         return $errors;

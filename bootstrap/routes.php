@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Controllers\AuthController;
+use App\Controllers\LocaleController;
 use App\Controllers\UserController;
 use App\Middleware\AuthMiddleware;
 use App\Middleware\RoleMiddleware;
@@ -11,6 +12,9 @@ use App\Middleware\RoleMiddleware;
 
 $authMiddleware = [AuthMiddleware::class];
 $authRoleMiddleware = [AuthMiddleware::class, RoleMiddleware::class];
+
+// Language switcher
+$router->get('/lang/{locale}', [LocaleController::class, 'switch']);
 
 // Web routes
 $router->get('/', [AuthController::class, 'showLogin']);

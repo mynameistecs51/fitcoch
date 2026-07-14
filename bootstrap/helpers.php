@@ -82,3 +82,40 @@ if (!function_exists('verify_csrf_token')) {
             && hash_equals($_SESSION['csrf_token'], $token);
     }
 }
+
+if (!function_exists('__')) {
+    /** @param array<string, string> $replace */
+    function __(string $key, array $replace = []): string
+    {
+        return \App\Services\LocaleService::translate($key, $replace);
+    }
+}
+
+if (!function_exists('locale')) {
+    function locale(): string
+    {
+        return \App\Services\LocaleService::get();
+    }
+}
+
+if (!function_exists('translate_roles')) {
+    /** @param array<int, string> $roles */
+    function translate_roles(array $roles): string
+    {
+        return implode(', ', \App\Services\LocaleService::translateRoles($roles));
+    }
+}
+
+if (!function_exists('base_url')) {
+    function base_url(): string
+    {
+        return \App\Core\Url::base();
+    }
+}
+
+if (!function_exists('url')) {
+    function url(string $path = '/'): string
+    {
+        return \App\Core\Url::to($path);
+    }
+}

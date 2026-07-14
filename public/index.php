@@ -30,6 +30,9 @@ if (file_exists($envFile)) {
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 require_once dirname(__DIR__) . '/bootstrap/helpers.php';
 
+$scriptName = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '/index.php');
+\App\Core\Url::setBasePath(rtrim(dirname($scriptName), '/'));
+
 ini_set('session.cookie_httponly', '1');
 ini_set('session.cookie_samesite', 'Lax');
 ini_set('session.use_strict_mode', '1');
@@ -46,5 +49,6 @@ if (session_status() === PHP_SESSION_NONE) {
 $app = require dirname(__DIR__) . '/bootstrap/app.php';
 
 $request = Request::capture();
+\App\Services\LocaleService::initFromRequest($request);
 $response = $app['router']->dispatch($request);
 $response->send();

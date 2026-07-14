@@ -24,7 +24,7 @@ class UserController
         $profile = $this->userService->getCurrentUserProfile($userId);
 
         if ($profile === null) {
-            return Response::apiError('UNAUTHORIZED', 'Missing or invalid auth credentials.', 401);
+            return Response::apiError('UNAUTHORIZED', __('errors.unauthorized'), 401);
         }
 
         return Response::apiSuccess($profile);
@@ -41,7 +41,7 @@ class UserController
         $roles = $this->authService->getUserRoles($user->id);
 
         return Response::view('auth/profile', [
-            'title' => 'Profile Settings',
+            'title' => __('profile.title'),
             'user' => $user,
             'roles' => $roles,
             'success' => $request->query()['success'] ?? null,
@@ -60,10 +60,10 @@ class UserController
 
         if (!verify_csrf_token($data['csrf_token'] ?? null)) {
             return Response::view('auth/profile', [
-                'title' => 'Profile Settings',
+                'title' => __('profile.title'),
                 'user' => $user,
                 'roles' => $this->authService->getUserRoles($user->id),
-                'error' => 'Invalid security token. Please try again.',
+                'error' => __('errors.invalid_csrf'),
             ]);
         }
 
@@ -71,7 +71,7 @@ class UserController
             $updatedUser = $this->userService->updateProfile($user->id, $data);
         } catch (ValidationException $e) {
             return Response::view('auth/profile', [
-                'title' => 'Profile Settings',
+                'title' => __('profile.title'),
                 'user' => $user,
                 'roles' => $this->authService->getUserRoles($user->id),
                 'errors' => $e->errors(),
@@ -79,9 +79,9 @@ class UserController
             ]);
         }
 
-        return Response::redirect('/profile?success=1');
+        return Response::redirect('/profile?' . http_build_query(['success' => 1]));
     public function instructorPing(Request $request): Response
     {
-        return Response::apiSuccess(['message' => 'Instructor access granted.']);
+        return Response::apiSuccess(['message' => __('api.instructor_granted')]);
     }
 }

@@ -8,8 +8,8 @@ ob_start();
 <div class="flex items-center justify-center px-6 py-16">
     <div class="w-full max-w-md">
         <div class="bg-white/80 backdrop-blur-md p-8 rounded-2xl border border-slate-200 shadow-sm">
-            <h1 class="text-2xl font-bold text-slate-900 mb-2">Create your account</h1>
-            <p class="text-slate-500 mb-6">Join FitCoch and start learning today.</p>
+            <h1 class="text-2xl font-bold text-slate-900 mb-2"><?= escape(__('auth.register_title')) ?></h1>
+            <p class="text-slate-500 mb-6"><?= escape(__('auth.register_subtitle')) ?></p>
 
             <?php if ($error): ?>
                 <div class="mb-4 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">
@@ -17,12 +17,12 @@ ob_start();
                 </div>
             <?php endif; ?>
 
-            <form method="POST" action="/register" class="space-y-4">
+            <form method="POST" action="<?= escape(url('/register')) ?>" class="space-y-4">
                 <input type="hidden" name="csrf_token" value="<?= escape(csrf_token()) ?>">
 
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label for="first_name" class="block text-sm font-medium text-slate-700 mb-1">First Name</label>
+                        <label for="first_name" class="block text-sm font-medium text-slate-700 mb-1"><?= escape(__('auth.first_name')) ?></label>
                         <input
                             type="text"
                             id="first_name"
@@ -37,7 +37,7 @@ ob_start();
                     </div>
 
                     <div>
-                        <label for="last_name" class="block text-sm font-medium text-slate-700 mb-1">Last Name</label>
+                        <label for="last_name" class="block text-sm font-medium text-slate-700 mb-1"><?= escape(__('auth.last_name')) ?></label>
                         <input
                             type="text"
                             id="last_name"
@@ -53,7 +53,7 @@ ob_start();
                 </div>
 
                 <div>
-                    <label for="email" class="block text-sm font-medium text-slate-700 mb-1">Email</label>
+                    <label for="email" class="block text-sm font-medium text-slate-700 mb-1"><?= escape(__('auth.email')) ?></label>
                     <input
                         type="email"
                         id="email"
@@ -68,7 +68,7 @@ ob_start();
                 </div>
 
                 <div>
-                    <label for="password" class="block text-sm font-medium text-slate-700 mb-1">Password</label>
+                    <label for="password" class="block text-sm font-medium text-slate-700 mb-1"><?= escape(__('auth.password')) ?></label>
                     <input
                         type="password"
                         id="password"
@@ -81,12 +81,12 @@ ob_start();
                             <p class="mt-1 text-sm text-red-600"><?= escape($passwordError) ?></p>
                         <?php endforeach; ?>
                     <?php else: ?>
-                        <p class="mt-1 text-xs text-slate-400">Min 10 characters with upper, lower, number, and special character.</p>
+                        <p class="mt-1 text-xs text-slate-400"><?= escape(__('auth.password_hint')) ?></p>
                     <?php endif; ?>
                 </div>
 
                 <div>
-                    <label for="timezone" class="block text-sm font-medium text-slate-700 mb-1">Timezone</label>
+                    <label for="timezone" class="block text-sm font-medium text-slate-700 mb-1"><?= escape(__('auth.timezone')) ?></label>
                     <select
                         id="timezone"
                         name="timezone"
@@ -107,18 +107,18 @@ ob_start();
                     type="submit"
                     class="w-full py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition-colors"
                 >
-                    Create Account
+                    <?= escape(__('auth.create_account')) ?>
                 </button>
             </form>
 
             <p class="mt-6 text-center text-sm text-slate-500">
-                Already have an account?
-                <a href="/login" class="text-indigo-600 hover:text-indigo-700 font-medium">Sign in</a>
+                <?= escape(__('auth.has_account')) ?>
+                <a href="<?= escape(url('/login')) ?>" class="text-indigo-600 hover:text-indigo-700 font-medium"><?= escape(__('auth.sign_in')) ?></a>
             </p>
         </div>
     </div>
 </div>
 <?php
 $content = ob_get_clean();
-$showAuthLinks = false;
+$showAuthLinks = true;
 require base_path('app/Views/layouts/app.php');

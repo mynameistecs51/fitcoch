@@ -37,7 +37,7 @@ class AuthMiddleware implements MiddlewareInterface
             if ($request->isApi()) {
                 return Response::apiError(
                     'UNAUTHORIZED',
-                    'Missing or invalid auth credentials.',
+                    __('errors.unauthorized'),
                     401
                 );
             }

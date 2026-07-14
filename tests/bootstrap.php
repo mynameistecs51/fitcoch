@@ -10,6 +10,8 @@ $_ENV['APP_NAME'] = 'FMMP';
 putenv('JWT_SECRET=test-secret-key-for-jwt-signing-purposes');
 putenv('APP_NAME=FMMP');
 
+\App\Services\LocaleService::set('en');
+
 $cacheDir = dirname(__DIR__) . '/storage/cache';
 
 if (!is_dir($cacheDir)) {

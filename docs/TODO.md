@@ -48,6 +48,7 @@
 
 ### MEDIUM
 
+- [x] Bilingual UI (Thai / English) — language switcher, `lang/en.php`, `lang/th.php`
 - [ ] Dark Mode
 
 ### LOW

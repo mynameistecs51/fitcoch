@@ -24,15 +24,15 @@ class AuthService
         $user = $this->userRepo->findByEmail($email);
 
         if ($user === null) {
-            throw new Exception('Invalid login credentials.');
+            throw new Exception(__('errors.invalid_credentials'));
         }
 
         if ($user->status === 'suspended') {
-            throw new Exception('Account has been suspended.');
+            throw new Exception(__('errors.account_suspended'));
         }
 
         if (!password_verify($password, $user->passwordHash)) {
-            throw new Exception('Invalid login credentials.');
+            throw new Exception(__('errors.invalid_credentials'));
         }
 
         $this->startSession($user);
@@ -46,12 +46,12 @@ class AuthService
         $errors = $this->validateRegistration($data);
 
         if ($errors !== []) {
-            throw new ValidationException('The provided inputs failed validation requirements.', $errors);
+            throw new ValidationException(__('errors.validation_failed'), $errors);
         }
 
         if ($this->userRepo->emailExists($data['email'])) {
-            throw new ValidationException('The provided inputs failed validation requirements.', [
-                'email' => ['The email address has already been registered.'],
+            throw new ValidationException(__('errors.validation_failed'), [
+                'email' => [__('validation.email_taken')],
             ]);
         }
 
@@ -136,11 +136,11 @@ class AuthService
         $errors = [];
 
         if (empty($data['email']) || !filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-            $errors['email'] = ['A valid email address is required.'];
+            $errors['email'] = [__('validation.email_required')];
         }
 
         if (empty($data['password'])) {
-            $errors['password'] = ['Password is required.'];
+            $errors['password'] = [__('validation.password_required')];
         }
 
         return $errors;
@@ -152,15 +152,15 @@ class AuthService
         $errors = [];
 
         if (empty($data['email']) || !filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-            $errors['email'] = ['A valid email address is required.'];
+            $errors['email'] = [__('validation.email_required')];
         }
 
         if (empty($data['first_name'])) {
-            $errors['first_name'] = ['First name is required.'];
+            $errors['first_name'] = [__('validation.first_name_required')];
         }
 
         if (empty($data['last_name'])) {
-            $errors['last_name'] = ['Last name is required.'];
+            $errors['last_name'] = [__('validation.last_name_required')];
         }
 
         $passwordErrors = $this->validatePassword((string) ($data['password'] ?? ''));
@@ -170,7 +170,7 @@ class AuthService
         }
 
         if (!empty($data['timezone']) && !in_array($data['timezone'], timezone_identifiers_list(), true)) {
-            $errors['timezone'] = ['The provided timezone is invalid.'];
+            $errors['timezone'] = [__('validation.timezone_invalid')];
         }
 
         return $errors;
@@ -182,23 +182,23 @@ class AuthService
         $errors = [];
 
         if (strlen($password) < 10) {
-            $errors[] = 'Password must be at least 10 characters.';
+            $errors[] = __('validation.password_min');
         }
 
         if (!preg_match('/[A-Z]/', $password)) {
-            $errors[] = 'Password must contain at least one uppercase letter.';
+            $errors[] = __('validation.password_upper');
         }
 
         if (!preg_match('/[a-z]/', $password)) {
-            $errors[] = 'Password must contain at least one lowercase letter.';
+            $errors[] = __('validation.password_lower');
         }
 
         if (!preg_match('/[0-9]/', $password)) {
-            $errors[] = 'Password must contain at least one number.';
+            $errors[] = __('validation.password_number');
         }
 
         if (!preg_match('/[^A-Za-z0-9]/', $password)) {
-            $errors[] = 'Password must contain at least one special character.';
+            $errors[] = __('validation.password_special');
         }
 
         return $errors;

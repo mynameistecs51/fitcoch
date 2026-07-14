@@ -11,15 +11,15 @@ ob_start();
         <div class="bg-white/80 backdrop-blur-md p-8 rounded-2xl border border-slate-200 shadow-sm">
             <div class="flex items-center justify-between mb-6">
                 <div>
-                    <h1 class="text-2xl font-bold text-slate-900">Profile Settings</h1>
-                    <p class="text-slate-500 mt-1">Manage your account and timezone preferences.</p>
+                    <h1 class="text-2xl font-bold text-slate-900"><?= escape(__('profile.title')) ?></h1>
+                    <p class="text-slate-500 mt-1"><?= escape(__('profile.subtitle')) ?></p>
                 </div>
-                <a href="/dashboard" class="text-sm text-indigo-600 hover:text-indigo-700">Back</a>
+                <a href="<?= escape(url('/dashboard')) ?>" class="text-sm text-indigo-600 hover:text-indigo-700"><?= escape(__('nav.back')) ?></a>
             </div>
 
             <?php if ($success): ?>
                 <div class="mb-4 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm">
-                    Profile updated successfully.
+                    <?= escape(__('profile.updated')) ?>
                 </div>
             <?php endif; ?>
 
@@ -30,18 +30,18 @@ ob_start();
             <?php endif; ?>
 
             <div class="mb-6 p-4 rounded-xl bg-slate-50 border border-slate-200">
-                <p class="text-sm text-slate-500">Email</p>
+                <p class="text-sm text-slate-500"><?= escape(__('auth.email')) ?></p>
                 <p class="font-semibold"><?= escape($user->email) ?></p>
-                <p class="text-sm text-slate-500 mt-3">Roles</p>
-                <p class="font-semibold"><?= escape(implode(', ', $roles)) ?></p>
+                <p class="text-sm text-slate-500 mt-3"><?= escape(__('profile.roles')) ?></p>
+                <p class="font-semibold"><?= escape(translate_roles($roles)) ?></p>
             </div>
 
-            <form method="POST" action="/profile" class="space-y-4">
+            <form method="POST" action="<?= escape(url('/profile')) ?>" class="space-y-4">
                 <input type="hidden" name="csrf_token" value="<?= escape(csrf_token()) ?>">
 
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label for="first_name" class="block text-sm font-medium text-slate-700 mb-1">First Name</label>
+                        <label for="first_name" class="block text-sm font-medium text-slate-700 mb-1"><?= escape(__('auth.first_name')) ?></label>
                         <input
                             type="text"
                             id="first_name"
@@ -56,7 +56,7 @@ ob_start();
                     </div>
 
                     <div>
-                        <label for="last_name" class="block text-sm font-medium text-slate-700 mb-1">Last Name</label>
+                        <label for="last_name" class="block text-sm font-medium text-slate-700 mb-1"><?= escape(__('auth.last_name')) ?></label>
                         <input
                             type="text"
                             id="last_name"
@@ -72,7 +72,7 @@ ob_start();
                 </div>
 
                 <div>
-                    <label for="timezone" class="block text-sm font-medium text-slate-700 mb-1">Timezone</label>
+                    <label for="timezone" class="block text-sm font-medium text-slate-700 mb-1"><?= escape(__('auth.timezone')) ?></label>
                     <select
                         id="timezone"
                         name="timezone"
@@ -96,7 +96,7 @@ ob_start();
                     type="submit"
                     class="w-full py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition-colors"
                 >
-                    Save Changes
+                    <?= escape(__('profile.save')) ?>
                 </button>
             </form>
         </div>

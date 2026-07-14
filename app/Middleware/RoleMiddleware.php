@@ -29,13 +29,13 @@ class RoleMiddleware implements MiddlewareInterface
             if ($request->isApi()) {
                 return Response::apiError(
                     'FORBIDDEN',
-                    'You do not have permission to access this resource.',
+                    __('errors.forbidden'),
                     403
                 );
             }
 
             return Response::view('errors/forbidden', [
-                'title' => 'Access Denied',
+                'title' => __('errors.access_denied'),
             ], 403);
         }
 

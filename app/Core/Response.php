@@ -63,6 +63,10 @@ class Response
 
     public static function redirect(string $url, int $statusCode = 302): self
     {
+        if (str_starts_with($url, '/') && !str_starts_with($url, '//')) {
+            $url = Url::to($url);
+        }
+
         return new self(
             body: '',
             statusCode: $statusCode,
