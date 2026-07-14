@@ -25,6 +25,14 @@ copy .env.example .env
 
 3. Create the database and `users` table:
 
+**Windows (PowerShell + XAMPP):**
+
+```powershell
+Get-Content database\migrations\001_create_users_table.sql -Raw | D:\xamp\mysql\bin\mysql.exe -u root
+```
+
+**Linux / macOS:**
+
 ```bash
 mysql -u root < database/migrations/001_create_users_table.sql
 ```

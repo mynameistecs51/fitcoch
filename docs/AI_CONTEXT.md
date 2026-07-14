@@ -1,10 +1,12 @@
 Current Module
 
-Video Tracking
+Authentication (Sprint 1 complete)
 
 Completed
 
-Authentication
+Sprint 0.5 — Design & Diagrams
+
+Sprint 1 — Authentication Core
 
 User
 
@@ -13,6 +15,8 @@ Course
 Lesson
 
 Pending
+
+Sprint 2 — User Profiles & Role Management
 
 Quiz
 
@@ -24,11 +28,11 @@ Certificate
 
 Current Branch
 
-feature/video
+main
 
 Current Database Version
 
-v1.3
+v1.0 (users table)
 
 Coding Standard
 
