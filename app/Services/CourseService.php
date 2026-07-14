@@ -6,17 +6,23 @@ namespace App\Services;
 
 use App\Models\Course;
 use App\Models\Module;
+use App\Models\Nugget;
 use App\Repositories\CourseRepository;
 use App\Repositories\ModuleRepository;
+use App\Repositories\NuggetRepository;
 use Exception;
 
 class CourseService
 {
     private const ALLOWED_STATUSES = ['draft', 'published', 'archived'];
 
+    private const VIDEO_SOURCES = ['none', 'youtube', 'upload'];
+
     public function __construct(
         private readonly CourseRepository $courseRepo,
         private readonly ModuleRepository $moduleRepo,
+        private readonly NuggetRepository $nuggetRepo,
+        private readonly VideoService $videoService,
     ) {
     }
 
@@ -33,7 +39,7 @@ class CourseService
     }
 
     /**
-     * @return array{course: Course, modules: array<int, Module>}|null
+     * @return array{course: Course, modules: array<int, Module>, nuggetsByModule: array<int, array<int, Nugget>>}|null
      */
     public function getCourseOutline(int $courseId, int $userId): ?array
     {
@@ -47,14 +53,11 @@ class CourseService
             return null;
         }
 
-        return [
-            'course' => $course,
-            'modules' => $this->moduleRepo->listByCourseId($courseId),
-        ];
+        return $this->buildCourseOutline($course);
     }
 
     /**
-     * @return array{course: Course, modules: array<int, Module>}|null
+     * @return array{course: Course, modules: array<int, Module>, nuggetsByModule: array<int, array<int, Nugget>>}|null
      */
     public function getCourseForInstructor(int $courseId): ?array
     {
@@ -64,18 +67,20 @@ class CourseService
             return null;
         }
 
-        return [
-            'course' => $course,
-            'modules' => $this->moduleRepo->listByCourseId($courseId),
-        ];
+        return $this->buildCourseOutline($course);
     }
 
-    /** @param array<string, mixed> $data */
-    public function createCourse(array $data): Course
+    /**
+     * @param array<string, mixed> $data
+     * @param array<string, mixed> $files
+     */
+    public function createCourse(array $data, array $files = []): Course
     {
         $validated = $this->validateCourseData($data);
+        $course = $this->courseRepo->create($validated);
+        $this->maybeAttachVideoNugget($course, $data, $files);
 
-        return $this->courseRepo->create($validated);
+        return $course;
     }
 
     /** @param array<string, mixed> $data */
@@ -92,8 +97,11 @@ class CourseService
         return $this->courseRepo->update($courseId, $validated);
     }
 
-    /** @param array<string, mixed> $data */
-    public function createModule(int $courseId, array $data): Module
+    /**
+     * @param array<string, mixed> $data
+     * @param array<string, mixed> $files
+     */
+    public function createModule(int $courseId, array $data, array $files = []): Module
     {
         $course = $this->courseRepo->findById($courseId);
 
@@ -105,7 +113,10 @@ class CourseService
         $validated['course_id'] = $courseId;
         $validated['sequence_order'] = $this->moduleRepo->nextSequenceOrder($courseId);
 
-        return $this->moduleRepo->create($validated);
+        $module = $this->moduleRepo->create($validated);
+        $this->maybeAttachVideoNuggetToModule($module, $data, $files);
+
+        return $module;
     }
 
     /** @param array<string, mixed> $data */
@@ -132,6 +143,145 @@ class CourseService
         }
 
         $this->moduleRepo->delete($moduleId);
+    }
+
+    /**
+     * @return array{course: Course, modules: array<int, Module>, nuggetsByModule: array<int, array<int, Nugget>>}
+     */
+    private function buildCourseOutline(Course $course): array
+    {
+        $modules = $this->moduleRepo->listByCourseId($course->id);
+        $nuggetsByModule = [];
+
+        foreach ($modules as $module) {
+            $nuggetsByModule[$module->id] = $this->nuggetRepo->listByModuleId($module->id);
+        }
+
+        return [
+            'course' => $course,
+            'modules' => $modules,
+            'nuggetsByModule' => $nuggetsByModule,
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     * @param array<string, mixed> $files
+     */
+    private function maybeAttachVideoNugget(Course $course, array $data, array $files): void
+    {
+        $source = $this->normalizeVideoSource($data);
+
+        if ($source === 'none') {
+            return;
+        }
+
+        $moduleTitle = trim((string) ($data['module_title'] ?? ''));
+
+        if ($moduleTitle === '') {
+            $moduleTitle = __('courses.form.default_module_title');
+        }
+
+        $module = $this->moduleRepo->create([
+            'course_id' => $course->id,
+            'title' => $moduleTitle,
+            'sequence_order' => 1,
+        ]);
+
+        $this->maybeAttachVideoNuggetToModule($module, $data, $files);
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     * @param array<string, mixed> $files
+     */
+    private function maybeAttachVideoNuggetToModule(Module $module, array $data, array $files): void
+    {
+        $source = $this->normalizeVideoSource($data);
+
+        if ($source === 'none') {
+            return;
+        }
+
+        $nuggetPayload = $this->resolveVideoNuggetPayload($data, $files, $source);
+
+        $this->nuggetRepo->create([
+            'module_id' => $module->id,
+            'title' => $nuggetPayload['title'],
+            'nugget_type' => 'video',
+            'content_url' => $nuggetPayload['content_url'],
+            'content_body' => null,
+            'duration_seconds' => $nuggetPayload['duration_seconds'],
+            'sequence_order' => $this->nuggetRepo->nextSequenceOrder($module->id),
+        ]);
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     * @param array<string, mixed> $files
+     * @return array{title: string, content_url: string, duration_seconds: int}
+     */
+    private function resolveVideoNuggetPayload(array $data, array $files, string $source): array
+    {
+        $title = trim((string) ($data['nugget_title'] ?? ''));
+
+        if ($title === '') {
+            $title = trim((string) ($data['module_title'] ?? ''));
+
+            if ($title === '') {
+                $title = trim((string) ($data['title'] ?? ''));
+            }
+
+            if ($title === '') {
+                $title = __('courses.form.default_nugget_title');
+            }
+        }
+
+        if ($source === 'youtube') {
+            $youtubeUrl = $this->videoService->normalizeYoutubeUrl((string) ($data['youtube_url'] ?? ''));
+
+            if ($youtubeUrl === null) {
+                throw new ValidationException(__('errors.validation_failed'), [
+                    'youtube_url' => [__('courses.validation.youtube_url_invalid')],
+                ]);
+            }
+
+            return [
+                'title' => $title,
+                'content_url' => $youtubeUrl,
+                'duration_seconds' => 0,
+            ];
+        }
+
+        $uploadedFile = $files['video_file'] ?? null;
+
+        if (!is_array($uploadedFile)) {
+            throw new ValidationException(__('errors.validation_failed'), [
+                'video_file' => [__('courses.validation.video_file_required')],
+            ]);
+        }
+
+        try {
+            $stored = $this->videoService->storeUploadedVideo($uploadedFile);
+        } catch (Exception $e) {
+            throw new ValidationException(__('errors.validation_failed'), [
+                'video_file' => [$e->getMessage()],
+            ]);
+        }
+
+        return [
+            'title' => $title,
+            'content_url' => $stored['content_url'],
+            'duration_seconds' => $stored['duration_seconds'],
+        ];
+    }
+
+    /** @param array<string, mixed> $data */
+    private function normalizeVideoSource(array $data): string
+    {
+        $source = (string) ($data['video_source'] ?? 'none');
+
+        return in_array($source, self::VIDEO_SOURCES, true) ? $source : 'none';
     }
 
     /**

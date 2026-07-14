@@ -25,9 +25,10 @@ class CourseRepository implements RepositoryInterface
     /** @return array<int, Course> */
     public function listPublished(): array
     {
-        $stmt = $this->db->query(
+        $stmt = $this->db->prepare(
             "SELECT * FROM courses WHERE status = 'published' ORDER BY title ASC"
         );
+        $stmt->execute();
 
         return array_map(
             static fn (array $row): Course => Course::fromArray($row),
@@ -60,7 +61,8 @@ class CourseRepository implements RepositoryInterface
     /** @return array<int, Course> */
     public function listAll(): array
     {
-        $stmt = $this->db->query('SELECT * FROM courses ORDER BY updated_at DESC');
+        $stmt = $this->db->prepare('SELECT * FROM courses ORDER BY updated_at DESC');
+        $stmt->execute();
 
         return array_map(
             static fn (array $row): Course => Course::fromArray($row),

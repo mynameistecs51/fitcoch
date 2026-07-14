@@ -61,6 +61,7 @@ class CourseController
             'isAdmin' => in_array('admin', $roles, true),
             'course' => $outline['course'],
             'modules' => $outline['modules'],
+            'nuggetsByModule' => $outline['nuggetsByModule'],
         ]);
     }
 
@@ -90,9 +91,11 @@ class CourseController
             return Response::apiError('FORBIDDEN', __('errors.forbidden'), 403);
         }
 
-        $modules = array_map(static function ($module): array {
+        $modules = array_map(function ($module) use ($outline): array {
+            $nuggets = $outline['nuggetsByModule'][$module->id] ?? [];
+
             return array_merge($module->toArray(), [
-                'nuggets' => [],
+                'nuggets' => array_map(static fn ($nugget) => $nugget->toArray(), $nuggets),
                 'status' => 'unlocked',
             ]);
         }, $outline['modules']);

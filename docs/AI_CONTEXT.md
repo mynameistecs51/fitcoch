@@ -1,6 +1,6 @@
 Current Module
 
-Sprint 4 — Lessons (Nuggets) & Video Streaming (next)
+Sprint 5 — Quiz Engine & Readiness Gate (next)
 
 Completed
 
@@ -12,17 +12,17 @@ Sprint 2 — User Profiles & Role Management
 
 Sprint 3 — Course Curriculum Structures
 
+Sprint 4 — Lessons (Nuggets) & Video Streaming
+
 User
 
 Course
 
-Lesson
+Lesson (Nugget player + progress API)
 
 Pending
 
-Sprint 4 — Lessons (Nuggets) & Video Streaming
-
-Quiz
+Sprint 5 — Quiz Engine & Readiness Gate
 
 Dashboard
 
@@ -36,7 +36,7 @@ main
 
 Current Database Version
 
-v1.2 (users, roles, user_roles, courses, cohorts, cohort_enrollments, modules)
+v1.3 (users, roles, user_roles, courses, cohorts, cohort_enrollments, modules, nuggets, nugget_progress)
 
 Coding Standard
 

@@ -73,7 +73,13 @@ ob_start();
             </div>
         </div>
 
-        <form method="POST" action="<?= escape(url('/admin/users/' . $user->id . '/roles')) ?>">
+        <form
+            method="POST"
+            action="<?= escape(url('/admin/users/' . $user->id . '/roles')) ?>"
+            data-progress
+            data-progress-label="<?= escape(__('progress.saving_roles')) ?>"
+            data-progress-processing="<?= escape(__('progress.processing')) ?>"
+        >
             <input type="hidden" name="csrf_token" value="<?= escape(csrf_token()) ?>">
 
             <h2 class="text-sm font-bold text-slate-900 dark:text-white mb-3"><?= escape(__('admin.assign_roles')) ?></h2>
@@ -134,7 +140,14 @@ ob_start();
                             <td class="<?= escape($labelTdClass) ?>"><?= escape(__('admin.account_status')) ?></td>
                             <td class="<?= escape($tdClass) ?>">
                                 <?php if ($user->status === 'active'): ?>
-                                    <form method="POST" action="<?= escape(url('/admin/users/' . $user->id . '/status')) ?>" class="inline">
+                                    <form
+                                        method="POST"
+                                        action="<?= escape(url('/admin/users/' . $user->id . '/status')) ?>"
+                                        class="inline"
+                                        data-progress
+                                        data-progress-label="<?= escape(__('progress.updating_status')) ?>"
+                                        data-progress-processing="<?= escape(__('progress.processing')) ?>"
+                                    >
                                         <input type="hidden" name="csrf_token" value="<?= escape(csrf_token()) ?>">
                                         <input type="hidden" name="status" value="suspended">
                                         <button type="submit" class="px-4 py-2 text-sm border border-red-200 dark:border-red-500/30 text-red-700 dark:text-red-400 rounded-xl hover:bg-red-50 dark:hover:bg-red-500/10 transition">
@@ -142,7 +155,14 @@ ob_start();
                                         </button>
                                     </form>
                                 <?php else: ?>
-                                    <form method="POST" action="<?= escape(url('/admin/users/' . $user->id . '/status')) ?>" class="inline">
+                                    <form
+                                        method="POST"
+                                        action="<?= escape(url('/admin/users/' . $user->id . '/status')) ?>"
+                                        class="inline"
+                                        data-progress
+                                        data-progress-label="<?= escape(__('progress.updating_status')) ?>"
+                                        data-progress-processing="<?= escape(__('progress.processing')) ?>"
+                                    >
                                         <input type="hidden" name="csrf_token" value="<?= escape(csrf_token()) ?>">
                                         <input type="hidden" name="status" value="active">
                                         <button type="submit" class="px-4 py-2 text-sm border border-brand-500/30 text-brand-700 dark:text-brand-accent rounded-xl hover:bg-brand-500/10 transition">

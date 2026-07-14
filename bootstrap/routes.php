@@ -7,6 +7,7 @@ use App\Controllers\AuthController;
 use App\Controllers\CourseController;
 use App\Controllers\InstructorCourseController;
 use App\Controllers\LocaleController;
+use App\Controllers\NuggetController;
 use App\Controllers\UserController;
 use App\Middleware\AuthMiddleware;
 use App\Middleware\RoleMiddleware;
@@ -33,6 +34,10 @@ $router->post('/profile', [UserController::class, 'updateProfile'], $authMiddlew
 // Course routes (learner)
 $router->get('/courses', [CourseController::class, 'index'], $authMiddleware);
 $router->get('/courses/{courseId}', [CourseController::class, 'show'], $authMiddleware);
+
+// Nugget lesson routes (learner)
+$router->get('/nuggets/{nuggetId}', [NuggetController::class, 'show'], $authMiddleware);
+$router->get('/nuggets/{nuggetId}/stream', [NuggetController::class, 'stream'], $authMiddleware);
 
 // Instructor course management
 $instructorRoles = ['instructor', 'admin'];
@@ -62,6 +67,10 @@ $router->get('/api/v1/users/me', [UserController::class, 'me'], $authMiddleware)
 // API routes — Courses
 $router->get('/api/v1/courses', [CourseController::class, 'apiList'], $authMiddleware);
 $router->get('/api/v1/courses/{courseId}', [CourseController::class, 'apiShow'], $authMiddleware);
+
+// API routes — Nuggets
+$router->get('/api/v1/nuggets/{nuggetId}', [NuggetController::class, 'apiShow'], $authMiddleware);
+$router->post('/api/v1/nuggets/{nuggetId}/progress', [NuggetController::class, 'apiProgress'], $authMiddleware);
 
 // API routes — RBAC demo (instructor/admin only)
 $router->get('/api/v1/instructor/ping', [UserController::class, 'instructorPing'], $authRoleMiddleware, ['instructor', 'admin']);

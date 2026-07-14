@@ -23,7 +23,14 @@ ob_start();
                 </div>
             <?php endif; ?>
 
-            <form method="POST" action="<?= escape(url('/register')) ?>" class="space-y-4">
+            <form
+                method="POST"
+                action="<?= escape(url('/register')) ?>"
+                class="space-y-4"
+                data-progress
+                data-progress-label="<?= escape(__('progress.creating_account')) ?>"
+                data-progress-processing="<?= escape(__('progress.processing')) ?>"
+            >
                 <input type="hidden" name="csrf_token" value="<?= escape(csrf_token()) ?>">
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">

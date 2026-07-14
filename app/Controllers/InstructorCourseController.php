@@ -46,6 +46,7 @@ class InstructorCourseController
             'isAdmin' => in_array('admin', $roles, true),
             'course' => null,
             'modules' => [],
+            'nuggetsByModule' => [],
             'form' => [],
             'errors' => [],
             'error' => null,
@@ -59,9 +60,9 @@ class InstructorCourseController
         }
 
         try {
-            $course = $this->courseService->createCourse($request->all());
+            $course = $this->courseService->createCourse($request->all(), $request->files());
         } catch (ValidationException $e) {
-            return Response::view('instructor/courses/form', $this->formViewData(null, [], $request->all(), $e->errors()));
+            return Response::view('instructor/courses/form', $this->formViewData(null, [], [], $request->all(), $e->errors()));
         }
 
         return Response::redirect('/instructor/courses/' . $course->id . '/edit?success=created');
@@ -85,6 +86,7 @@ class InstructorCourseController
             'isAdmin' => in_array('admin', $roles, true),
             'course' => $outline['course'],
             'modules' => $outline['modules'],
+            'nuggetsByModule' => $outline['nuggetsByModule'],
             'form' => [],
             'errors' => [],
             'error' => $request->query()['error'] ?? null,
@@ -106,6 +108,7 @@ class InstructorCourseController
             return Response::view('instructor/courses/form', $this->formViewData(
                 $outline['course'] ?? null,
                 $outline['modules'] ?? [],
+                $outline['nuggetsByModule'] ?? [],
                 $request->all(),
                 $e->errors()
             ));
@@ -123,7 +126,7 @@ class InstructorCourseController
         }
 
         try {
-            $this->courseService->createModule($courseId, $request->all());
+            $this->courseService->createModule($courseId, $request->all(), $request->files());
         } catch (ValidationException $e) {
             return Response::redirect('/instructor/courses/' . $courseId . '/edit?error=module');
         } catch (Exception $e) {
@@ -153,7 +156,7 @@ class InstructorCourseController
         $user = $this->authService->currentUser();
         $roles = $this->authService->getUserRoles($user?->id ?? 0);
 
-        return Response::view('instructor/courses/form', array_merge($this->formViewData(null, [], [], []), [
+        return Response::view('instructor/courses/form', array_merge($this->formViewData(null, [], [], [], []), [
             'user' => $user,
             'roles' => $roles,
             'isAdmin' => in_array('admin', $roles, true),
@@ -166,7 +169,7 @@ class InstructorCourseController
      * @param array<string, array<int, string>> $errors
      * @return array<string, mixed>
      */
-    private function formViewData(?\App\Models\Course $course, array $modules, array $form, array $errors): array
+    private function formViewData(?\App\Models\Course $course, array $modules, array $nuggetsByModule, array $form, array $errors): array
     {
         $user = $this->authService->currentUser();
         $roles = $this->authService->getUserRoles($user?->id ?? 0);
@@ -178,6 +181,7 @@ class InstructorCourseController
             'isAdmin' => in_array('admin', $roles, true),
             'course' => $course,
             'modules' => $modules,
+            'nuggetsByModule' => $nuggetsByModule,
             'form' => $form,
             'errors' => $errors,
             'error' => null,

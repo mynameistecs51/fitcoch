@@ -3,6 +3,7 @@
 ob_start();
 $thClass = 'px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase';
 $tdClass = 'px-4 py-3 text-sm text-slate-700 dark:text-slate-300';
+$nuggetsByModule = $nuggetsByModule ?? [];
 ?>
 <section class="space-y-6">
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -37,6 +38,7 @@ $tdClass = 'px-4 py-3 text-sm text-slate-700 dark:text-slate-300';
                     </thead>
                     <tbody class="divide-y divide-slate-200 dark:divide-slate-800 bg-white dark:bg-slate-900">
                         <?php foreach ($modules as $module): ?>
+                            <?php $moduleNuggets = $nuggetsByModule[$module->id] ?? []; ?>
                             <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
                                 <td class="<?= escape($tdClass) ?> font-bold text-brand-600 dark:text-brand-accent">
                                     <?= escape((string) $module->sequenceOrder) ?>
@@ -45,7 +47,23 @@ $tdClass = 'px-4 py-3 text-sm text-slate-700 dark:text-slate-300';
                                     <?= escape($module->title) ?>
                                 </td>
                                 <td class="<?= escape($tdClass) ?> text-slate-500 dark:text-slate-400 text-xs">
-                                    <?= escape(__('courses.nuggets_coming_sprint4')) ?>
+                                    <?php if ($moduleNuggets === []): ?>
+                                        <?= escape(__('courses.no_nuggets')) ?>
+                                    <?php else: ?>
+                                        <ul class="space-y-1">
+                                            <?php foreach ($moduleNuggets as $nugget): ?>
+                                                <li>
+                                                    <a href="<?= escape(url('/nuggets/' . $nugget->id)) ?>" class="hover:text-brand-600 dark:hover:text-brand-500 transition">
+                                                        <i class="fa-solid fa-circle-play text-brand-500 mr-1"></i>
+                                                        <?= escape($nugget->title) ?>
+                                                    </a>
+                                                    <?php if ($nugget->nuggetType === 'video'): ?>
+                                                        — <?= escape(__('courses.nugget_video')) ?>
+                                                    <?php endif; ?>
+                                                </li>
+                                            <?php endforeach; ?>
+                                        </ul>
+                                    <?php endif; ?>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

@@ -7,4 +7,6 @@
 !/storage/logs/.gitkeep
 /storage/uploads/*
 !/storage/uploads/.gitkeep
+/public/uploads/videos/*
+!/public/uploads/videos/.gitkeep
 .phpunit.result.cache

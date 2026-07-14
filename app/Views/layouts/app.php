@@ -128,6 +128,7 @@ $user = $user ?? null;
     <?php endif; ?>
 
     <script src="<?= escape(url('/assets/theme.js')) ?>"></script>
+    <script src="<?= escape(url('/assets/form-progress.js')) ?>"></script>
     <?php if ($showSidebar): ?>
         <script src="<?= escape(url('/assets/app.js')) ?>"></script>
     <?php endif; ?>

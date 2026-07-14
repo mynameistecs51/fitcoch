@@ -5,6 +5,7 @@ $errors = $errors ?? [];
 $error = $error ?? null;
 $success = $success ?? null;
 $isEdit = $course !== null;
+$nuggetsByModule = $nuggetsByModule ?? [];
 
 $inputClass = 'w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-200 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20';
 $labelClass = 'block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1';
@@ -43,7 +44,16 @@ ob_start();
             </div>
         <?php endif; ?>
 
-        <form method="POST" action="<?= escape(url($isEdit ? '/instructor/courses/' . $course->id : '/instructor/courses')) ?>">
+        <form
+            method="POST"
+            enctype="multipart/form-data"
+            action="<?= escape(url($isEdit ? '/instructor/courses/' . $course->id : '/instructor/courses')) ?>"
+            data-progress
+            data-progress-mode="auto"
+            data-progress-label="<?= escape(__('progress.saving_course')) ?>"
+            data-progress-upload-label="<?= escape(__('progress.uploading_video')) ?>"
+            data-progress-processing="<?= escape(__('progress.processing')) ?>"
+        >
             <input type="hidden" name="csrf_token" value="<?= escape(csrf_token()) ?>">
 
             <div class="table-responsive rounded-2xl border border-slate-200 dark:border-slate-800 mb-4">
@@ -84,6 +94,7 @@ ob_start();
                                 <?php endif; ?>
                             </td>
                         </tr>
+                        <?php require base_path('app/Views/partials/video-fields.php'); ?>
                     </tbody>
                 </table>
             </div>
@@ -109,9 +120,29 @@ ob_start();
                             </thead>
                             <tbody class="divide-y divide-slate-200 dark:divide-slate-800 bg-white dark:bg-slate-900">
                                 <?php foreach ($modules as $module): ?>
+                                    <?php $moduleNuggets = $nuggetsByModule[$module->id] ?? []; ?>
                                     <tr>
                                         <td class="<?= escape($tdClass) ?> font-bold text-brand-600 dark:text-brand-accent"><?= escape((string) $module->sequenceOrder) ?></td>
-                                        <td class="<?= escape($tdClass) ?>"><?= escape($module->title) ?></td>
+                                        <td class="<?= escape($tdClass) ?>">
+                                            <div class="font-semibold text-slate-900 dark:text-slate-200"><?= escape($module->title) ?></div>
+                                            <?php if ($moduleNuggets !== []): ?>
+                                                <ul class="mt-2 space-y-1 text-xs text-slate-500 dark:text-slate-400">
+                                                    <?php foreach ($moduleNuggets as $nugget): ?>
+                                                        <li>
+                                                            <i class="fa-solid fa-circle-play text-brand-500 mr-1"></i>
+                                                            <?= escape($nugget->title) ?>
+                                                            <?php if ($nugget->isYoutubeVideo()): ?>
+                                                                <span class="text-brand-600 dark:text-brand-500">(<?= escape(__('courses.nugget_youtube')) ?>)</span>
+                                                            <?php elseif ($nugget->contentUrl): ?>
+                                                                <span class="text-brand-600 dark:text-brand-500">(<?= escape(__('courses.nugget_uploaded')) ?>)</span>
+                                                            <?php endif; ?>
+                                                        </li>
+                                                    <?php endforeach; ?>
+                                                </ul>
+                                            <?php else: ?>
+                                                <p class="mt-1 text-xs text-slate-400"><?= escape(__('courses.no_nuggets')) ?></p>
+                                            <?php endif; ?>
+                                        </td>
                                         <td class="<?= escape($tdClass) ?> text-right">
                                             <form method="POST" action="<?= escape(url('/instructor/courses/' . $course->id . '/modules/' . $module->id . '/delete')) ?>" class="inline" onsubmit="return confirm('<?= escape(__('courses.instructor.confirm_delete_module')) ?>');">
                                                 <input type="hidden" name="csrf_token" value="<?= escape(csrf_token()) ?>">
@@ -125,9 +156,31 @@ ob_start();
                     </div>
                 <?php endif; ?>
 
-                <form method="POST" action="<?= escape(url('/instructor/courses/' . $course->id . '/modules')) ?>" class="flex flex-col sm:flex-row gap-3">
+                <form
+                    method="POST"
+                    enctype="multipart/form-data"
+                    action="<?= escape(url('/instructor/courses/' . $course->id . '/modules')) ?>"
+                    class="space-y-4"
+                    data-progress
+                    data-progress-mode="auto"
+                    data-progress-label="<?= escape(__('progress.adding_module')) ?>"
+                    data-progress-upload-label="<?= escape(__('progress.uploading_video')) ?>"
+                    data-progress-processing="<?= escape(__('progress.processing')) ?>"
+                >
                     <input type="hidden" name="csrf_token" value="<?= escape(csrf_token()) ?>">
-                    <input type="text" name="title" placeholder="<?= escape(__('courses.form.module_title')) ?>" required class="<?= escape($inputClass) ?> flex-1">
+                    <div class="table-responsive rounded-2xl border border-slate-200 dark:border-slate-800">
+                        <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-800">
+                            <tbody class="divide-y divide-slate-200 dark:divide-slate-800 bg-white dark:bg-slate-900">
+                                <tr>
+                                    <td class="<?= escape($labelTdClass) ?>"><?= escape(__('courses.form.module_title_new')) ?></td>
+                                    <td class="<?= escape($tdClass) ?>">
+                                        <input type="text" name="title" placeholder="<?= escape(__('courses.form.module_title_new')) ?>" required class="<?= escape($inputClass) ?>">
+                                    </td>
+                                </tr>
+                                <?php $showModuleTitle = false; require base_path('app/Views/partials/video-fields.php'); ?>
+                            </tbody>
+                        </table>
+                    </div>
                     <button type="submit" class="px-4 py-3 bg-slate-800 dark:bg-slate-700 text-white font-bold rounded-xl hover:bg-slate-700 dark:hover:bg-slate-600 text-sm whitespace-nowrap">
                         <?= escape(__('courses.instructor.add_module')) ?>
                     </button>
@@ -136,6 +189,18 @@ ob_start();
         <?php endif; ?>
     </div>
 </section>
+<script>
+document.querySelectorAll('.video-source-radio').forEach((radio) => {
+    radio.addEventListener('change', () => {
+        const prefix = radio.dataset.prefix || '';
+        const source = radio.value;
+        document.querySelectorAll(`.video-field-row[data-prefix="${prefix}"]`).forEach((row) => {
+            const sources = (row.dataset.source || '').split(' ');
+            row.hidden = !sources.includes(source);
+        });
+    });
+});
+</script>
 <?php
 $content = ob_get_clean();
 $showAuthLinks = false;

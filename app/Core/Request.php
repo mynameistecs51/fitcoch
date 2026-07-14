@@ -19,6 +19,8 @@ class Request
         /** @var array<string, mixed> */
         private readonly array $body,
         private readonly string $rawBody,
+        /** @var array<string, mixed> */
+        private readonly array $files = [],
     ) {
     }
 
@@ -57,7 +59,7 @@ class Request
             }
         }
 
-        return new self($method, $uri, $headers, $_GET, $body, $rawBody);
+        return new self($method, $uri, $headers, $_GET, $body, $rawBody, $_FILES);
     }
 
     public function method(): string
@@ -129,6 +131,19 @@ class Request
         $decoded = json_decode($this->rawBody, true);
 
         return is_array($decoded) ? $decoded : [];
+    }
+
+    /** @return array<string, mixed> */
+    public function files(): array
+    {
+        return $this->files;
+    }
+
+    public function file(string $key): ?array
+    {
+        $file = $this->files[$key] ?? null;
+
+        return is_array($file) ? $file : null;
     }
 
     public function setAttribute(string $key, mixed $value): void
