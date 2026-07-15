@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Controllers\AdminController;
 use App\Controllers\AuthController;
 use App\Controllers\CourseController;
+use App\Controllers\InstructorCohortController;
 use App\Controllers\InstructorCourseController;
 use App\Controllers\InstructorCourseProgressController;
 use App\Controllers\InstructorLiveSessionController;
@@ -70,6 +71,11 @@ $router->get('/instructor/courses', [InstructorCourseController::class, 'index']
 $router->get('/instructor/courses/create', [InstructorCourseController::class, 'create'], $authRoleMiddleware, $instructorRoles);
 $router->post('/instructor/courses', [InstructorCourseController::class, 'store'], $authRoleMiddleware, $instructorRoles);
 $router->get('/instructor/courses/{courseId}/progress', [InstructorCourseProgressController::class, 'show'], $authRoleMiddleware, $instructorRoles);
+$router->get('/instructor/courses/{courseId}/cohorts', [InstructorCohortController::class, 'index'], $authRoleMiddleware, $instructorRoles);
+$router->post('/instructor/courses/{courseId}/cohorts', [InstructorCohortController::class, 'store'], $authRoleMiddleware, $instructorRoles);
+$router->post('/instructor/courses/{courseId}/cohorts/{cohortId}', [InstructorCohortController::class, 'update'], $authRoleMiddleware, $instructorRoles);
+$router->post('/instructor/courses/{courseId}/cohorts/{cohortId}/enroll', [InstructorCohortController::class, 'enroll'], $authRoleMiddleware, $instructorRoles);
+$router->post('/instructor/courses/{courseId}/cohorts/{cohortId}/enrollments/{learnerId}/drop', [InstructorCohortController::class, 'drop'], $authRoleMiddleware, $instructorRoles);
 $router->get('/instructor/courses/{courseId}/edit', [InstructorCourseController::class, 'edit'], $authRoleMiddleware, $instructorRoles);
 $router->post('/instructor/courses/{courseId}', [InstructorCourseController::class, 'update'], $authRoleMiddleware, $instructorRoles);
 $router->post('/instructor/courses/{courseId}/modules', [InstructorCourseController::class, 'storeModule'], $authRoleMiddleware, $instructorRoles);
@@ -77,6 +83,7 @@ $router->post('/instructor/courses/{courseId}/modules/{moduleId}', [InstructorCo
 $router->post('/instructor/courses/{courseId}/modules/{moduleId}/delete', [InstructorCourseController::class, 'deleteModule'], $authRoleMiddleware, $instructorRoles);
 $router->get('/instructor/courses/{courseId}/modules/{moduleId}/readiness', [InstructorReadinessController::class, 'show'], $authRoleMiddleware, $instructorRoles);
 $router->post('/instructor/courses/{courseId}/modules/{moduleId}/readiness/{learnerId}/override', [InstructorReadinessController::class, 'override'], $authRoleMiddleware, $instructorRoles);
+$router->post('/instructor/courses/{courseId}/modules/{moduleId}/readiness/{learnerId}/lock', [InstructorReadinessController::class, 'lock'], $authRoleMiddleware, $instructorRoles);
 $router->get('/instructor/courses/{courseId}/modules/{moduleId}/quiz/import/template', [InstructorQuizController::class, 'downloadImportTemplate'], $authRoleMiddleware, $instructorRoles);
 $router->post('/instructor/courses/{courseId}/modules/{moduleId}/quiz/{quizId}/import', [InstructorQuizController::class, 'importQuestions'], $authRoleMiddleware, $instructorRoles);
 $router->get('/instructor/courses/{courseId}/modules/{moduleId}/quiz', [InstructorQuizController::class, 'edit'], $authRoleMiddleware, $instructorRoles);

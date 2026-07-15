@@ -12,15 +12,24 @@ ob_start();
                 <?= escape($course->title) ?> · <?= escape($module->title) ?> · <?= escape($cohort->name) ?>
             </p>
         </div>
-        <a href="<?= escape(url('/instructor/courses/' . $course->id . '/edit')) ?>" class="text-sm text-brand-600 dark:text-brand-500 hover:text-brand-accent">
-            <?= escape(__('courses.instructor.back')) ?>
-        </a>
+        <div class="flex flex-wrap items-center gap-3">
+            <a href="<?= escape(url('/instructor/courses/' . $course->id . '/cohorts')) ?>" class="text-sm text-brand-600 dark:text-brand-500 hover:text-brand-accent font-semibold">
+                <?= escape(__('cohorts.instructor.manage')) ?>
+            </a>
+            <a href="<?= escape(url('/instructor/courses/' . $course->id . '/edit')) ?>" class="text-sm text-brand-600 dark:text-brand-500 hover:text-brand-accent">
+                <?= escape(__('courses.instructor.back')) ?>
+            </a>
+        </div>
     </div>
 
     <div class="bg-white dark:bg-slate-900 p-6 md:p-8 rounded-3xl border border-slate-200 dark:border-slate-800 space-y-6">
         <?php if ($success === 'overridden'): ?>
             <div class="p-4 rounded-xl bg-brand-500/10 border border-brand-500/20 text-brand-700 dark:text-brand-accent text-sm">
                 <?= escape(__('quizzes.instructor.override_success')) ?>
+            </div>
+        <?php elseif ($success === 'locked'): ?>
+            <div class="p-4 rounded-xl bg-brand-500/10 border border-brand-500/20 text-brand-700 dark:text-brand-accent text-sm">
+                <?= escape(__('quizzes.instructor.lock_success')) ?>
             </div>
         <?php endif; ?>
 
@@ -42,13 +51,18 @@ ob_start();
                     <thead class="bg-slate-50 dark:bg-slate-950">
                         <tr>
                             <th class="<?= escape($thClass) ?>"><?= escape(__('quizzes.instructor.learner')) ?></th>
+                            <th class="<?= escape($thClass) ?>"><?= escape(__('quizzes.instructor.latest_score')) ?></th>
                             <th class="<?= escape($thClass) ?>"><?= escape(__('quizzes.instructor.ticket_status')) ?></th>
                             <th class="<?= escape($thClass) ?> text-right"><?= escape(__('courses.table.actions')) ?></th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-200 dark:divide-slate-800 bg-white dark:bg-slate-900">
                         <?php foreach ($tickets as $row): ?>
-                            <?php $status = (string) ($row['status'] ?? 'locked'); ?>
+                            <?php
+                                $status = (string) ($row['status'] ?? 'locked');
+                                $latestScore = $row['latest_score'] ?? null;
+                                $quizPassed = (bool) ($row['quiz_passed'] ?? false);
+                            ?>
                             <tr>
                                 <td class="<?= escape($tdClass) ?>">
                                     <div class="font-medium text-slate-900 dark:text-slate-200">
@@ -57,21 +71,42 @@ ob_start();
                                     <div class="text-xs text-slate-500 dark:text-slate-400"><?= escape((string) ($row['email'] ?? '')) ?></div>
                                 </td>
                                 <td class="<?= escape($tdClass) ?>">
+                                    <?php if ($latestScore !== null): ?>
+                                        <span class="font-semibold <?= $quizPassed ? 'text-brand-600 dark:text-brand-accent' : 'text-amber-600 dark:text-amber-400' ?>">
+                                            <?= escape((string) $latestScore) ?>%
+                                        </span>
+                                        <span class="text-xs text-slate-500 dark:text-slate-400 block">
+                                            <?= escape(__('quizzes.instructor.passing_score', ['score' => (string) $quiz->passingScorePct])) ?>
+                                        </span>
+                                    <?php else: ?>
+                                        <span class="text-slate-400"><?= escape(__('quizzes.instructor.not_attempted')) ?></span>
+                                    <?php endif; ?>
+                                </td>
+                                <td class="<?= escape($tdClass) ?>">
                                     <span class="inline-flex px-2 py-1 rounded-lg text-xs font-semibold <?= $status === 'locked' ? 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300' : 'bg-brand-500/15 text-brand-700 dark:text-brand-accent' ?>">
                                         <?= escape(__('quizzes.ticket_status.' . $status)) ?>
                                     </span>
                                 </td>
-                                <td class="<?= escape($tdClass) ?> text-right">
-                                    <?php if ($status === 'locked'): ?>
-                                        <form method="POST" action="<?= escape(url('/instructor/courses/' . $course->id . '/modules/' . $module->id . '/readiness/' . $row['user_id'] . '/override')) ?>" class="inline">
-                                            <input type="hidden" name="csrf_token" value="<?= escape(csrf_token()) ?>">
-                                            <button type="submit" class="text-xs text-brand-600 dark:text-brand-500 hover:underline font-semibold">
-                                                <?= escape(__('quizzes.instructor.override')) ?>
-                                            </button>
-                                        </form>
-                                    <?php else: ?>
-                                        <span class="text-xs text-slate-400">—</span>
-                                    <?php endif; ?>
+                                <td class="<?= escape($tdClass) ?> text-right whitespace-nowrap">
+                                    <div class="inline-flex flex-wrap items-center justify-end gap-3">
+                                        <?php if ($status === 'locked'): ?>
+                                            <form method="POST" action="<?= escape(url('/instructor/courses/' . $course->id . '/modules/' . $module->id . '/readiness/' . $row['user_id'] . '/override')) ?>" class="inline">
+                                                <input type="hidden" name="csrf_token" value="<?= escape(csrf_token()) ?>">
+                                                <button type="submit" class="text-xs text-brand-600 dark:text-brand-500 hover:underline font-semibold">
+                                                    <?= escape(__('quizzes.instructor.override')) ?>
+                                                </button>
+                                            </form>
+                                        <?php elseif (in_array($status, ['unlocked', 'overridden'], true)): ?>
+                                            <form method="POST" action="<?= escape(url('/instructor/courses/' . $course->id . '/modules/' . $module->id . '/readiness/' . $row['user_id'] . '/lock')) ?>" class="inline" onsubmit="return confirm('<?= escape(__('quizzes.instructor.confirm_lock')) ?>');">
+                                                <input type="hidden" name="csrf_token" value="<?= escape(csrf_token()) ?>">
+                                                <button type="submit" class="text-xs text-red-600 dark:text-red-400 hover:underline font-semibold">
+                                                    <?= escape(__('quizzes.instructor.lock')) ?>
+                                                </button>
+                                            </form>
+                                        <?php else: ?>
+                                            <span class="text-xs text-slate-400">—</span>
+                                        <?php endif; ?>
+                                    </div>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

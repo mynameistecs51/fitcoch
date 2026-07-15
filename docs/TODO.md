@@ -1,56 +1,27 @@
 # FMMP Development TODO
 
-## Sprint Progress (ROADMAP)
+## ความคืบหน้า Sprint (ตาม ROADMAP)
 
-### Completed
+### เสร็จแล้ว
 
-- [x] **Sprint 0.5** — Architecture Design & Diagrams
-- [x] **Sprint 1** — Authentication Core
-- [x] **Sprint 2** — User Profiles & Role Management
-- [x] **Sprint 3** — Course Curriculum Structures
-- [x] **Sprint 4** — Lessons (Nuggets) & Video Streaming
-- [x] **Sprint 5** — Quiz Engine & Readiness Gate
-  - [x] Migration: `quizzes`, `questions`, `options`, `quiz_attempts`, `quiz_responses`, `readiness_tickets`
-  - [x] `QuizService` grading logic (single-choice, weighted points)
-  - [x] Auto-unlock readiness tickets at ≥ 80%
-  - [x] Learner quiz UI `/quizzes/{id}` + API submit
-  - [x] Instructor readiness override panel per module
-  - [x] Seed readiness quiz for Unit 1
-- [x] **Post-Sprint 5 polish** — Admin, auth, and onboarding UX
-  - [x] Admin user edit form (profile fields) + responsive 2-column layout
-  - [x] Bulk user import (Excel/CSV template download + upload)
-  - [x] Forgot password / reset password flow (migration `009`)
-  - [x] Register form fix (`form-progress.js` no longer strips POST fields)
-  - [x] Default timezone `Asia/Bangkok` (removed timezone fields from forms)
-  - [x] Password show/hide toggle on login & register (`password-toggle.js`)
-- [x] **Sprint 6** — Virtual Classroom & WebRTC Workspace
-  - [x] Migration: `live_sessions`, `live_attendance` (`010`, `011`)
-  - [x] `LiveSessionService` + readiness gate middleware on `/live/{id}`
-  - [x] Learner/instructor live room UI (WebRTC signaling stub)
-  - [x] Session scheduling from instructor course module panel
-  - [x] Host live controls (go live / end session, camera/mic toggle)
-  - [x] Host participant roster API + real-time polling
-- [x] **Post-Sprint 6 polish** — Instructor quiz & live UX
-  - [x] Instructor quiz editor per module (create/edit/delete quiz & questions)
-  - [x] Bulk add multiple questions in one submit
-  - [x] Quiz import from Excel/CSV template (download + upload)
-  - [x] Learner quiz answer layout — 2-column options on wider screens
-- [x] **Post-Sprint 6 polish** — Learner experience & instructor course management
-  - [x] Single-browser login per user (migration `012` — `users.session_token`)
-  - [x] Header role label from actual user roles (not hardcoded)
-  - [x] Lesson layout: video + quiz center, lesson sidebar right (`LessonNavigationService`, `LessonUnlockService`)
-  - [x] Quiz submit validation — block submit when unanswered (`quiz-submit.js`)
-  - [x] Quiz pass celebration effect (`quiz-celebration.js` + canvas-confetti)
-  - [x] Unlock next module after quiz pass (or video ≥ 90% if no quiz)
-  - [x] Learner dashboard: enrolled courses, progress overview, retake failed quizzes (`LearnerDashboardService`)
-  - [x] Fix circular DI memory error (`LessonUnlockService` → `QuizRepository`)
-  - [x] Instructor course modules: table view, add-module modal
-  - [x] Instructor course modules: edit-module modal (title + video)
-  - [x] Instructor learner progress report per course (`InstructorCourseProgressService`, `/instructor/courses/{id}/progress`)
+- [x] **Sprint 0.5** — ออกแบบสถาปัตยกรรมและแผนภาพ
+- [x] **Sprint 1** — ระบบ Authentication
+- [x] **Sprint 2** — โปรไฟล์ผู้ใช้และบทบาท
+- [x] **Sprint 3** — โครงสร้างหลักสูตรและ Cohort
+- [x] **Sprint 4** — บทเรียน (Nuggets) และสตรีมวิดีโอ
+- [x] **Sprint 5** — Quiz Engine และ Readiness Gate
+- [x] **Post-Sprint 5** — ปรับ UX แอดมิน, auth และ onboarding
+- [x] **Sprint 6 (core)** — ห้องเรียนสดและ WebRTC (stub + ตารางเรียน)
+- [x] **Post-Sprint 6** — Quiz ผู้สอน, แดชบอร์ดผู้เรียน, CRUD โมดูล, รายงานความคืบหน้า
+- [x] **Cohort & Readiness UX** — UI จัดการรุ่น + คะแนน quiz/ล็อกกลับในหน้า Readiness
 
-### Pending
+### เลื่อนออกไปก่อน (Deferred)
 
-- [ ] **Sprint 7** — Live Classroom Interactions (Polling & Chat)
+- [ ] **Sprint 6/7 (Live interactions)** — Poll, Chat, WebSocket
+  - โค้ดห้องเรียนสดพื้นฐานมีแล้ว แต่ยังไม่พัฒนาต่อในรอบนี้
+
+### รอทำ (Pending)
+
 - [ ] **Sprint 8** — Spaced Repetition (SM-2 Engine)
 - [ ] **Sprint 9** — Gamification, Analytics & Certificates
 
@@ -58,28 +29,31 @@
 
 ## Feature Backlog
 
-### HIGH
+### สำคัญ (HIGH)
 
-- [x] Finish Dashboard (learner overview + instructor course progress)
-- [ ] Sprint 7 live polling & chat (WebSocket)
+- [x] แดชบอร์ดผู้เรียน + รายงานความคืบหน้าหลักสูตร (ผู้สอน)
+- [x] UI จัดการรุ่น (cohort) — `/instructor/courses/{id}/cohorts`
+- [x] หน้า Readiness — แสดงคะแนน quiz ล่าสุด + ปุ่มล็อกกลับ
+- [x] แก้ปุ่มแก้ไขโมดูลใน modal หลักสูตร
+- [ ] Sprint 7 live polling & chat (WebSocket) — **เลื่อนออกไปก่อน**
 
-### MEDIUM
+### ปานกลาง (MEDIUM)
 
-- [x] Bilingual UI (Thai / English)
+- [x] UI สองภาษา (ไทย / อังกฤษ)
 - [x] Dark Mode
-- [x] Form upload progress bar
-- [x] Admin bulk user import (Excel template)
-- [x] Forgot password flow
-- [x] Instructor quiz editor + Excel import
-- [x] Live room host roster & broadcast controls
-- [x] Instructor module CRUD modal (add / edit)
-- [x] Instructor enrolled-learner progress (individual + aggregate)
+- [x] แถบ progress อัปโหลดไฟล์
+- [x] นำเข้าผู้ใช้แบบ bulk (Excel)
+- [x] ลืมรหัสผ่าน
+- [x] แก้ไข Quiz ผู้สอน + นำเข้า Excel
+- [x] ห้องเรียนสด — host roster & broadcast (มีแล้ว ไม่พัฒนาต่อ)
+- [x] CRUD โมดูลแบบ modal (เพิ่ม / แก้ไข)
+- [x] ความคืบหน้าผู้เรียนที่ลงทะเบียน (รายบุคคล + รวม)
 
-### LOW
+### ต่ำ (LOW)
 
 - [ ] Animation
 
-### Future
+### อนาคต (Future)
 
 - [ ] AI Trainer
 - [ ] Flutter

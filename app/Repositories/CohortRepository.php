@@ -150,4 +150,65 @@ class CohortRepository implements RepositoryInterface
 
         return $counts;
     }
+
+    /**
+     * @param array{name: string, start_date: string, end_date: string} $data
+     */
+    public function update(int $id, array $data): Cohort
+    {
+        $stmt = $this->db->prepare(
+            'UPDATE cohorts
+             SET name = :name, start_date = :start_date, end_date = :end_date
+             WHERE id = :id'
+        );
+        $stmt->execute([
+            'id' => $id,
+            'name' => $data['name'],
+            'start_date' => $data['start_date'],
+            'end_date' => $data['end_date'],
+        ]);
+
+        return $this->findById($id)
+            ?? throw new \RuntimeException('Failed to update cohort.');
+    }
+
+    public function countActiveEnrollments(int $cohortId): int
+    {
+        $stmt = $this->db->prepare(
+            "SELECT COUNT(*) FROM cohort_enrollments
+             WHERE cohort_id = :cohort_id AND status = 'active'"
+        );
+        $stmt->execute(['cohort_id' => $cohortId]);
+
+        return (int) $stmt->fetchColumn();
+    }
+
+    public function setEnrollmentStatus(int $cohortId, int $userId, string $status): void
+    {
+        $stmt = $this->db->prepare(
+            'UPDATE cohort_enrollments
+             SET status = :status
+             WHERE cohort_id = :cohort_id AND user_id = :user_id'
+        );
+        $stmt->execute([
+            'cohort_id' => $cohortId,
+            'user_id' => $userId,
+            'status' => $status,
+        ]);
+    }
+
+    public function isUserEnrolled(int $cohortId, int $userId): bool
+    {
+        $stmt = $this->db->prepare(
+            "SELECT 1 FROM cohort_enrollments
+             WHERE cohort_id = :cohort_id AND user_id = :user_id AND status = 'active'
+             LIMIT 1"
+        );
+        $stmt->execute([
+            'cohort_id' => $cohortId,
+            'user_id' => $userId,
+        ]);
+
+        return (bool) $stmt->fetchColumn();
+    }
 }

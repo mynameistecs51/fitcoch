@@ -97,6 +97,28 @@ class ReadinessTicketRepository implements RepositoryInterface
             ?? throw new \RuntimeException('Failed to override readiness ticket.');
     }
 
+    public function lock(int $userId, int $cohortId, int $moduleId): ReadinessTicket
+    {
+        $this->ensureLocked($userId, $cohortId, $moduleId);
+
+        $stmt = $this->db->prepare(
+            'UPDATE readiness_tickets
+             SET status = \'locked\',
+                 overridden_by = NULL,
+                 overridden_at = NULL,
+                 unlocked_at = NULL
+             WHERE user_id = :user_id AND cohort_id = :cohort_id AND module_id = :module_id'
+        );
+        $stmt->execute([
+            'user_id' => $userId,
+            'cohort_id' => $cohortId,
+            'module_id' => $moduleId,
+        ]);
+
+        return $this->find($userId, $cohortId, $moduleId)
+            ?? throw new \RuntimeException('Failed to lock readiness ticket.');
+    }
+
     /**
      * @return array<int, array<string, mixed>>
      */

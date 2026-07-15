@@ -1,10 +1,16 @@
 <?php
+
+use App\Models\Course;
+
+/** @var Course|null $course */
 $course = $course ?? null;
 $form = $form ?? [];
 $errors = $errors ?? [];
 $error = $error ?? null;
 $success = $success ?? null;
-$isEdit = $course !== null;
+$isEdit = $course instanceof Course;
+$courseId = $course?->id ?? 0;
+$moduleUpdateBase = $courseId > 0 ? url('/instructor/courses/' . $courseId . '/modules/') : '';
 $nuggetsByModule = $nuggetsByModule ?? [];
 $quizzesByModule = $quizzesByModule ?? [];
 $moduleEditData = $moduleEditData ?? [];
@@ -28,7 +34,10 @@ ob_start();
         </div>
         <div class="flex flex-wrap items-center gap-3">
             <?php if ($isEdit): ?>
-                <a href="<?= escape(url('/instructor/courses/' . $course->id . '/progress')) ?>" class="text-sm text-brand-600 dark:text-brand-500 hover:text-brand-accent font-semibold">
+                <a href="<?= escape(url('/instructor/courses/' . $courseId . '/cohorts')) ?>" class="text-sm text-brand-600 dark:text-brand-500 hover:text-brand-accent font-semibold">
+                    <?= escape(__('cohorts.instructor.manage')) ?>
+                </a>
+                <a href="<?= escape(url('/instructor/courses/' . $courseId . '/progress')) ?>" class="text-sm text-brand-600 dark:text-brand-500 hover:text-brand-accent font-semibold">
                     <?= escape(__('courses.instructor.view_progress')) ?>
                 </a>
             <?php endif; ?>
@@ -58,7 +67,7 @@ ob_start();
         <form
             method="POST"
             enctype="multipart/form-data"
-            action="<?= escape(url($isEdit ? '/instructor/courses/' . $course->id : '/instructor/courses')) ?>"
+            action="<?= escape(url($isEdit ? '/instructor/courses/' . $courseId : '/instructor/courses')) ?>"
             data-progress
             data-progress-mode="auto"
             data-progress-label="<?= escape(__('progress.saving_course')) ?>"
@@ -208,16 +217,16 @@ ob_start();
                                                 >
                                                     <i class="fa-solid fa-pen"></i><?= escape(__('courses.instructor.edit_module')) ?>
                                                 </button>
-                                                <a href="<?= escape(url('/instructor/courses/' . $course->id . '/modules/' . $module->id . '/quiz')) ?>" class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg bg-brand-500/10 text-brand-700 dark:text-brand-accent hover:bg-brand-500/20 transition">
+                                                <a href="<?= escape(url('/instructor/courses/' . $courseId . '/modules/' . $module->id . '/quiz')) ?>" class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg bg-brand-500/10 text-brand-700 dark:text-brand-accent hover:bg-brand-500/20 transition">
                                                     <i class="fa-solid fa-clipboard-question"></i><?= escape(__('quizzes.instructor.manage_quiz')) ?>
                                                 </a>
-                                                <a href="<?= escape(url('/instructor/courses/' . $course->id . '/modules/' . $module->id . '/readiness')) ?>" class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+                                                <a href="<?= escape(url('/instructor/courses/' . $courseId . '/modules/' . $module->id . '/readiness')) ?>" class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
                                                     <?= escape(__('quizzes.instructor.manage_readiness')) ?>
                                                 </a>
-                                                <a href="<?= escape(url('/instructor/courses/' . $course->id . '/modules/' . $module->id . '/live-sessions')) ?>" class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+                                                <a href="<?= escape(url('/instructor/courses/' . $courseId . '/modules/' . $module->id . '/live-sessions')) ?>" class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
                                                     <?= escape(__('live.instructor.manage_sessions')) ?>
                                                 </a>
-                                                <form method="POST" action="<?= escape(url('/instructor/courses/' . $course->id . '/modules/' . $module->id . '/delete')) ?>" class="inline" onsubmit="return confirm('<?= escape(__('courses.instructor.confirm_delete_module')) ?>');">
+                                                <form method="POST" action="<?= escape(url('/instructor/courses/' . $courseId . '/modules/' . $module->id . '/delete')) ?>" class="inline" onsubmit="return confirm('<?= escape(__('courses.instructor.confirm_delete_module')) ?>');">
                                                     <input type="hidden" name="csrf_token" value="<?= escape(csrf_token()) ?>">
                                                     <button type="submit" class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition">
                                                         <i class="fa-solid fa-trash"></i><?= escape(__('courses.instructor.delete_module')) ?>
@@ -334,7 +343,7 @@ ob_start();
                 </div>
             </div>
 
-            <script type="application/json" id="module-edit-data"><?= escape(json_encode($moduleEditData, JSON_UNESCAPED_UNICODE)) ?></script>
+            <script type="application/json" id="module-edit-data"><?= json_encode($moduleEditData, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) ?></script>
 
             <div id="add-module-modal" class="app-modal hidden" role="dialog" aria-modal="true" aria-labelledby="add-module-modal-title">
                 <div class="app-modal-backdrop" data-close-modal></div>
@@ -350,7 +359,7 @@ ob_start();
                     <form
                         method="POST"
                         enctype="multipart/form-data"
-                        action="<?= escape(url('/instructor/courses/' . $course->id . '/modules')) ?>"
+                        action="<?= escape(url('/instructor/courses/' . $courseId . '/modules')) ?>"
                         id="add-module-form"
                         data-progress
                         data-progress-mode="auto"
@@ -453,8 +462,8 @@ document.querySelectorAll('form').forEach((form) => {
     const modal = document.getElementById('edit-module-modal');
     const editForm = document.getElementById('edit-module-form');
     const dataEl = document.getElementById('module-edit-data');
-    const courseId = <?= json_encode($isEdit ? (string) $course->id : '') ?>;
-    const moduleUpdateBase = <?= json_encode($isEdit ? url('/instructor/courses/' . $course->id . '/modules/') : '') ?>;
+    const courseId = <?= json_encode($isEdit ? (string) $courseId : '') ?>;
+    const moduleUpdateBase = <?= json_encode($moduleUpdateBase) ?>;
 
     if (!modal || !editForm || !dataEl || !courseId || !moduleUpdateBase) {
         return;

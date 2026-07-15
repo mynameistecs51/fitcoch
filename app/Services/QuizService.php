@@ -132,13 +132,56 @@ class QuizService
             return null;
         }
 
+        $quizzesByModule = $this->quizRepo->listByModuleIds([$moduleId]);
+        $quiz = $quizzesByModule[$moduleId] ?? $this->quizRepo->findReadinessByModuleId($moduleId);
+        $tickets = $this->ticketRepo->listEnrollmentStatuses($cohort->id, $moduleId);
+
+        if ($quiz !== null) {
+            $latestAttempts = $this->attemptRepo->findLatestByCohortAndQuizIds($cohort->id, [$quiz->id]);
+
+            foreach ($tickets as $index => $row) {
+                $userId = (int) $row['user_id'];
+                $attempt = $latestAttempts[$userId][$quiz->id] ?? null;
+                $latestScore = $attempt['score_pct'] ?? null;
+                $tickets[$index]['latest_score'] = $latestScore;
+                $tickets[$index]['quiz_passed'] = $latestScore !== null && $latestScore >= $quiz->passingScorePct;
+            }
+        }
+
         return [
             'course' => $course,
             'cohort' => $cohort,
             'module' => $module,
-            'quiz' => $this->quizRepo->findReadinessByModuleId($moduleId),
-            'tickets' => $this->ticketRepo->listEnrollmentStatuses($cohort->id, $moduleId),
+            'quiz' => $quiz,
+            'tickets' => $tickets,
         ];
+    }
+
+    public function lockTicket(int $courseId, int $moduleId, int $learnerId): ReadinessTicket
+    {
+        $panel = $this->getInstructorReadinessPanel($courseId, $moduleId);
+
+        if ($panel === null) {
+            throw new Exception(__('courses.validation.not_found'));
+        }
+
+        $enrolled = false;
+        foreach ($panel['tickets'] as $ticketRow) {
+            if ((int) $ticketRow['user_id'] === $learnerId) {
+                $enrolled = true;
+                break;
+            }
+        }
+
+        if (!$enrolled) {
+            throw new Exception(__('quizzes.validation.learner_not_enrolled'));
+        }
+
+        return $this->ticketRepo->lock(
+            $learnerId,
+            $panel['cohort']->id,
+            $moduleId
+        );
     }
 
     public function overrideTicket(int $courseId, int $moduleId, int $learnerId, int $instructorId): ReadinessTicket

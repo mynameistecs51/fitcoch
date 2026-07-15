@@ -305,6 +305,7 @@ erDiagram
 *   **Effort Estimate:** 8 Story Points (5 developer days)
 *   **Priority:** High
 *   **Dependencies:** Sprint 2 (User profiles mapping)
+*   **Status:** ✅ Complete (incl. instructor cohort management UI at `/instructor/courses/{id}/cohorts`)
 *   **Deliverables:**
     1.  Create database tables for `courses`, `cohorts`, and `cohort_enrollments`.
     2.  Build course listing and outline views for students.
@@ -332,6 +333,7 @@ erDiagram
 *   **Effort Estimate:** 10 Story Points (6 developer days)
 *   **Priority:** High
 *   **Dependencies:** Sprint 4 (Lesson progress checks)
+*   **Status:** ✅ Complete (incl. instructor readiness panel with latest quiz scores and lock-back)
 *   **Deliverables:**
     1.  Develop tables for `quizzes`, `questions`, `options`, and `readiness_tickets`.
     2.  Create quiz grading calculations logic.
@@ -345,6 +347,7 @@ erDiagram
 *   **Effort Estimate:** 21 Story Points (14 developer days)
 *   **Priority:** High
 *   **Dependencies:** Sprint 5 (Readiness tickets validations)
+*   **Status:** ⏸ Core stub complete; further Live work deferred (see Sprint 7)
 *   **Deliverables:**
     1.  Create `live_sessions` and `live_attendance` schemas.
     2.  Setup WebRTC signaling channel mappings.
@@ -358,6 +361,7 @@ erDiagram
 *   **Effort Estimate:** 13 Story Points (8 developer days)
 *   **Priority:** Medium
 *   **Dependencies:** Sprint 6 (Live sessions connection context)
+*   **Status:** ⏸ Deferred — skip for now; resume after Sprint 8 or when Live UX is prioritized
 *   **Deliverables:**
     1.  Create `live_polls` and `live_poll_responses` database tables.
     2.  Integrate WebSockets server managing message routing.

@@ -60,4 +60,19 @@ class InstructorReadinessController
 
         return Response::redirect('/instructor/courses/' . $courseId . '/modules/' . $moduleId . '/readiness?success=overridden');
     }
+
+    public function lock(Request $request, int $courseId, int $moduleId, int $learnerId): Response
+    {
+        if (!verify_csrf_token($request->input('csrf_token'))) {
+            return Response::redirect('/instructor/courses/' . $courseId . '/modules/' . $moduleId . '/readiness?error=csrf');
+        }
+
+        try {
+            $this->quizService->lockTicket($courseId, $moduleId, $learnerId);
+        } catch (Exception $e) {
+            return Response::redirect('/instructor/courses/' . $courseId . '/modules/' . $moduleId . '/readiness?error=' . urlencode($e->getMessage()));
+        }
+
+        return Response::redirect('/instructor/courses/' . $courseId . '/modules/' . $moduleId . '/readiness?success=locked');
+    }
 }
