@@ -82,6 +82,32 @@ class NuggetRepository implements RepositoryInterface
         return $nugget;
     }
 
+    /**
+     * @param array{title: string, content_url: ?string, duration_seconds: int} $data
+     */
+    public function update(int $id, array $data): Nugget
+    {
+        $stmt = $this->db->prepare(
+            'UPDATE nuggets
+             SET title = :title, content_url = :content_url, duration_seconds = :duration_seconds
+             WHERE id = :id'
+        );
+        $stmt->execute([
+            'id' => $id,
+            'title' => $data['title'],
+            'content_url' => $data['content_url'],
+            'duration_seconds' => $data['duration_seconds'],
+        ]);
+
+        $nugget = $this->findById($id);
+
+        if ($nugget === null) {
+            throw new \RuntimeException('Failed to update nugget.');
+        }
+
+        return $nugget;
+    }
+
     public function delete(int $id): void
     {
         $stmt = $this->db->prepare('DELETE FROM nuggets WHERE id = :id');

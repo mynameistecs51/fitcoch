@@ -9,6 +9,7 @@ use App\Core\Response;
 use App\Repositories\CohortRepository;
 use App\Services\AuthService;
 use App\Services\CourseService;
+use App\Services\LessonNavigationService;
 use App\Services\LiveSessionService;
 use App\Services\QuizService;
 
@@ -20,6 +21,7 @@ class CourseController
         private readonly QuizService $quizService,
         private readonly LiveSessionService $liveSessionService,
         private readonly CohortRepository $cohortRepo,
+        private readonly LessonNavigationService $lessonNavigationService,
     ) {
     }
 
@@ -39,7 +41,31 @@ class CourseController
             'roles' => $roles,
             'isAdmin' => in_array('admin', $roles, true),
             'courses' => $this->courseService->listEnrolledCourses($user->id),
+            'availableCourses' => $this->courseService->listAvailableCourses($user->id),
+            'success' => $request->query()['success'] ?? null,
+            'error' => $request->query()['error'] ?? null,
         ]);
+    }
+
+    public function enroll(Request $request, int $courseId): Response
+    {
+        if (!verify_csrf_token($request->input('csrf_token'))) {
+            return Response::redirect('/courses?error=csrf');
+        }
+
+        $user = $this->authService->currentUser();
+
+        if ($user === null) {
+            return Response::redirect('/login');
+        }
+
+        try {
+            $this->courseService->enrollLearner($user->id, $courseId);
+        } catch (\Exception $e) {
+            return Response::redirect('/courses?error=' . urlencode($e->getMessage()));
+        }
+
+        return Response::redirect('/courses?success=enrolled');
     }
 
     public function show(Request $request, int $courseId): Response
@@ -58,6 +84,12 @@ class CourseController
             ]);
         }
 
+        $resumeNuggetId = $this->lessonNavigationService->findResumeNuggetId($courseId, $user->id);
+
+        if ($resumeNuggetId !== null && ($request->query()['view'] ?? '') !== 'syllabus') {
+            return Response::redirect('/nuggets/' . $resumeNuggetId);
+        }
+
         $roles = $this->authService->getUserRoles($user->id);
         $moduleIds = array_map(static fn ($module) => $module->id, $outline['modules']);
         $quizzesByModule = $this->quizService->listQuizzesByModuleIds($moduleIds);
@@ -66,6 +98,14 @@ class CourseController
             ? $this->quizService->listTicketsForModules($user->id, $cohort->id, $moduleIds)
             : [];
         $sessionsByModule = $this->liveSessionService->listSessionsByModuleIds($moduleIds);
+        $lessonNav = $outline['modules'] !== []
+            ? $this->lessonNavigationService->buildForLearner(
+                $courseId,
+                $user->id,
+                $outline['modules'][0]->id,
+            )
+            : null;
+        $resumeLessonUrl = $resumeNuggetId !== null ? url('/nuggets/' . $resumeNuggetId) : null;
 
         return Response::view('courses/show', [
             'title' => $outline['course']->title,
@@ -78,6 +118,8 @@ class CourseController
             'quizzesByModule' => $quizzesByModule,
             'ticketsByModule' => $ticketsByModule,
             'sessionsByModule' => $sessionsByModule,
+            'lessonNav' => $lessonNav,
+            'resumeLessonUrl' => $resumeLessonUrl,
         ]);
     }
 

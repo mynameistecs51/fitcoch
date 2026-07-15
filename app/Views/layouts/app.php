@@ -88,8 +88,13 @@ $user = $user ?? null;
             <?php require base_path('app/Views/partials/header-controls.php'); ?>
 
             <?php if ($showSidebar && $user): ?>
+                <?php
+                $roleLabel = $roles !== []
+                    ? translate_roles($roles)
+                    : __('header.learner_label');
+                ?>
                 <div class="text-right hidden lg:block">
-                    <p class="text-xs text-slate-500 dark:text-slate-400"><?= escape(__('header.learner_label')) ?></p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400"><?= escape($roleLabel) ?></p>
                     <p class="text-sm font-semibold text-slate-700 dark:text-slate-200 max-w-[10rem] truncate"><?= escape($user->firstName . ' ' . $user->lastName) ?></p>
                 </div>
                 <div class="relative w-9 h-9 sm:w-10 sm:h-10 overflow-hidden rounded-full border-2 border-brand-500/50 bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">

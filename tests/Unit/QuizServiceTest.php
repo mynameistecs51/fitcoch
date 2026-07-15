@@ -16,6 +16,7 @@ use App\Repositories\ModuleRepository;
 use App\Repositories\QuizAttemptRepository;
 use App\Repositories\QuizRepository;
 use App\Repositories\ReadinessTicketRepository;
+use App\Services\LessonUnlockService;
 use App\Services\QuizService;
 use App\Services\ValidationException;
 use PHPUnit\Framework\TestCase;
@@ -29,7 +30,14 @@ class QuizServiceTest extends TestCase
         ?ModuleRepository $moduleRepo = null,
         ?CourseRepository $courseRepo = null,
         ?CohortRepository $cohortRepo = null,
+        ?LessonUnlockService $unlockService = null,
     ): QuizService {
+        $unlock = $unlockService ?? $this->createMock(LessonUnlockService::class);
+
+        if ($unlockService === null) {
+            $unlock->method('canAccessModule')->willReturn(true);
+        }
+
         return new QuizService(
             $quizRepo ?? $this->createMock(QuizRepository::class),
             $attemptRepo ?? $this->createMock(QuizAttemptRepository::class),
@@ -37,6 +45,7 @@ class QuizServiceTest extends TestCase
             $moduleRepo ?? $this->createMock(ModuleRepository::class),
             $courseRepo ?? $this->createMock(CourseRepository::class),
             $cohortRepo ?? $this->createMock(CohortRepository::class),
+            $unlock,
         );
     }
 

@@ -76,4 +76,78 @@ class CohortRepository implements RepositoryInterface
 
         return $row ? Cohort::fromArray($row) : null;
     }
+
+    public function enrollUser(int $cohortId, int $userId): void
+    {
+        $stmt = $this->db->prepare(
+            'INSERT INTO cohort_enrollments (cohort_id, user_id, status)
+             VALUES (:cohort_id, :user_id, \'active\')
+             ON DUPLICATE KEY UPDATE status = \'active\''
+        );
+        $stmt->execute([
+            'cohort_id' => $cohortId,
+            'user_id' => $userId,
+        ]);
+    }
+
+    /**
+     * @return array<int, array{
+     *     user_id: int,
+     *     first_name: string,
+     *     last_name: string,
+     *     email: string,
+     *     enrolled_at: string,
+     *     status: string
+     * }>
+     */
+    public function listActiveEnrollments(int $cohortId): array
+    {
+        $stmt = $this->db->prepare(
+            'SELECT
+                ce.user_id,
+                ce.enrolled_at,
+                ce.status,
+                u.first_name,
+                u.last_name,
+                u.email
+             FROM cohort_enrollments ce
+             INNER JOIN users u ON u.id = ce.user_id
+             WHERE ce.cohort_id = :cohort_id
+               AND ce.status = \'active\'
+             ORDER BY u.first_name ASC, u.last_name ASC, u.email ASC'
+        );
+        $stmt->execute(['cohort_id' => $cohortId]);
+
+        return $stmt->fetchAll();
+    }
+
+    /**
+     * @param array<int, int> $courseIds
+     * @return array<int, int>
+     */
+    public function countActiveEnrollmentsByCourseIds(array $courseIds): array
+    {
+        if ($courseIds === []) {
+            return [];
+        }
+
+        $placeholders = implode(',', array_fill(0, count($courseIds), '?'));
+        $stmt = $this->db->prepare(
+            "SELECT co.course_id, COUNT(DISTINCT ce.user_id) AS enrolled_count
+             FROM cohort_enrollments ce
+             INNER JOIN cohorts co ON co.id = ce.cohort_id
+             WHERE ce.status = 'active'
+               AND co.course_id IN ({$placeholders})
+             GROUP BY co.course_id"
+        );
+        $stmt->execute($courseIds);
+
+        $counts = [];
+
+        foreach ($stmt->fetchAll() as $row) {
+            $counts[(int) $row['course_id']] = (int) $row['enrolled_count'];
+        }
+
+        return $counts;
+    }
 }

@@ -7,7 +7,9 @@ namespace App\Controllers;
 use App\Core\Request;
 use App\Core\Response;
 use App\Services\AuthService;
+use App\Services\LessonNavigationService;
 use App\Services\NuggetService;
+use App\Services\QuizService;
 use App\Services\ValidationException;
 use Exception;
 
@@ -16,6 +18,8 @@ class NuggetController
     public function __construct(
         private readonly AuthService $authService,
         private readonly NuggetService $nuggetService,
+        private readonly LessonNavigationService $lessonNavigationService,
+        private readonly QuizService $quizService,
     ) {
     }
 
@@ -36,6 +40,13 @@ class NuggetController
         }
 
         $roles = $this->authService->getUserRoles($user->id);
+        $lessonNav = $this->lessonNavigationService->buildForLearner(
+            $lesson['course']->id,
+            $user->id,
+            $lesson['module']->id,
+            $nuggetId,
+        );
+        $moduleQuizData = $this->resolveModuleQuizData($lesson['module']->id, $user->id);
 
         return Response::view('courses/nugget', [
             'title' => $lesson['nugget']->title,
@@ -48,7 +59,44 @@ class NuggetController
             'progress' => $lesson['progress'],
             'youtubeId' => $lesson['youtube_id'],
             'streamUrl' => $lesson['stream_url'],
+            'lessonNav' => $lessonNav,
+            'moduleQuiz' => $moduleQuizData['quiz'],
+            'moduleQuizQuestions' => $moduleQuizData['questions'],
+            'moduleQuizTicket' => $moduleQuizData['ticket'],
+            'moduleQuizResult' => null,
+            'moduleQuizError' => null,
         ]);
+    }
+
+    /** @return array{quiz: ?\App\Models\Quiz, questions: array<int, \App\Models\Question>, ticket: ?\App\Models\ReadinessTicket} */
+    private function resolveModuleQuizData(int $moduleId, int $userId): array
+    {
+        $quizzes = $this->quizService->listQuizzesByModuleIds([$moduleId]);
+        $quiz = $quizzes[$moduleId] ?? null;
+
+        if ($quiz === null) {
+            return [
+                'quiz' => null,
+                'questions' => [],
+                'ticket' => null,
+            ];
+        }
+
+        $quizData = $this->quizService->getQuizForLearner($quiz->id, $userId);
+
+        if ($quizData === null) {
+            return [
+                'quiz' => null,
+                'questions' => [],
+                'ticket' => null,
+            ];
+        }
+
+        return [
+            'quiz' => $quizData['quiz'],
+            'questions' => $quizData['questions'],
+            'ticket' => $quizData['ticket'],
+        ];
     }
 
     public function stream(Request $request, int $nuggetId): Response

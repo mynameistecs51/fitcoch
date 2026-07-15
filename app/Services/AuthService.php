@@ -124,6 +124,19 @@ class AuthService
         return null;
     }
 
+    public function isActiveWebSession(int $userId): bool
+    {
+        $sessionToken = $_SESSION['session_token'] ?? null;
+
+        if (!is_string($sessionToken) || $sessionToken === '') {
+            return false;
+        }
+
+        $storedToken = $this->userRepo->findSessionToken($userId);
+
+        return $storedToken !== null && hash_equals($storedToken, $sessionToken);
+    }
+
     /** @return array<int, string> */
     public function getUserRoles(int $userId): array
     {
@@ -202,8 +215,12 @@ class AuthService
 
     private function startSession(User $user): void
     {
+        $sessionToken = bin2hex(random_bytes(32));
+        $this->userRepo->updateSessionToken($user->id, $sessionToken);
+
         session_regenerate_id(true);
         $_SESSION['user_id'] = $user->id;
+        $_SESSION['session_token'] = $sessionToken;
         $_SESSION['last_activity'] = time();
     }
 }

@@ -37,6 +37,31 @@ class CourseRepository implements RepositoryInterface
     }
 
     /** @return array<int, Course> */
+    public function listPublishedAvailableForUser(int $userId): array
+    {
+        $stmt = $this->db->prepare(
+            "SELECT c.*
+             FROM courses c
+             WHERE c.status = 'published'
+               AND NOT EXISTS (
+                    SELECT 1
+                    FROM cohorts co
+                    INNER JOIN cohort_enrollments ce ON ce.cohort_id = co.id
+                    WHERE co.course_id = c.id
+                      AND ce.user_id = :user_id
+                      AND ce.status = 'active'
+               )
+             ORDER BY c.title ASC"
+        );
+        $stmt->execute(['user_id' => $userId]);
+
+        return array_map(
+            static fn (array $row): Course => Course::fromArray($row),
+            $stmt->fetchAll()
+        );
+    }
+
+    /** @return array<int, Course> */
     public function listEnrolledForUser(int $userId): array
     {
         $stmt = $this->db->prepare(

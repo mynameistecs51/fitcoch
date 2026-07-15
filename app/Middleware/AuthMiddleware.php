@@ -45,6 +45,20 @@ class AuthMiddleware implements MiddlewareInterface
             return Response::redirect('/login');
         }
 
+        if (!$this->authService->isActiveWebSession((int) $userId)) {
+            $this->authService->logout();
+
+            if ($request->isApi()) {
+                return Response::apiError(
+                    'SESSION_REPLACED',
+                    __('auth.session_replaced'),
+                    401
+                );
+            }
+
+            return Response::redirect('/login?error=session_replaced');
+        }
+
         $request->setAttribute('user_id', (int) $userId);
 
         return $next($request);

@@ -8,6 +8,7 @@ use App\Core\Request;
 use App\Core\Response;
 use App\Services\AuthService;
 use App\Services\CourseService;
+use App\Services\InstructorCourseProgressService;
 use App\Services\QuizService;
 use App\Services\ValidationException;
 use Exception;
@@ -18,6 +19,7 @@ class InstructorCourseController
         private readonly AuthService $authService,
         private readonly CourseService $courseService,
         private readonly QuizService $quizService,
+        private readonly InstructorCourseProgressService $progressService,
     ) {
     }
 
@@ -25,13 +27,17 @@ class InstructorCourseController
     {
         $user = $this->authService->currentUser();
         $roles = $this->authService->getUserRoles($user?->id ?? 0);
+        $courses = $this->courseService->listManageableCourses();
+        $courseIds = array_map(static fn ($course) => $course->id, $courses);
+        $enrollmentCounts = $this->progressService->countEnrollmentsByCourseIds($courseIds);
 
         return Response::view('instructor/courses/index', [
             'title' => __('courses.instructor.title'),
             'user' => $user,
             'roles' => $roles,
             'isAdmin' => in_array('admin', $roles, true),
-            'courses' => $this->courseService->listManageableCourses(),
+            'courses' => $courses,
+            'enrollmentCounts' => $enrollmentCounts,
             'success' => $request->query()['success'] ?? null,
         ]);
     }
@@ -82,6 +88,16 @@ class InstructorCourseController
         $roles = $this->authService->getUserRoles($user?->id ?? 0);
         $moduleIds = array_map(static fn ($module) => $module->id, $outline['modules']);
         $quizzesByModule = $this->quizService->listQuizzesByModuleIds($moduleIds);
+        $videoFormDefaults = $this->courseService->buildVideoFormDefaults($outline['modules'], $outline['nuggetsByModule']);
+        $introContext = $this->courseService->getIntroVideoContext($outline['modules'], $outline['nuggetsByModule']);
+        $moduleEditData = [];
+
+        foreach ($outline['modules'] as $module) {
+            $moduleEditData[$module->id] = $this->courseService->buildModuleEditPayload(
+                $module,
+                $outline['nuggetsByModule'][$module->id] ?? []
+            );
+        }
 
         return Response::view('instructor/courses/form', [
             'title' => __('courses.instructor.edit_title'),
@@ -92,7 +108,10 @@ class InstructorCourseController
             'modules' => $outline['modules'],
             'nuggetsByModule' => $outline['nuggetsByModule'],
             'quizzesByModule' => $quizzesByModule,
-            'form' => [],
+            'moduleEditData' => $moduleEditData,
+            'form' => $videoFormDefaults,
+            'introVideoNugget' => $introContext['nugget'] ?? null,
+            'introYoutubeId' => $this->courseService->getIntroYoutubeId($outline['modules'], $outline['nuggetsByModule']),
             'errors' => [],
             'error' => $request->query()['error'] ?? null,
             'success' => $request->query()['success'] ?? null,
@@ -106,7 +125,7 @@ class InstructorCourseController
         }
 
         try {
-            $this->courseService->updateCourse($courseId, $request->all());
+            $this->courseService->updateCourse($courseId, $request->all(), $request->files());
         } catch (ValidationException $e) {
             $outline = $this->courseService->getCourseForInstructor($courseId);
 
@@ -139,6 +158,23 @@ class InstructorCourseController
         }
 
         return Response::redirect('/instructor/courses/' . $courseId . '/edit?success=module_added');
+    }
+
+    public function updateModule(Request $request, int $courseId, int $moduleId): Response
+    {
+        if (!verify_csrf_token($request->input('csrf_token'))) {
+            return Response::redirect('/instructor/courses/' . $courseId . '/edit?error=csrf');
+        }
+
+        try {
+            $this->courseService->updateModule($moduleId, $request->all(), $request->files());
+        } catch (ValidationException $e) {
+            return Response::redirect('/instructor/courses/' . $courseId . '/edit?error=module');
+        } catch (Exception $e) {
+            return Response::redirect('/instructor/courses/' . $courseId . '/edit?error=' . urlencode($e->getMessage()));
+        }
+
+        return Response::redirect('/instructor/courses/' . $courseId . '/edit?success=module_updated');
     }
 
     public function deleteModule(Request $request, int $courseId, int $moduleId): Response
@@ -179,6 +215,17 @@ class InstructorCourseController
         $user = $this->authService->currentUser();
         $roles = $this->authService->getUserRoles($user?->id ?? 0);
 
+        $moduleEditData = [];
+
+        if ($course !== null) {
+            foreach ($modules as $module) {
+                $moduleEditData[$module->id] = $this->courseService->buildModuleEditPayload(
+                    $module,
+                    $nuggetsByModule[$module->id] ?? []
+                );
+            }
+        }
+
         return [
             'title' => $course ? __('courses.instructor.edit_title') : __('courses.instructor.create_title'),
             'user' => $user,
@@ -188,7 +235,13 @@ class InstructorCourseController
             'modules' => $modules,
             'nuggetsByModule' => $nuggetsByModule,
             'quizzesByModule' => $course ? $this->quizService->listQuizzesByModuleIds(array_map(static fn ($m) => $m->id, $modules)) : [],
-            'form' => $form,
+            'moduleEditData' => $moduleEditData,
+            'form' => array_merge(
+                $course ? $this->courseService->buildVideoFormDefaults($modules, $nuggetsByModule) : [],
+                $form
+            ),
+            'introVideoNugget' => $course ? ($this->courseService->getIntroVideoContext($modules, $nuggetsByModule)['nugget'] ?? null) : null,
+            'introYoutubeId' => $course ? $this->courseService->getIntroYoutubeId($modules, $nuggetsByModule) : null,
             'errors' => $errors,
             'error' => null,
         ];

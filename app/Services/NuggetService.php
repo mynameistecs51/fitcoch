@@ -21,6 +21,7 @@ class NuggetService
         private readonly CourseRepository $courseRepo,
         private readonly NuggetProgressRepository $progressRepo,
         private readonly VideoService $videoService,
+        private readonly LessonUnlockService $unlockService,
     ) {
     }
 
@@ -55,6 +56,10 @@ class NuggetService
         }
 
         if (!$this->courseRepo->isUserEnrolled($userId, $course->id)) {
+            return null;
+        }
+
+        if (!$this->unlockService->canAccessNugget($nuggetId, $userId)) {
             return null;
         }
 

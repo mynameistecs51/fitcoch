@@ -6,7 +6,9 @@ namespace App\Controllers;
 
 use App\Core\Request;
 use App\Core\Response;
+use App\Repositories\NuggetRepository;
 use App\Services\AuthService;
+use App\Services\LessonNavigationService;
 use App\Services\QuizService;
 use App\Services\ValidationException;
 use Exception;
@@ -16,6 +18,8 @@ class QuizController
     public function __construct(
         private readonly AuthService $authService,
         private readonly QuizService $quizService,
+        private readonly LessonNavigationService $lessonNavigationService,
+        private readonly NuggetRepository $nuggetRepo,
     ) {
     }
 
@@ -36,6 +40,13 @@ class QuizController
         }
 
         $roles = $this->authService->getUserRoles($user->id);
+        $lessonNav = $this->lessonNavigationService->buildForLearner(
+            $quizData['course']->id,
+            $user->id,
+            $quizData['module']->id,
+            null,
+            $quizId,
+        );
 
         return Response::view('courses/quiz', [
             'title' => $quizData['quiz']->title,
@@ -49,7 +60,20 @@ class QuizController
             'ticket' => $quizData['ticket'],
             'result' => null,
             'error' => $request->query()['error'] ?? null,
+            'lessonNav' => $lessonNav,
+            'retakeLessonUrl' => $this->resolveModuleVideoUrl($quizData['module']->id),
         ]);
+    }
+
+    private function resolveModuleVideoUrl(int $moduleId): ?string
+    {
+        foreach ($this->nuggetRepo->listByModuleId($moduleId) as $nugget) {
+            if ($nugget->nuggetType === 'video') {
+                return url('/nuggets/' . $nugget->id);
+            }
+        }
+
+        return null;
     }
 
     public function submit(Request $request, int $quizId): Response
@@ -81,6 +105,13 @@ class QuizController
         }
 
         $roles = $this->authService->getUserRoles($user->id);
+        $lessonNav = $this->lessonNavigationService->buildForLearner(
+            $quizData['course']->id,
+            $user->id,
+            $quizData['module']->id,
+            null,
+            $quizId,
+        );
 
         return Response::view('courses/quiz', [
             'title' => $quizData['quiz']->title,
@@ -94,6 +125,8 @@ class QuizController
             'ticket' => $quizData['ticket'],
             'result' => $result,
             'error' => null,
+            'lessonNav' => $lessonNav,
+            'retakeLessonUrl' => $this->resolveModuleVideoUrl($quizData['module']->id),
         ]);
     }
 

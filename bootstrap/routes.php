@@ -6,6 +6,7 @@ use App\Controllers\AdminController;
 use App\Controllers\AuthController;
 use App\Controllers\CourseController;
 use App\Controllers\InstructorCourseController;
+use App\Controllers\InstructorCourseProgressController;
 use App\Controllers\InstructorLiveSessionController;
 use App\Controllers\InstructorQuizController;
 use App\Controllers\InstructorReadinessController;
@@ -44,6 +45,7 @@ $router->post('/profile', [UserController::class, 'updateProfile'], $authMiddlew
 
 // Course routes (learner)
 $router->get('/courses', [CourseController::class, 'index'], $authMiddleware);
+$router->post('/courses/{courseId}/enroll', [CourseController::class, 'enroll'], $authMiddleware);
 $router->get('/courses/{courseId}', [CourseController::class, 'show'], $authMiddleware);
 
 // Nugget lesson routes (learner)
@@ -67,9 +69,11 @@ $instructorRoles = ['instructor', 'admin'];
 $router->get('/instructor/courses', [InstructorCourseController::class, 'index'], $authRoleMiddleware, $instructorRoles);
 $router->get('/instructor/courses/create', [InstructorCourseController::class, 'create'], $authRoleMiddleware, $instructorRoles);
 $router->post('/instructor/courses', [InstructorCourseController::class, 'store'], $authRoleMiddleware, $instructorRoles);
+$router->get('/instructor/courses/{courseId}/progress', [InstructorCourseProgressController::class, 'show'], $authRoleMiddleware, $instructorRoles);
 $router->get('/instructor/courses/{courseId}/edit', [InstructorCourseController::class, 'edit'], $authRoleMiddleware, $instructorRoles);
 $router->post('/instructor/courses/{courseId}', [InstructorCourseController::class, 'update'], $authRoleMiddleware, $instructorRoles);
 $router->post('/instructor/courses/{courseId}/modules', [InstructorCourseController::class, 'storeModule'], $authRoleMiddleware, $instructorRoles);
+$router->post('/instructor/courses/{courseId}/modules/{moduleId}', [InstructorCourseController::class, 'updateModule'], $authRoleMiddleware, $instructorRoles);
 $router->post('/instructor/courses/{courseId}/modules/{moduleId}/delete', [InstructorCourseController::class, 'deleteModule'], $authRoleMiddleware, $instructorRoles);
 $router->get('/instructor/courses/{courseId}/modules/{moduleId}/readiness', [InstructorReadinessController::class, 'show'], $authRoleMiddleware, $instructorRoles);
 $router->post('/instructor/courses/{courseId}/modules/{moduleId}/readiness/{learnerId}/override', [InstructorReadinessController::class, 'override'], $authRoleMiddleware, $instructorRoles);

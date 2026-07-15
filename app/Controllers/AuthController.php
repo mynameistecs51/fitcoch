@@ -7,6 +7,7 @@ namespace App\Controllers;
 use App\Core\Request;
 use App\Core\Response;
 use App\Services\AuthService;
+use App\Services\LearnerDashboardService;
 use App\Services\PasswordResetService;
 use App\Services\ValidationException;
 use Exception;
@@ -16,6 +17,7 @@ class AuthController
     public function __construct(
         private readonly AuthService $authService,
         private readonly PasswordResetService $passwordResetService,
+        private readonly LearnerDashboardService $learnerDashboardService,
     ) {
     }
 
@@ -25,9 +27,15 @@ class AuthController
             return Response::redirect('/dashboard');
         }
 
+        $error = $request->query()['error'] ?? null;
+
+        if ($error === 'session_replaced') {
+            $error = __('auth.session_replaced');
+        }
+
         return Response::view('auth/login', [
             'title' => __('auth.sign_in'),
-            'error' => $request->query()['error'] ?? null,
+            'error' => $error,
             'success' => $request->query()['success'] ?? null,
         ]);
     }
@@ -233,12 +241,14 @@ class AuthController
         }
 
         $roles = $this->authService->getUserRoles($user->id);
+        $overview = $this->learnerDashboardService->buildOverview($user->id);
 
         return Response::view('dashboard/home', [
             'title' => __('dashboard.title'),
             'user' => $user,
             'roles' => $roles,
             'isAdmin' => in_array('admin', $roles, true),
+            'overview' => $overview,
         ]);
     }
 

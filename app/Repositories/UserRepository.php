@@ -160,7 +160,9 @@ class UserRepository implements RepositoryInterface
 
     public function updatePassword(int $userId, string $passwordHash): User
     {
-        $stmt = $this->db->prepare('UPDATE users SET password_hash = :password_hash WHERE id = :id');
+        $stmt = $this->db->prepare(
+            'UPDATE users SET password_hash = :password_hash, session_token = NULL WHERE id = :id'
+        );
         $stmt->execute([
             'id' => $userId,
             'password_hash' => $passwordHash,
@@ -173,6 +175,28 @@ class UserRepository implements RepositoryInterface
         }
 
         return $user;
+    }
+
+    public function updateSessionToken(int $userId, string $sessionToken): void
+    {
+        $stmt = $this->db->prepare(
+            'UPDATE users SET session_token = :session_token WHERE id = :id'
+        );
+        $stmt->execute([
+            'id' => $userId,
+            'session_token' => $sessionToken,
+        ]);
+    }
+
+    public function findSessionToken(int $userId): ?string
+    {
+        $stmt = $this->db->prepare(
+            'SELECT session_token FROM users WHERE id = :id LIMIT 1'
+        );
+        $stmt->execute(['id' => $userId]);
+        $token = $stmt->fetchColumn();
+
+        return is_string($token) && $token !== '' ? $token : null;
     }
 
     public function updateStatus(int $userId, string $status): User

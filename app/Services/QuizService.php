@@ -24,6 +24,7 @@ class QuizService
         private readonly ModuleRepository $moduleRepo,
         private readonly CourseRepository $courseRepo,
         private readonly CohortRepository $cohortRepo,
+        private readonly LessonUnlockService $unlockService,
     ) {
     }
 
@@ -513,6 +514,10 @@ class QuizService
         }
 
         if (!$this->courseRepo->isUserEnrolled($userId, $course->id)) {
+            return null;
+        }
+
+        if (!$this->unlockService->canAccessModule($moduleId, $userId)) {
             return null;
         }
 

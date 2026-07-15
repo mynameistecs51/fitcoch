@@ -35,6 +35,18 @@
   - [x] Bulk add multiple questions in one submit
   - [x] Quiz import from Excel/CSV template (download + upload)
   - [x] Learner quiz answer layout — 2-column options on wider screens
+- [x] **Post-Sprint 6 polish** — Learner experience & instructor course management
+  - [x] Single-browser login per user (migration `012` — `users.session_token`)
+  - [x] Header role label from actual user roles (not hardcoded)
+  - [x] Lesson layout: video + quiz center, lesson sidebar right (`LessonNavigationService`, `LessonUnlockService`)
+  - [x] Quiz submit validation — block submit when unanswered (`quiz-submit.js`)
+  - [x] Quiz pass celebration effect (`quiz-celebration.js` + canvas-confetti)
+  - [x] Unlock next module after quiz pass (or video ≥ 90% if no quiz)
+  - [x] Learner dashboard: enrolled courses, progress overview, retake failed quizzes (`LearnerDashboardService`)
+  - [x] Fix circular DI memory error (`LessonUnlockService` → `QuizRepository`)
+  - [x] Instructor course modules: table view, add-module modal
+  - [x] Instructor course modules: edit-module modal (title + video)
+  - [x] Instructor learner progress report per course (`InstructorCourseProgressService`, `/instructor/courses/{id}/progress`)
 
 ### Pending
 
@@ -48,7 +60,7 @@
 
 ### HIGH
 
-- [ ] Finish Dashboard
+- [x] Finish Dashboard (learner overview + instructor course progress)
 - [ ] Sprint 7 live polling & chat (WebSocket)
 
 ### MEDIUM
@@ -60,6 +72,8 @@
 - [x] Forgot password flow
 - [x] Instructor quiz editor + Excel import
 - [x] Live room host roster & broadcast controls
+- [x] Instructor module CRUD modal (add / edit)
+- [x] Instructor enrolled-learner progress (individual + aggregate)
 
 ### LOW
 

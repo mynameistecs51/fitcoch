@@ -66,4 +66,83 @@ class QuizAttemptRepository implements RepositoryInterface
             'completed_at' => (string) $row['completed_at'],
         ];
     }
+
+    /**
+     * @param array<int, int> $quizIds
+     * @return array<int, array{id: int, quiz_id: int, score_pct: int, completed_at: string}>
+     */
+    public function findLatestByUserAndQuizIds(int $userId, array $quizIds): array
+    {
+        if ($quizIds === []) {
+            return [];
+        }
+
+        $placeholders = implode(',', array_fill(0, count($quizIds), '?'));
+        $stmt = $this->db->prepare(
+            "SELECT qa.id, qa.quiz_id, qa.score_pct, qa.completed_at
+             FROM quiz_attempts qa
+             INNER JOIN (
+                SELECT quiz_id, MAX(id) AS latest_id
+                FROM quiz_attempts
+                WHERE user_id = ? AND quiz_id IN ({$placeholders})
+                GROUP BY quiz_id
+             ) latest ON qa.id = latest.latest_id"
+        );
+        $stmt->execute(array_merge([$userId], $quizIds));
+
+        $indexed = [];
+
+        foreach ($stmt->fetchAll() as $row) {
+            $indexed[(int) $row['quiz_id']] = [
+                'id' => (int) $row['id'],
+                'quiz_id' => (int) $row['quiz_id'],
+                'score_pct' => (int) $row['score_pct'],
+                'completed_at' => (string) $row['completed_at'],
+            ];
+        }
+
+        return $indexed;
+    }
+
+    /**
+     * @param array<int, int> $quizIds
+     * @return array<int, array<int, array{id: int, quiz_id: int, score_pct: int, completed_at: string}>>
+     */
+    public function findLatestByCohortAndQuizIds(int $cohortId, array $quizIds): array
+    {
+        if ($quizIds === []) {
+            return [];
+        }
+
+        $placeholders = implode(',', array_fill(0, count($quizIds), '?'));
+        $stmt = $this->db->prepare(
+            "SELECT qa.id, qa.user_id, qa.quiz_id, qa.score_pct, qa.completed_at
+             FROM quiz_attempts qa
+             INNER JOIN (
+                SELECT qa2.user_id, qa2.quiz_id, MAX(qa2.id) AS latest_id
+                FROM quiz_attempts qa2
+                INNER JOIN cohort_enrollments ce
+                    ON ce.user_id = qa2.user_id
+                   AND ce.cohort_id = ?
+                   AND ce.status = 'active'
+                WHERE qa2.quiz_id IN ({$placeholders})
+                GROUP BY qa2.user_id, qa2.quiz_id
+             ) latest ON qa.id = latest.latest_id"
+        );
+        $stmt->execute(array_merge([$cohortId], $quizIds));
+
+        $indexed = [];
+
+        foreach ($stmt->fetchAll() as $row) {
+            $userId = (int) $row['user_id'];
+            $indexed[$userId][(int) $row['quiz_id']] = [
+                'id' => (int) $row['id'],
+                'quiz_id' => (int) $row['quiz_id'],
+                'score_pct' => (int) $row['score_pct'],
+                'completed_at' => (string) $row['completed_at'],
+            ];
+        }
+
+        return $indexed;
+    }
 }
