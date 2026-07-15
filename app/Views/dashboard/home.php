@@ -49,6 +49,23 @@ $retakeItems = $overview['retake_items'] ?? [];
         </div>
     </div>
 
+    <?php if (($summary['reviews_due'] ?? 0) > 0): ?>
+        <div class="rounded-3xl border border-brand-500/30 bg-gradient-to-r from-brand-500/10 to-brand-500/5 p-5 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <h2 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <i class="fa-solid fa-brain text-brand-500"></i>
+                    <?= escape(__('dashboard.reviews_title')) ?>
+                </h2>
+                <p class="text-sm text-slate-600 dark:text-slate-300 mt-1">
+                    <?= escape(__('dashboard.reviews_hint', ['count' => (string) ($summary['reviews_due'] ?? 0)])) ?>
+                </p>
+            </div>
+            <a href="<?= escape(url('/review/daily')) ?>" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-brand-500 text-slate-950 font-bold rounded-xl hover:bg-brand-accent text-sm shadow-lg shadow-brand-500/20 shrink-0">
+                <?= escape(__('dashboard.reviews_cta')) ?>
+            </a>
+        </div>
+    <?php endif; ?>
+
     <?php if ($retakeItems !== []): ?>
         <div class="rounded-3xl border border-amber-500/30 bg-amber-500/10 p-5 md:p-6 space-y-4">
             <div>

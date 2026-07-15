@@ -14,6 +14,8 @@
 - [x] **Sprint 6 (core)** — ห้องเรียนสดและ WebRTC (stub + ตารางเรียน)
 - [x] **Post-Sprint 6** — Quiz ผู้สอน, แดชบอร์ดผู้เรียน, CRUD โมดูล, รายงานความคืบหน้า
 - [x] **Cohort & Readiness UX** — UI จัดการรุ่น + คะแนน quiz/ล็อกกลับในหน้า Readiness
+- [x] **Sprint 8 (MVP)** — Spaced Repetition SM-2, `/review/daily`, API, แดชบอร์ด CTA
+- [x] **Sprint 8 (Instructor)** — จัดการแนวคิดทบทวน (ตาราง + modal เพิ่ม/แก้ไข)
 
 ### เลื่อนออกไปก่อน (Deferred)
 
@@ -22,7 +24,7 @@
 
 ### รอทำ (Pending)
 
-- [ ] **Sprint 8** — Spaced Repetition (SM-2 Engine)
+- [ ] **Sprint 8 (ต่อ)** — CRON scheduler แจ้งเตือนรายวัน + หน้า `/review/dashboard`
 - [ ] **Sprint 9** — Gamification, Analytics & Certificates
 
 ---
@@ -35,6 +37,9 @@
 - [x] UI จัดการรุ่น (cohort) — `/instructor/courses/{id}/cohorts`
 - [x] หน้า Readiness — แสดงคะแนน quiz ล่าสุด + ปุ่มล็อกกลับ
 - [x] แก้ปุ่มแก้ไขโมดูลใน modal หลักสูตร
+- [x] Sprint 8 — ทบทวนรายวัน `/review/daily` + อัลกอริทึม SM-2 + API
+- [x] UI จัดการแนวคิดทบทวน — ตาราง + modal (เพิ่ม/แก้ไข/ดึงจากโมดูล)
+- [x] ลิงก์แนวคิดทบทวนในหน้ารายการหลักสูตรผู้สอน
 - [ ] Sprint 7 live polling & chat (WebSocket) — **เลื่อนออกไปก่อน**
 
 ### ปานกลาง (MEDIUM)
@@ -48,6 +53,7 @@
 - [x] ห้องเรียนสด — host roster & broadcast (มีแล้ว ไม่พัฒนาต่อ)
 - [x] CRUD โมดูลแบบ modal (เพิ่ม / แก้ไข)
 - [x] ความคืบหน้าผู้เรียนที่ลงทะเบียน (รายบุคคล + รวม)
+- [x] สคริปต์ช่วยรัน SQL/fix encoding (`scripts/run-sql.ps1`, `fix-knowledge-descriptions.php`)
 
 ### ต่ำ (LOW)
 

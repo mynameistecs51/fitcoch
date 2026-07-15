@@ -6,6 +6,7 @@ use App\Controllers\AdminController;
 use App\Controllers\AuthController;
 use App\Controllers\CourseController;
 use App\Controllers\InstructorCohortController;
+use App\Controllers\InstructorKnowledgeItemController;
 use App\Controllers\InstructorCourseController;
 use App\Controllers\InstructorCourseProgressController;
 use App\Controllers\InstructorLiveSessionController;
@@ -15,6 +16,7 @@ use App\Controllers\LiveSessionController;
 use App\Controllers\LocaleController;
 use App\Controllers\NuggetController;
 use App\Controllers\QuizController;
+use App\Controllers\ReviewController;
 use App\Controllers\UserController;
 use App\Middleware\AuthMiddleware;
 use App\Middleware\ReadinessGateMiddleware;
@@ -57,6 +59,10 @@ $router->get('/nuggets/{nuggetId}/stream', [NuggetController::class, 'stream'], 
 $router->get('/quizzes/{quizId}', [QuizController::class, 'show'], $authMiddleware);
 $router->post('/quizzes/{quizId}/attempts', [QuizController::class, 'submit'], $authMiddleware);
 
+// Spaced repetition review routes (learner)
+$router->get('/review/daily', [ReviewController::class, 'showDaily'], $authMiddleware);
+$router->post('/review/daily/{knowledgeItemId}/respond', [ReviewController::class, 'respond'], $authMiddleware);
+
 // Live classroom routes (learner)
 $router->get('/live/{id}', [LiveSessionController::class, 'show'], $liveGateMiddleware);
 $router->post('/api/v1/live/{id}/join', [LiveSessionController::class, 'apiJoin'], $liveGateMiddleware);
@@ -76,6 +82,11 @@ $router->post('/instructor/courses/{courseId}/cohorts', [InstructorCohortControl
 $router->post('/instructor/courses/{courseId}/cohorts/{cohortId}', [InstructorCohortController::class, 'update'], $authRoleMiddleware, $instructorRoles);
 $router->post('/instructor/courses/{courseId}/cohorts/{cohortId}/enroll', [InstructorCohortController::class, 'enroll'], $authRoleMiddleware, $instructorRoles);
 $router->post('/instructor/courses/{courseId}/cohorts/{cohortId}/enrollments/{learnerId}/drop', [InstructorCohortController::class, 'drop'], $authRoleMiddleware, $instructorRoles);
+$router->get('/instructor/courses/{courseId}/knowledge-items', [InstructorKnowledgeItemController::class, 'index'], $authRoleMiddleware, $instructorRoles);
+$router->post('/instructor/courses/{courseId}/knowledge-items', [InstructorKnowledgeItemController::class, 'store'], $authRoleMiddleware, $instructorRoles);
+$router->post('/instructor/courses/{courseId}/knowledge-items/sync', [InstructorKnowledgeItemController::class, 'sync'], $authRoleMiddleware, $instructorRoles);
+$router->post('/instructor/courses/{courseId}/knowledge-items/{itemId}', [InstructorKnowledgeItemController::class, 'update'], $authRoleMiddleware, $instructorRoles);
+$router->post('/instructor/courses/{courseId}/knowledge-items/{itemId}/delete', [InstructorKnowledgeItemController::class, 'delete'], $authRoleMiddleware, $instructorRoles);
 $router->get('/instructor/courses/{courseId}/edit', [InstructorCourseController::class, 'edit'], $authRoleMiddleware, $instructorRoles);
 $router->post('/instructor/courses/{courseId}', [InstructorCourseController::class, 'update'], $authRoleMiddleware, $instructorRoles);
 $router->post('/instructor/courses/{courseId}/modules', [InstructorCourseController::class, 'storeModule'], $authRoleMiddleware, $instructorRoles);
@@ -125,6 +136,10 @@ $router->post('/api/v1/nuggets/{nuggetId}/progress', [NuggetController::class, '
 // API routes — Quizzes
 $router->get('/api/v1/quizzes/{quizId}', [QuizController::class, 'apiShow'], $authMiddleware);
 $router->post('/api/v1/quizzes/{quizId}/attempts', [QuizController::class, 'apiSubmitAttempt'], $authMiddleware);
+
+// API routes — Spaced Repetition Reviews
+$router->get('/api/v1/reviews/daily', [ReviewController::class, 'apiDaily'], $authMiddleware);
+$router->post('/api/v1/reviews/{knowledgeItemId}/respond', [ReviewController::class, 'respond'], $authMiddleware);
 
 // API routes — RBAC demo (instructor/admin only)
 $router->get('/api/v1/instructor/ping', [UserController::class, 'instructorPing'], $authRoleMiddleware, ['instructor', 'admin']);

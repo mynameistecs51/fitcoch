@@ -375,6 +375,7 @@ erDiagram
 *   **Effort Estimate:** 13 Story Points (8 developer days)
 *   **Priority:** Medium
 *   **Dependencies:** Sprint 5 (Quiz structures)
+*   **Status:** ✅ MVP complete (`/review/daily`, SM-2 engine, API, dashboard CTA) — CRON scheduler & review dashboard pending
 *   **Deliverables:**
     1.  Create `knowledge_items` and `spaced_rep_schedules` schemas.
     2.  Build `QuizService::calculateSM2` formulas.

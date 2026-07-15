@@ -37,6 +37,9 @@ ob_start();
                 <a href="<?= escape(url('/instructor/courses/' . $courseId . '/cohorts')) ?>" class="text-sm text-brand-600 dark:text-brand-500 hover:text-brand-accent font-semibold">
                     <?= escape(__('cohorts.instructor.manage')) ?>
                 </a>
+                <a href="<?= escape(url('/instructor/courses/' . $courseId . '/knowledge-items')) ?>" class="text-sm text-brand-600 dark:text-brand-500 hover:text-brand-accent font-semibold">
+                    <?= escape(__('knowledge_items.instructor.manage')) ?>
+                </a>
                 <a href="<?= escape(url('/instructor/courses/' . $courseId . '/progress')) ?>" class="text-sm text-brand-600 dark:text-brand-500 hover:text-brand-accent font-semibold">
                     <?= escape(__('courses.instructor.view_progress')) ?>
                 </a>

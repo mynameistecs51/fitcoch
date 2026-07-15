@@ -55,6 +55,11 @@ html.dark [class*="text-slate-"]:not(.text-slate-950) {
 }
 
 /* Keep dark text on green brand buttons for contrast */
+html:not(.dark) button.bg-brand-500,
+html:not(.dark) a.bg-brand-500 {
+    color: #020617 !important;
+}
+
 html.dark .bg-brand-500.text-slate-950,
 html.dark .bg-brand-500 .text-slate-950,
 html.dark button.bg-brand-500,

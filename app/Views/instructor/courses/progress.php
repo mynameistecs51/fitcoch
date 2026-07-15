@@ -27,6 +27,9 @@ ob_start();
             </p>
         </div>
         <div class="flex flex-wrap items-center gap-3">
+            <a href="<?= escape(url('/instructor/courses/' . $course->id . '/knowledge-items')) ?>" class="text-sm text-brand-600 dark:text-brand-500 hover:text-brand-accent font-semibold">
+                <?= escape(__('knowledge_items.instructor.manage')) ?>
+            </a>
             <a href="<?= escape(url('/instructor/courses/' . $course->id . '/edit')) ?>" class="text-sm text-brand-600 dark:text-brand-500 hover:text-brand-accent">
                 <?= escape(__('courses.instructor.edit')) ?>
             </a>

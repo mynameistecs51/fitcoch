@@ -36,13 +36,16 @@
             <span class="px-1.5 py-0.5 text-[9px] font-bold rounded bg-slate-200 dark:bg-slate-800 text-slate-500 shrink-0"><?= escape(__('sidebar.coming_soon')) ?></span>
         </span>
 
-        <span class="nav-item flex items-center w-full px-4 py-3 text-sm font-medium rounded-xl text-slate-400 dark:text-slate-500 cursor-not-allowed opacity-60">
-            <i class="fa-solid fa-square-poll-horizontal w-6 shrink-0 text-slate-400"></i>
+        <a
+            href="<?= escape(url('/review/daily')) ?>"
+            class="nav-item flex items-center w-full px-4 py-3 text-sm font-medium rounded-xl transition duration-200 <?= ($currentNav ?? '') === 'reviews' ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white border-l-4 border-brand-500' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' ?>"
+        >
+            <i class="fa-solid fa-brain w-6 shrink-0 <?= ($currentNav ?? '') === 'reviews' ? 'text-brand-500' : 'text-slate-400' ?>"></i>
             <span class="flex-1 text-left min-w-0">
                 <?= escape(__('sidebar.assessment')) ?>
                 <span class="text-[9px] block text-yellow-600 dark:text-yellow-400"><?= escape(__('sidebar.assessment_sub')) ?></span>
             </span>
-        </span>
+        </a>
 
         <?php if (!empty($isAdmin) || (!empty($roles) && (in_array('instructor', $roles, true) || in_array('admin', $roles, true)))): ?>
             <a

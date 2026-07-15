@@ -56,6 +56,12 @@ $enrollmentCounts = $enrollmentCounts ?? [];
                                     <a href="<?= escape(url('/instructor/courses/' . $course->id . '/progress')) ?>" class="text-sm text-brand-600 dark:text-brand-500 hover:text-brand-accent font-medium">
                                         <?= escape(__('courses.instructor.view_progress')) ?>
                                     </a>
+                                    <a href="<?= escape(url('/instructor/courses/' . $course->id . '/knowledge-items')) ?>" class="text-sm text-brand-600 dark:text-brand-500 hover:text-brand-accent font-medium">
+                                        <?= escape(__('knowledge_items.instructor.manage')) ?>
+                                    </a>
+                                    <a href="<?= escape(url('/instructor/courses/' . $course->id . '/cohorts')) ?>" class="text-sm text-brand-600 dark:text-brand-500 hover:text-brand-accent font-medium">
+                                        <?= escape(__('cohorts.instructor.manage')) ?>
+                                    </a>
                                     <a href="<?= escape(url('/instructor/courses/' . $course->id . '/edit')) ?>" class="text-sm text-slate-600 dark:text-slate-300 hover:text-brand-600 dark:hover:text-brand-500 font-medium">
                                         <?= escape(__('courses.instructor.edit')) ?>
                                     </a>

@@ -10,6 +10,7 @@ use App\Models\Nugget;
 use App\Models\Quiz;
 use App\Repositories\NuggetProgressRepository;
 use App\Repositories\QuizAttemptRepository;
+use App\Repositories\UserRepository;
 
 class LearnerDashboardService
 {
@@ -17,8 +18,10 @@ class LearnerDashboardService
         private readonly CourseService $courseService,
         private readonly QuizService $quizService,
         private readonly LessonNavigationService $lessonNavigationService,
+        private readonly SpacedRepetitionService $reviewService,
         private readonly NuggetProgressRepository $progressRepo,
         private readonly QuizAttemptRepository $attemptRepo,
+        private readonly UserRepository $userRepo,
     ) {
     }
 
@@ -31,7 +34,8 @@ class LearnerDashboardService
      *         lessons_total: int,
      *         quizzes_passed: int,
      *         quizzes_total: int,
-     *         average_quiz_score: ?int
+     *         average_quiz_score: ?int,
+     *         reviews_due: int
      *     },
      *     courses: array<int, array{
      *         course: Course,
@@ -64,6 +68,9 @@ class LearnerDashboardService
      */
     public function buildOverview(int $userId): array
     {
+        $user = $this->userRepo->findById($userId);
+        $reviewsDue = $user !== null ? $this->reviewService->countDueToday($user) : 0;
+
         $enrolledCourses = $this->courseService->listEnrolledCourses($userId);
         $courses = [];
         $retakeItems = [];
@@ -216,6 +223,7 @@ class LearnerDashboardService
                 'quizzes_passed' => $quizzesPassed,
                 'quizzes_total' => $quizzesTotal,
                 'average_quiz_score' => $quizScoreCount > 0 ? (int) round($quizScoreTotal / $quizScoreCount) : null,
+                'reviews_due' => $reviewsDue,
             ],
             'courses' => $courses,
             'retake_items' => $retakeItems,

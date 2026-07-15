@@ -8,12 +8,15 @@ use App\Models\Course;
 use App\Models\Module;
 use App\Models\Nugget;
 use App\Models\Quiz;
+use App\Models\User;
 use App\Repositories\NuggetProgressRepository;
 use App\Repositories\QuizAttemptRepository;
+use App\Repositories\UserRepository;
 use App\Services\CourseService;
 use App\Services\LearnerDashboardService;
 use App\Services\LessonNavigationService;
 use App\Services\QuizService;
+use App\Services\SpacedRepetitionService;
 use PHPUnit\Framework\TestCase;
 
 class LearnerDashboardServiceTest extends TestCase
@@ -61,12 +64,30 @@ class LearnerDashboardServiceTest extends TestCase
             ],
         ]);
 
+        $reviewService = $this->createMock(SpacedRepetitionService::class);
+        $reviewService->method('countDueToday')->willReturn(3);
+
+        $userRepo = $this->createMock(UserRepository::class);
+        $userRepo->method('findById')->willReturn(new User(
+            7,
+            'learner@test.com',
+            'hash',
+            'Test',
+            'User',
+            'active',
+            'Asia/Bangkok',
+            'now',
+            'now',
+        ));
+
         $service = new LearnerDashboardService(
             $courseService,
             $quizService,
             $lessonNavigation,
+            $reviewService,
             $progressRepo,
             $attemptRepo,
+            $userRepo,
         );
 
         $overview = $service->buildOverview(7);
@@ -74,6 +95,7 @@ class LearnerDashboardServiceTest extends TestCase
         $this->assertSame(1, $overview['summary']['enrolled_courses']);
         $this->assertSame(1, $overview['summary']['lessons_completed']);
         $this->assertSame(0, $overview['summary']['quizzes_passed']);
+        $this->assertSame(3, $overview['summary']['reviews_due']);
         $this->assertCount(1, $overview['retake_items']);
         $this->assertSame('failed', $overview['courses'][0]['modules'][0]['status']);
     }
