@@ -67,6 +67,10 @@ class Router
                 $request->setAttribute('required_roles', $route['roles']);
             }
 
+            foreach ($params as $key => $value) {
+                $request->setAttribute($key, $value);
+            }
+
             $handler = $this->resolveHandler($route['handler'], $params);
 
             $pipeline = $this->buildPipeline($route['middleware'], $handler);

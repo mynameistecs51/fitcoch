@@ -8,6 +8,7 @@ use App\Core\Request;
 use App\Core\Response;
 use App\Services\AuthService;
 use App\Services\CourseService;
+use App\Services\QuizService;
 use App\Services\ValidationException;
 use Exception;
 
@@ -16,6 +17,7 @@ class InstructorCourseController
     public function __construct(
         private readonly AuthService $authService,
         private readonly CourseService $courseService,
+        private readonly QuizService $quizService,
     ) {
     }
 
@@ -78,6 +80,8 @@ class InstructorCourseController
 
         $user = $this->authService->currentUser();
         $roles = $this->authService->getUserRoles($user?->id ?? 0);
+        $moduleIds = array_map(static fn ($module) => $module->id, $outline['modules']);
+        $quizzesByModule = $this->quizService->listQuizzesByModuleIds($moduleIds);
 
         return Response::view('instructor/courses/form', [
             'title' => __('courses.instructor.edit_title'),
@@ -87,6 +91,7 @@ class InstructorCourseController
             'course' => $outline['course'],
             'modules' => $outline['modules'],
             'nuggetsByModule' => $outline['nuggetsByModule'],
+            'quizzesByModule' => $quizzesByModule,
             'form' => [],
             'errors' => [],
             'error' => $request->query()['error'] ?? null,
@@ -182,6 +187,7 @@ class InstructorCourseController
             'course' => $course,
             'modules' => $modules,
             'nuggetsByModule' => $nuggetsByModule,
+            'quizzesByModule' => $course ? $this->quizService->listQuizzesByModuleIds(array_map(static fn ($m) => $m->id, $modules)) : [],
             'form' => $form,
             'errors' => $errors,
             'error' => null,

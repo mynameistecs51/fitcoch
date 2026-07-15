@@ -1,14 +1,12 @@
 Current Module
 
-Sprint 6 — Virtual Classroom & WebRTC Workspace (next)
+Sprint 7 — Live Classroom Interactions (next)
 
 Recent (develop)
 
-Quiz engine + readiness gate (Sprint 5)
+Virtual classroom + readiness gate (Sprint 6)
 
-Admin user edit/import + forgot password
-
-Default timezone Asia/Bangkok
+Quiz engine + admin/auth polish (Sprint 5)
 
 Completed
 
@@ -34,9 +32,11 @@ Quiz / Readiness Gate
 
 Pending
 
-Sprint 6 — Virtual Classroom & WebRTC Workspace
+Sprint 7 — Live Classroom Interactions
 
-Dashboard
+Pending
+
+Sprint 7 — Live polling & chat
 
 Analytics
 
@@ -48,7 +48,7 @@ develop
 
 Current Database Version
 
-v1.5 (users, roles, courses, modules, nuggets, quizzes, readiness_tickets, password_reset_tokens)
+v1.6 (users, roles, courses, modules, nuggets, quizzes, readiness_tickets, password_reset_tokens, live_sessions)
 
 Coding Standard
 

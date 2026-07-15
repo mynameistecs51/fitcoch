@@ -5,6 +5,7 @@ $thClass = 'px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-s
 $tdClass = 'px-4 py-3 text-sm text-slate-700 dark:text-slate-300';
 $nuggetsByModule = $nuggetsByModule ?? [];
 $quizzesByModule = $quizzesByModule ?? [];
+$sessionsByModule = $sessionsByModule ?? [];
 $ticketsByModule = $ticketsByModule ?? [];
 ?>
 <section class="space-y-6">
@@ -43,6 +44,7 @@ $ticketsByModule = $ticketsByModule ?? [];
                             <?php $moduleNuggets = $nuggetsByModule[$module->id] ?? []; ?>
                             <?php $moduleQuiz = $quizzesByModule[$module->id] ?? null; ?>
                             <?php $moduleTicket = $ticketsByModule[$module->id] ?? null; ?>
+                            <?php $moduleSessions = $sessionsByModule[$module->id] ?? []; ?>
                             <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
                                 <td class="<?= escape($tdClass) ?> font-bold text-brand-600 dark:text-brand-accent">
                                     <?= escape((string) $module->sequenceOrder) ?>
@@ -51,7 +53,7 @@ $ticketsByModule = $ticketsByModule ?? [];
                                     <?= escape($module->title) ?>
                                 </td>
                                 <td class="<?= escape($tdClass) ?> text-slate-500 dark:text-slate-400 text-xs">
-                                    <?php if ($moduleNuggets === [] && $moduleQuiz === null): ?>
+                                    <?php if ($moduleNuggets === [] && $moduleQuiz === null && $moduleSessions === []): ?>
                                         <?= escape(__('courses.no_nuggets')) ?>
                                     <?php else: ?>
                                         <ul class="space-y-1">
@@ -79,6 +81,26 @@ $ticketsByModule = $ticketsByModule ?? [];
                                                     <?php endif; ?>
                                                 </li>
                                             <?php endif; ?>
+                                            <?php foreach ($moduleSessions as $liveSession): ?>
+                                                <?php if (!$liveSession->isJoinable()) { continue; } ?>
+                                                <li>
+                                                    <?php if ($moduleTicket !== null && $moduleTicket->isOpen()): ?>
+                                                        <a href="<?= escape(url('/live/' . $liveSession->id)) ?>" class="hover:text-brand-600 dark:hover:text-brand-500 transition font-semibold">
+                                                            <i class="fa-solid fa-video text-brand-500 mr-1"></i>
+                                                            <?= escape($liveSession->title) ?>
+                                                        </a>
+                                                        <span class="ml-1 inline-flex px-1.5 py-0.5 rounded text-[10px] font-bold bg-brand-500/15 text-brand-700 dark:text-brand-accent">
+                                                            <?= escape(__('live.status.' . $liveSession->status)) ?>
+                                                        </span>
+                                                    <?php else: ?>
+                                                        <span class="text-slate-400">
+                                                            <i class="fa-solid fa-video mr-1"></i>
+                                                            <?= escape($liveSession->title) ?>
+                                                            — <?= escape(__('live.syllabus_locked')) ?>
+                                                        </span>
+                                                    <?php endif; ?>
+                                                </li>
+                                            <?php endforeach; ?>
                                         </ul>
                                     <?php endif; ?>
                                 </td>

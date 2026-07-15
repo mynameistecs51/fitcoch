@@ -5,6 +5,7 @@ $success = $success ?? null;
 $errors = $errors ?? [];
 
 $inputClass = 'w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-200 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20';
+$passwordInputClass = $inputClass . ' pr-12';
 $labelClass = 'block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1';
 
 ob_start();
@@ -46,7 +47,19 @@ ob_start();
                             <?= escape(__('auth.forgot_password')) ?>
                         </a>
                     </div>
-                    <input type="password" id="password" name="password" required class="<?= escape($inputClass) ?>">
+                    <div class="password-toggle-wrap relative">
+                        <input type="password" id="password" name="password" required class="<?= escape($passwordInputClass) ?>">
+                        <button
+                            type="button"
+                            class="password-toggle-btn absolute inset-y-0 right-0 flex items-center px-4 text-slate-400 hover:text-brand-500 dark:hover:text-brand-accent transition"
+                            aria-label="<?= escape(__('auth.show_password')) ?>"
+                            aria-pressed="false"
+                            data-label-show="<?= escape(__('auth.show_password')) ?>"
+                            data-label-hide="<?= escape(__('auth.hide_password')) ?>"
+                        >
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
                     <?php if (!empty($errors['password'])): ?>
                         <p class="mt-1 text-sm text-red-600 dark:text-red-400"><?= escape($errors['password'][0]) ?></p>
                     <?php endif; ?>

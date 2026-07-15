@@ -71,11 +71,11 @@ ob_start();
             <input type="hidden" name="csrf_token" value="<?= escape(csrf_token()) ?>">
 
             <div class="table-responsive rounded-2xl border border-slate-200 dark:border-slate-800 mb-4">
-                <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-800">
+                <table class="min-w-full w-full table-fixed divide-y divide-slate-200 dark:divide-slate-800">
                     <thead class="bg-slate-50 dark:bg-slate-950">
                         <tr>
                             <th class="<?= escape($thClass) ?> w-16">#</th>
-                            <th class="<?= escape($thClass) ?>"><?= escape(__('quizzes.question')) ?></th>
+                            <th class="<?= escape($thClass) ?> w-2/5"><?= escape(__('quizzes.question')) ?></th>
                             <th class="<?= escape($thClass) ?>"><?= escape(__('quizzes.answer')) ?></th>
                         </tr>
                     </thead>
@@ -85,7 +85,7 @@ ob_start();
                                 <td class="<?= escape($tdClass) ?> font-bold text-brand-600 dark:text-brand-accent"><?= escape((string) ($index + 1)) ?></td>
                                 <td class="<?= escape($tdClass) ?> font-medium"><?= escape($question->questionText) ?></td>
                                 <td class="<?= escape($tdClass) ?>">
-                                    <div class="space-y-2">
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3">
                                         <?php foreach ($question->options as $option): ?>
                                             <label class="flex items-start gap-2 cursor-pointer">
                                                 <input
@@ -93,9 +93,9 @@ ob_start();
                                                     name="responses[<?= (int) $question->id ?>]"
                                                     value="<?= (int) $option['option_number'] ?>"
                                                     required
-                                                    class="mt-1 <?= escape($inputClass) ?>"
+                                                    class="mt-1 shrink-0 <?= escape($inputClass) ?>"
                                                 >
-                                                <span><?= escape($option['option_text']) ?></span>
+                                                <span class="text-sm leading-relaxed"><?= escape($option['option_text']) ?></span>
                                             </label>
                                         <?php endforeach; ?>
                                     </div>

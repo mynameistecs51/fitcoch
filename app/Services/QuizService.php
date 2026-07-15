@@ -194,6 +194,305 @@ class QuizService
     /**
      * @return array{
      *     course: \App\Models\Course,
+     *     module: Module,
+     *     quiz: ?Quiz,
+     *     questions: array<int, Question>
+     * }|null
+     */
+    public function getQuizEditor(int $courseId, int $moduleId): ?array
+    {
+        $course = $this->courseRepo->findById($courseId);
+        $module = $this->moduleRepo->findById($moduleId);
+
+        if ($course === null || $module === null || $module->courseId !== $courseId) {
+            return null;
+        }
+
+        $quiz = $this->quizRepo->findReadinessByModuleId($moduleId);
+
+        return [
+            'course' => $course,
+            'module' => $module,
+            'quiz' => $quiz,
+            'questions' => $quiz ? $this->quizRepo->listQuestionsWithOptions($quiz->id, true) : [],
+        ];
+    }
+
+    /** @param array<string, mixed> $data */
+    public function saveQuiz(int $courseId, int $moduleId, array $data): Quiz
+    {
+        $editor = $this->getQuizEditor($courseId, $moduleId);
+
+        if ($editor === null) {
+            throw new Exception(__('courses.validation.not_found'));
+        }
+
+        $validated = $this->validateQuizInput($data);
+        $existing = $editor['quiz'];
+
+        if ($existing !== null) {
+            return $this->quizRepo->update($existing->id, $validated);
+        }
+
+        return $this->quizRepo->create([
+            'module_id' => $moduleId,
+            'quiz_type' => 'readiness',
+            'title' => $validated['title'],
+            'passing_score_pct' => $validated['passing_score_pct'],
+        ]);
+    }
+
+    public function deleteQuiz(int $courseId, int $moduleId, int $quizId): void
+    {
+        $editor = $this->getQuizEditor($courseId, $moduleId);
+
+        if ($editor === null || $editor['quiz'] === null || $editor['quiz']->id !== $quizId) {
+            throw new Exception(__('quizzes.validation.not_found'));
+        }
+
+        $this->quizRepo->delete($quizId);
+    }
+
+    /** @param array<string, mixed> $data */
+    public function saveQuestion(int $courseId, int $moduleId, int $quizId, array $data): Question
+    {
+        $editor = $this->assertQuizEditor($courseId, $moduleId, $quizId);
+        $validated = $this->validateQuestionInput($data);
+        $questionId = (int) ($data['question_id'] ?? 0);
+
+        if ($questionId > 0) {
+            $question = $this->quizRepo->findQuestionById($questionId);
+
+            if ($question === null || $question->quizId !== $quizId) {
+                throw new Exception(__('quizzes.validation.question_not_found'));
+            }
+
+            $question = $this->quizRepo->updateQuestion($questionId, [
+                'question_text' => $validated['question_text'],
+                'points' => $validated['points'],
+            ]);
+        } else {
+            $question = $this->quizRepo->createQuestion([
+                'quiz_id' => $quizId,
+                'question_text' => $validated['question_text'],
+                'question_type' => 'single_choice',
+                'points' => $validated['points'],
+            ]);
+        }
+
+        $this->quizRepo->syncQuestionOptions($question->id, $validated['options']);
+
+        return $this->quizRepo->findQuestionById($question->id)
+            ?? throw new Exception(__('quizzes.validation.question_not_found'));
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     * @return array<int, Question>
+     */
+    public function saveQuestions(int $courseId, int $moduleId, int $quizId, array $data): array
+    {
+        $this->assertQuizEditor($courseId, $moduleId, $quizId);
+        $rawQuestions = $data['questions'] ?? [];
+
+        if (!is_array($rawQuestions)) {
+            throw new ValidationException(__('errors.validation_failed'), [
+                'questions' => [__('quizzes.validation.questions_required')],
+            ]);
+        }
+
+        $blocks = [];
+        $errors = [];
+
+        foreach ($rawQuestions as $index => $questionData) {
+            if (!is_array($questionData) || $this->isQuestionBlockEmpty($questionData)) {
+                continue;
+            }
+
+            $blockErrors = $this->collectQuestionInputErrors($questionData, (string) $index);
+
+            if ($blockErrors !== []) {
+                $errors = array_merge($errors, $blockErrors);
+                continue;
+            }
+
+            $blocks[] = $this->normalizeQuestionInput($questionData);
+        }
+
+        if ($blocks === [] && $errors === []) {
+            throw new ValidationException(__('errors.validation_failed'), [
+                'questions' => [__('quizzes.validation.questions_required')],
+            ]);
+        }
+
+        if ($errors !== []) {
+            throw new ValidationException(__('errors.validation_failed'), $errors);
+        }
+
+        $created = [];
+
+        foreach ($blocks as $validated) {
+            $question = $this->quizRepo->createQuestion([
+                'quiz_id' => $quizId,
+                'question_text' => $validated['question_text'],
+                'question_type' => 'single_choice',
+                'points' => $validated['points'],
+            ]);
+            $this->quizRepo->syncQuestionOptions($question->id, $validated['options']);
+            $created[] = $this->quizRepo->findQuestionById($question->id)
+                ?? throw new Exception(__('quizzes.validation.question_not_found'));
+        }
+
+        return $created;
+    }
+
+    public function deleteQuestion(int $courseId, int $moduleId, int $quizId, int $questionId): void
+    {
+        $this->assertQuizEditor($courseId, $moduleId, $quizId);
+        $question = $this->quizRepo->findQuestionById($questionId);
+
+        if ($question === null || $question->quizId !== $quizId) {
+            throw new Exception(__('quizzes.validation.question_not_found'));
+        }
+
+        $this->quizRepo->deleteQuestion($questionId);
+    }
+
+    /**
+     * @return array{course: \App\Models\Course, module: Module, quiz: Quiz}
+     */
+    private function assertQuizEditor(int $courseId, int $moduleId, int $quizId): array
+    {
+        $editor = $this->getQuizEditor($courseId, $moduleId);
+
+        if ($editor === null || $editor['quiz'] === null || $editor['quiz']->id !== $quizId) {
+            throw new Exception(__('quizzes.validation.not_found'));
+        }
+
+        return [
+            'course' => $editor['course'],
+            'module' => $editor['module'],
+            'quiz' => $editor['quiz'],
+        ];
+    }
+
+    /** @param array<string, mixed> $data */
+    private function validateQuizInput(array $data): array
+    {
+        $errors = [];
+        $title = trim((string) ($data['title'] ?? ''));
+        $passingScore = (int) ($data['passing_score_pct'] ?? 80);
+
+        if ($title === '') {
+            $errors['title'][] = __('quizzes.validation.title_required');
+        }
+
+        if ($passingScore < 1 || $passingScore > 100) {
+            $errors['passing_score_pct'][] = __('quizzes.validation.passing_score_invalid');
+        }
+
+        if ($errors !== []) {
+            throw new ValidationException(__('errors.validation_failed'), $errors);
+        }
+
+        return [
+            'title' => $title,
+            'passing_score_pct' => $passingScore,
+        ];
+    }
+
+    /** @param array<string, mixed> $data */
+    private function validateQuestionInput(array $data): array
+    {
+        $errors = $this->collectQuestionInputErrors($data, '');
+
+        if ($errors !== []) {
+            throw new ValidationException(__('errors.validation_failed'), $errors);
+        }
+
+        return $this->normalizeQuestionInput($data);
+    }
+
+    /** @param array<string, mixed> $data */
+    private function isQuestionBlockEmpty(array $data): bool
+    {
+        if (trim((string) ($data['question_text'] ?? '')) !== '') {
+            return false;
+        }
+
+        for ($i = 1; $i <= 4; $i++) {
+            if (trim((string) ($data['option_' . $i] ?? '')) !== '') {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     * @return array<string, array<int, string>>
+     */
+    private function collectQuestionInputErrors(array $data, string $index): array
+    {
+        $errors = [];
+        $prefix = $index === '' ? '' : 'questions.' . $index . '.';
+        $questionText = trim((string) ($data['question_text'] ?? ''));
+        $points = (int) ($data['points'] ?? 10);
+        $correctOption = (int) ($data['correct_option'] ?? 0);
+
+        if ($questionText === '') {
+            $errors[$prefix . 'question_text'][] = __('quizzes.validation.question_text_required');
+        }
+
+        if ($points < 1 || $points > 100) {
+            $errors[$prefix . 'points'][] = __('quizzes.validation.points_invalid');
+        }
+
+        for ($i = 1; $i <= 4; $i++) {
+            $text = trim((string) ($data['option_' . $i] ?? ''));
+
+            if ($text === '') {
+                $errors[$prefix . 'option_' . $i][] = __('quizzes.validation.option_required');
+            }
+        }
+
+        if ($correctOption < 1 || $correctOption > 4) {
+            $errors[$prefix . 'correct_option'][] = __('quizzes.validation.correct_option_required');
+        }
+
+        return $errors;
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     * @return array{question_text: string, points: int, options: array<int, array{option_number: int, option_text: string, is_correct: bool}>}
+     */
+    private function normalizeQuestionInput(array $data): array
+    {
+        $questionText = trim((string) ($data['question_text'] ?? ''));
+        $points = (int) ($data['points'] ?? 10);
+        $correctOption = (int) ($data['correct_option'] ?? 1);
+        $options = [];
+
+        for ($i = 1; $i <= 4; $i++) {
+            $options[] = [
+                'option_number' => $i,
+                'option_text' => trim((string) ($data['option_' . $i] ?? '')),
+                'is_correct' => $correctOption === $i,
+            ];
+        }
+
+        return [
+            'question_text' => $questionText,
+            'points' => $points,
+            'options' => $options,
+        ];
+    }
+
+    /**
+     * @return array{
+     *     course: \App\Models\Course,
      *     cohort: \App\Models\Cohort,
      *     module: Module,
      *     ticket: ?ReadinessTicket

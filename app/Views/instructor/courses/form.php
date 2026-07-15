@@ -6,6 +6,7 @@ $error = $error ?? null;
 $success = $success ?? null;
 $isEdit = $course !== null;
 $nuggetsByModule = $nuggetsByModule ?? [];
+$quizzesByModule = $quizzesByModule ?? [];
 
 $inputClass = 'w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-200 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20';
 $labelClass = 'block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1';
@@ -121,6 +122,7 @@ ob_start();
                             <tbody class="divide-y divide-slate-200 dark:divide-slate-800 bg-white dark:bg-slate-900">
                                 <?php foreach ($modules as $module): ?>
                                     <?php $moduleNuggets = $nuggetsByModule[$module->id] ?? []; ?>
+                                    <?php $moduleQuiz = ($quizzesByModule ?? [])[$module->id] ?? null; ?>
                                     <tr>
                                         <td class="<?= escape($tdClass) ?> font-bold text-brand-600 dark:text-brand-accent"><?= escape((string) $module->sequenceOrder) ?></td>
                                         <td class="<?= escape($tdClass) ?>">
@@ -142,15 +144,29 @@ ob_start();
                                             <?php else: ?>
                                                 <p class="mt-1 text-xs text-slate-400"><?= escape(__('courses.no_nuggets')) ?></p>
                                             <?php endif; ?>
+                                            <?php if ($moduleQuiz): ?>
+                                                <p class="mt-2 text-xs text-brand-600 dark:text-brand-500">
+                                                    <i class="fa-solid fa-clipboard-question mr-1"></i>
+                                                    <?= escape($moduleQuiz->title) ?> (<?= escape((string) $moduleQuiz->passingScorePct) ?>%)
+                                                </p>
+                                            <?php endif; ?>
                                         </td>
-                                        <td class="<?= escape($tdClass) ?> text-right space-x-3">
+                                        <td class="<?= escape($tdClass) ?> text-right">
+                                            <div class="flex flex-col items-end gap-1">
+                                            <a href="<?= escape(url('/instructor/courses/' . $course->id . '/modules/' . $module->id . '/quiz')) ?>" class="text-xs text-brand-600 dark:text-brand-500 hover:underline font-semibold">
+                                                <i class="fa-solid fa-clipboard-question mr-1"></i><?= escape(__('quizzes.instructor.manage_quiz')) ?>
+                                            </a>
                                             <a href="<?= escape(url('/instructor/courses/' . $course->id . '/modules/' . $module->id . '/readiness')) ?>" class="text-xs text-brand-600 dark:text-brand-500 hover:underline font-semibold">
                                                 <?= escape(__('quizzes.instructor.manage_readiness')) ?>
+                                            </a>
+                                            <a href="<?= escape(url('/instructor/courses/' . $course->id . '/modules/' . $module->id . '/live-sessions')) ?>" class="text-xs text-brand-600 dark:text-brand-500 hover:underline font-semibold">
+                                                <?= escape(__('live.instructor.manage_sessions')) ?>
                                             </a>
                                             <form method="POST" action="<?= escape(url('/instructor/courses/' . $course->id . '/modules/' . $module->id . '/delete')) ?>" class="inline" onsubmit="return confirm('<?= escape(__('courses.instructor.confirm_delete_module')) ?>');">
                                                 <input type="hidden" name="csrf_token" value="<?= escape(csrf_token()) ?>">
                                                 <button type="submit" class="text-xs text-red-600 dark:text-red-400 hover:underline"><?= escape(__('courses.instructor.delete_module')) ?></button>
                                             </form>
+                                            </div>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>

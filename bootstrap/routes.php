@@ -6,18 +6,23 @@ use App\Controllers\AdminController;
 use App\Controllers\AuthController;
 use App\Controllers\CourseController;
 use App\Controllers\InstructorCourseController;
+use App\Controllers\InstructorLiveSessionController;
+use App\Controllers\InstructorQuizController;
 use App\Controllers\InstructorReadinessController;
+use App\Controllers\LiveSessionController;
 use App\Controllers\LocaleController;
 use App\Controllers\NuggetController;
 use App\Controllers\QuizController;
 use App\Controllers\UserController;
 use App\Middleware\AuthMiddleware;
+use App\Middleware\ReadinessGateMiddleware;
 use App\Middleware\RoleMiddleware;
 
 /** @var \App\Core\Router $router */
 
 $authMiddleware = [AuthMiddleware::class];
 $authRoleMiddleware = [AuthMiddleware::class, RoleMiddleware::class];
+$liveGateMiddleware = [AuthMiddleware::class, ReadinessGateMiddleware::class];
 
 // Language switcher
 $router->get('/lang/{locale}', [LocaleController::class, 'switch']);
@@ -49,6 +54,14 @@ $router->get('/nuggets/{nuggetId}/stream', [NuggetController::class, 'stream'], 
 $router->get('/quizzes/{quizId}', [QuizController::class, 'show'], $authMiddleware);
 $router->post('/quizzes/{quizId}/attempts', [QuizController::class, 'submit'], $authMiddleware);
 
+// Live classroom routes (learner)
+$router->get('/live/{id}', [LiveSessionController::class, 'show'], $liveGateMiddleware);
+$router->post('/api/v1/live/{id}/join', [LiveSessionController::class, 'apiJoin'], $liveGateMiddleware);
+$router->post('/api/v1/live/{id}/leave', [LiveSessionController::class, 'apiLeave'], $authMiddleware);
+$router->get('/api/v1/live/{id}/participants', [LiveSessionController::class, 'apiParticipants'], $authMiddleware);
+$router->post('/api/v1/live/{id}/activate', [LiveSessionController::class, 'apiActivate'], $authMiddleware);
+$router->post('/api/v1/live/{id}/complete', [LiveSessionController::class, 'apiComplete'], $authMiddleware);
+
 // Instructor course management
 $instructorRoles = ['instructor', 'admin'];
 $router->get('/instructor/courses', [InstructorCourseController::class, 'index'], $authRoleMiddleware, $instructorRoles);
@@ -60,6 +73,17 @@ $router->post('/instructor/courses/{courseId}/modules', [InstructorCourseControl
 $router->post('/instructor/courses/{courseId}/modules/{moduleId}/delete', [InstructorCourseController::class, 'deleteModule'], $authRoleMiddleware, $instructorRoles);
 $router->get('/instructor/courses/{courseId}/modules/{moduleId}/readiness', [InstructorReadinessController::class, 'show'], $authRoleMiddleware, $instructorRoles);
 $router->post('/instructor/courses/{courseId}/modules/{moduleId}/readiness/{learnerId}/override', [InstructorReadinessController::class, 'override'], $authRoleMiddleware, $instructorRoles);
+$router->get('/instructor/courses/{courseId}/modules/{moduleId}/quiz/import/template', [InstructorQuizController::class, 'downloadImportTemplate'], $authRoleMiddleware, $instructorRoles);
+$router->post('/instructor/courses/{courseId}/modules/{moduleId}/quiz/{quizId}/import', [InstructorQuizController::class, 'importQuestions'], $authRoleMiddleware, $instructorRoles);
+$router->get('/instructor/courses/{courseId}/modules/{moduleId}/quiz', [InstructorQuizController::class, 'edit'], $authRoleMiddleware, $instructorRoles);
+$router->post('/instructor/courses/{courseId}/modules/{moduleId}/quiz', [InstructorQuizController::class, 'saveQuiz'], $authRoleMiddleware, $instructorRoles);
+$router->post('/instructor/courses/{courseId}/modules/{moduleId}/quiz/{quizId}/delete', [InstructorQuizController::class, 'deleteQuiz'], $authRoleMiddleware, $instructorRoles);
+$router->post('/instructor/courses/{courseId}/modules/{moduleId}/quiz/{quizId}/questions', [InstructorQuizController::class, 'saveQuestion'], $authRoleMiddleware, $instructorRoles);
+$router->post('/instructor/courses/{courseId}/modules/{moduleId}/quiz/{quizId}/questions/{questionId}/delete', [InstructorQuizController::class, 'deleteQuestion'], $authRoleMiddleware, $instructorRoles);
+$router->get('/instructor/courses/{courseId}/modules/{moduleId}/live-sessions', [InstructorLiveSessionController::class, 'index'], $authRoleMiddleware, $instructorRoles);
+$router->post('/instructor/courses/{courseId}/modules/{moduleId}/live-sessions', [InstructorLiveSessionController::class, 'store'], $authRoleMiddleware, $instructorRoles);
+$router->post('/instructor/courses/{courseId}/modules/{moduleId}/live-sessions/{sessionId}/activate', [InstructorLiveSessionController::class, 'activate'], $authRoleMiddleware, $instructorRoles);
+$router->post('/instructor/courses/{courseId}/modules/{moduleId}/live-sessions/{sessionId}/complete', [InstructorLiveSessionController::class, 'complete'], $authRoleMiddleware, $instructorRoles);
 
 // Admin routes (admin only)
 $adminRoles = ['admin'];
