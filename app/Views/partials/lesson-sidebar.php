@@ -140,4 +140,8 @@ $lessonCount = (int) ($lessonNav['lesson_count'] ?? count($lessons));
             </ul>
         </div>
     <?php endif; ?>
+
+    <?php if (!empty($discussionModuleId)): ?>
+        <?php require base_path('app/Views/partials/lesson-discussion-board.php'); ?>
+    <?php endif; ?>
 </aside>

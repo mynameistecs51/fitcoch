@@ -7,6 +7,7 @@ namespace App\Controllers;
 use App\Core\Request;
 use App\Core\Response;
 use App\Services\AuthService;
+use App\Services\DiscussionService;
 use App\Services\LessonNavigationService;
 use App\Services\NuggetService;
 use App\Services\QuizService;
@@ -19,6 +20,7 @@ class NuggetController
         private readonly AuthService $authService,
         private readonly NuggetService $nuggetService,
         private readonly LessonNavigationService $lessonNavigationService,
+        private readonly DiscussionService $discussionService,
         private readonly QuizService $quizService,
     ) {
     }
@@ -48,7 +50,7 @@ class NuggetController
         );
         $moduleQuizData = $this->resolveModuleQuizData($lesson['module']->id, $user->id);
 
-        return Response::view('courses/nugget', [
+        return Response::view('courses/nugget', array_merge([
             'title' => $lesson['nugget']->title,
             'user' => $user,
             'roles' => $roles,
@@ -65,7 +67,12 @@ class NuggetController
             'moduleQuizTicket' => $moduleQuizData['ticket'],
             'moduleQuizResult' => null,
             'moduleQuizError' => null,
-        ]);
+        ], $this->discussionService->buildViewContext(
+            $request,
+            $lesson['module']->id,
+            $user->id,
+            '/nuggets/' . $nuggetId,
+        )));
     }
 
     /** @return array{quiz: ?\App\Models\Quiz, questions: array<int, \App\Models\Question>, ticket: ?\App\Models\ReadinessTicket} */

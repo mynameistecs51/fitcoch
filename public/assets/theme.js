@@ -4,7 +4,7 @@
 
     function getStoredTheme() {
         const stored = localStorage.getItem(STORAGE_KEY);
-        return stored === 'light' || stored === 'dark' ? stored : 'dark';
+        return stored === 'light' || stored === 'dark' ? stored : 'light';
     }
 
     function applyTheme(theme) {

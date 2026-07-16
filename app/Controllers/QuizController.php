@@ -8,6 +8,7 @@ use App\Core\Request;
 use App\Core\Response;
 use App\Repositories\NuggetRepository;
 use App\Services\AuthService;
+use App\Services\DiscussionService;
 use App\Services\LessonNavigationService;
 use App\Services\QuizService;
 use App\Services\ValidationException;
@@ -19,6 +20,7 @@ class QuizController
         private readonly AuthService $authService,
         private readonly QuizService $quizService,
         private readonly LessonNavigationService $lessonNavigationService,
+        private readonly DiscussionService $discussionService,
         private readonly NuggetRepository $nuggetRepo,
     ) {
     }
@@ -48,7 +50,7 @@ class QuizController
             $quizId,
         );
 
-        return Response::view('courses/quiz', [
+        return Response::view('courses/quiz', array_merge([
             'title' => $quizData['quiz']->title,
             'user' => $user,
             'roles' => $roles,
@@ -62,7 +64,12 @@ class QuizController
             'error' => $request->query()['error'] ?? null,
             'lessonNav' => $lessonNav,
             'retakeLessonUrl' => $this->resolveModuleVideoUrl($quizData['module']->id),
-        ]);
+        ], $this->discussionService->buildViewContext(
+            $request,
+            $quizData['module']->id,
+            $user->id,
+            '/quizzes/' . $quizId,
+        )));
     }
 
     private function resolveModuleVideoUrl(int $moduleId): ?string
@@ -113,7 +120,7 @@ class QuizController
             $quizId,
         );
 
-        return Response::view('courses/quiz', [
+        return Response::view('courses/quiz', array_merge([
             'title' => $quizData['quiz']->title,
             'user' => $user,
             'roles' => $roles,
@@ -127,7 +134,12 @@ class QuizController
             'error' => null,
             'lessonNav' => $lessonNav,
             'retakeLessonUrl' => $this->resolveModuleVideoUrl($quizData['module']->id),
-        ]);
+        ], $this->discussionService->buildViewContext(
+            $request,
+            $quizData['module']->id,
+            $user->id,
+            '/quizzes/' . $quizId,
+        )));
     }
 
     public function apiShow(Request $request, int $quizId): Response

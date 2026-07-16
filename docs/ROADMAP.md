@@ -342,31 +342,24 @@ erDiagram
 
 ---
 
-### 2.6 Sprint 6: Virtual Classroom & WebRTC Workspace
-*   **Focus:** Establish signaling nodes and support WebRTC session entries restricted by active readiness tickets.
-*   **Effort Estimate:** 21 Story Points (14 developer days)
+### 2.6 Sprint 6: Module Discussion Board (แทน Live Classroom)
+*   **Focus:** Per-unit discussion board for learners to exchange thoughts during pre-class microlearning.
+*   **Effort Estimate:** 8 Story Points (5 developer days)
 *   **Priority:** High
-*   **Dependencies:** Sprint 5 (Readiness tickets validations)
-*   **Status:** ⏸ Core stub complete; further Live work deferred (see Sprint 7)
+*   **Dependencies:** Sprint 4 (Lesson pages), Sprint 3 (Enrollment)
+*   **Status:** ✅ Complete — sidebar discussion panel on nugget/quiz pages
+*   **Note:** Replaces original Live WebRTC scope (Sprint 6/7 Live deferred/removed from plan)
 *   **Deliverables:**
-    1.  Create `live_sessions` and `live_attendance` schemas.
-    2.  Setup WebRTC signaling channel mappings.
-    3.  Enforce gate middleware blockages on classroom route entries (`/live/{id}`).
-    4.  Write participant connection duration logs.
+    1.  Create `module_discussions` schema.
+    2.  Build discussion post/create flow per module.
+    3.  Embed discussion board in lesson sidebar (below lesson list).
 
 ---
 
-### 2.7 Sprint 7: Live Classroom Interactions (Polling & Chat)
-*   **Focus:** Build WebSocket communication pipelines to support live instructor polls and whiteboard data sharing.
-*   **Effort Estimate:** 13 Story Points (8 developer days)
-*   **Priority:** Medium
-*   **Dependencies:** Sprint 6 (Live sessions connection context)
-*   **Status:** ⏸ Deferred — skip for now; resume after Sprint 8 or when Live UX is prioritized
-*   **Deliverables:**
-    1.  Create `live_polls` and `live_poll_responses` database tables.
-    2.  Integrate WebSockets server managing message routing.
-    3.  Build live poll display overlays on student screens.
-    4.  Generate aggregate distribution charts on instructor control consoles.
+### 2.7 Sprint 7: Live Classroom Interactions — REMOVED FROM PLAN
+*   **Original Focus:** WebSocket polls and chat for live sessions.
+*   **Status:** ❌ Removed — replaced by Module Discussion Board (Sprint 6 revision).
+*   **Note:** Basic `/live` stub code remains in repo but is not on the active roadmap.
 
 ---
 

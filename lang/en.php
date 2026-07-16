@@ -378,6 +378,26 @@ return [
         'sidebar_quiz_label' => 'Pre-test quiz',
         'sidebar_quiz_locked' => 'Unlock after previous lesson',
     ],
+    'discussion' => [
+        'board_title' => 'Discussion Board',
+        'board_hint' => 'Share thoughts and questions with classmates in this unit',
+        'empty' => 'No posts yet — start the conversation',
+        'enroll_to_post' => 'Enroll in the course to post messages',
+        'form' => [
+            'body' => 'Message',
+            'placeholder' => 'Share your thoughts or questions about this lesson...',
+            'submit' => 'Post message',
+        ],
+        'success' => [
+            'posted' => 'Your message was posted',
+        ],
+        'validation' => [
+            'module_not_found' => 'Lesson unit not found',
+            'not_enrolled' => 'You must be enrolled to post',
+            'body_required' => 'Message is required',
+            'body_max' => 'Message must be 2,000 characters or fewer',
+        ],
+    ],
     'quizzes' => [
         'back_to_syllabus' => 'Back to syllabus',
         'passing_score' => 'Passing score: :score%',

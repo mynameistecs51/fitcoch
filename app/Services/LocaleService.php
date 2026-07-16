@@ -8,7 +8,7 @@ use App\Core\Request;
 
 class LocaleService
 {
-    private static string $locale = 'en';
+    private static string $locale = 'th';
 
     /** @var array<string, mixed> */
     private static array $lines = [];

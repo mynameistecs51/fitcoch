@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use App\Controllers\AdminController;
 use App\Controllers\AuthController;
-use App\Controllers\CourseController;
+use App\Controllers\DiscussionController;
 use App\Controllers\InstructorCohortController;
 use App\Controllers\InstructorKnowledgeItemController;
 use App\Controllers\InstructorCourseController;
@@ -54,6 +54,11 @@ $router->get('/courses/{courseId}', [CourseController::class, 'show'], $authMidd
 // Nugget lesson routes (learner)
 $router->get('/nuggets/{nuggetId}', [NuggetController::class, 'show'], $authMiddleware);
 $router->get('/nuggets/{nuggetId}/stream', [NuggetController::class, 'stream'], $authMiddleware);
+
+// Discussion board (per module/lesson unit)
+$router->get('/api/v1/modules/{moduleId}/discussions', [DiscussionController::class, 'apiList'], $authMiddleware);
+$router->post('/modules/{moduleId}/discussions', [DiscussionController::class, 'store'], $authMiddleware);
+$router->post('/api/v1/modules/{moduleId}/discussions', [DiscussionController::class, 'store'], $authMiddleware);
 
 // Quiz routes (learner)
 $router->get('/quizzes/{quizId}', [QuizController::class, 'show'], $authMiddleware);

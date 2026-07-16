@@ -15,7 +15,7 @@ $user = $user ?? null;
     <script>
         (function () {
             const t = localStorage.getItem('fitcoch-theme');
-            document.documentElement.classList.toggle('dark', t !== 'light');
+            document.documentElement.classList.toggle('dark', t === 'dark');
         })();
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
