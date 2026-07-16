@@ -23,11 +23,12 @@
 - [x] **Sprint 8 (Instructor)** — จัดการแนวคิดทบทวน (ตาราง + modal เพิ่ม/แก้ไข)
 - [x] **Sprint 8 (Dashboard)** — หน้า `/review/dashboard` สรุปคิวทบทวนและประวัติ
 - [x] **UX Defaults** — โหมดสว่าง + ภาษาไทยเป็นค่าเริ่มต้น
+- [x] **Live cleanup** — ลบโค้ดห้องเรียนสด, routes, เมนู sidebar และ UI ผู้สอน
 
 ### ตัดออกจากแผน (Removed)
 
 - ~~**Sprint 6/7 (Live interactions)**~~ — Poll, Chat, WebSocket (แทนด้วยกระดานสนทนา)
-  - โค้ดห้องเรียนสดพื้นฐานยังอยู่ใน repo แต่ไม่พัฒนาต่อ
+  - ลบโค้ด Live ออกจาก repo แล้ว (migration 010/011 ยังคงไว้เป็นประวัติ)
 - ~~**Sprint 8 CRON แจ้งเตือน**~~ — ไม่ทำในแผนปัจจุบัน
 
 ### รอทำ (Pending)

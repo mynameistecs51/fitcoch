@@ -3,7 +3,6 @@
 ob_start();
 $nuggetsByModule = $nuggetsByModule ?? [];
 $quizzesByModule = $quizzesByModule ?? [];
-$sessionsByModule = $sessionsByModule ?? [];
 $ticketsByModule = $ticketsByModule ?? [];
 $lessonNav = $lessonNav ?? null;
 $resumeLessonUrl = $resumeLessonUrl ?? null;
@@ -62,8 +61,7 @@ $resumeLessonUrl = $resumeLessonUrl ?? null;
                             $moduleNuggets = $nuggetsByModule[$module->id] ?? [];
                             $moduleQuiz = $quizzesByModule[$module->id] ?? null;
                             $moduleTicket = $ticketsByModule[$module->id] ?? null;
-                            $moduleSessions = $sessionsByModule[$module->id] ?? [];
-                            $hasContent = $moduleNuggets !== [] || $moduleQuiz !== null || $moduleSessions !== [];
+                            $hasContent = $moduleNuggets !== [] || $moduleQuiz !== null;
                             ?>
                             <article class="rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
                                 <div class="px-4 py-3 bg-slate-50 dark:bg-slate-950/70 border-b border-slate-200 dark:border-slate-800 flex items-center gap-3">
@@ -120,28 +118,6 @@ $resumeLessonUrl = $resumeLessonUrl ?? null;
                                                     </a>
                                                 </li>
                                             <?php endif; ?>
-
-                                            <?php foreach ($moduleSessions as $liveSession): ?>
-                                                <?php if (!$liveSession->isJoinable()) { continue; } ?>
-                                                <li>
-                                                    <?php if ($moduleTicket !== null && $moduleTicket->isOpen()): ?>
-                                                        <a
-                                                            href="<?= escape(url('/live/' . $liveSession->id)) ?>"
-                                                            class="flex items-center gap-3 p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-brand-500/40 transition"
-                                                        >
-                                                            <span class="w-9 h-9 rounded-full bg-brand-500/15 flex items-center justify-center shrink-0">
-                                                                <i class="fa-solid fa-video text-brand-500"></i>
-                                                            </span>
-                                                            <span class="text-sm font-semibold text-slate-900 dark:text-white"><?= escape($liveSession->title) ?></span>
-                                                        </a>
-                                                    <?php else: ?>
-                                                        <div class="flex items-center gap-3 p-3 rounded-xl border border-dashed border-slate-200 dark:border-slate-800 text-slate-400 text-sm">
-                                                            <i class="fa-solid fa-video"></i>
-                                                            <span><?= escape($liveSession->title) ?> — <?= escape(__('live.syllabus_locked')) ?></span>
-                                                        </div>
-                                                    <?php endif; ?>
-                                                </li>
-                                            <?php endforeach; ?>
                                         </ul>
                                     <?php endif; ?>
                                 </div>

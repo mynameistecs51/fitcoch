@@ -135,7 +135,7 @@ ob_start();
                                 <th class="<?= escape($thClass) ?>">#</th>
                                 <th class="<?= escape($thClass) ?>"><?= escape(__('quizzes.question')) ?></th>
                                 <th class="<?= escape($thClass) ?>"><?= escape(__('quizzes.instructor.points')) ?></th>
-                                <th class="<?= escape($thClass) ?> text-right"><?= escape(__('live.table.actions')) ?></th>
+                                <th class="<?= escape($thClass) ?> text-right"><?= escape(__('courses.table.actions')) ?></th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-200 dark:divide-slate-800">

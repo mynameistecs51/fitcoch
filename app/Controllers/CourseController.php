@@ -10,7 +10,6 @@ use App\Repositories\CohortRepository;
 use App\Services\AuthService;
 use App\Services\CourseService;
 use App\Services\LessonNavigationService;
-use App\Services\LiveSessionService;
 use App\Services\QuizService;
 
 class CourseController
@@ -19,7 +18,6 @@ class CourseController
         private readonly AuthService $authService,
         private readonly CourseService $courseService,
         private readonly QuizService $quizService,
-        private readonly LiveSessionService $liveSessionService,
         private readonly CohortRepository $cohortRepo,
         private readonly LessonNavigationService $lessonNavigationService,
     ) {
@@ -97,7 +95,6 @@ class CourseController
         $ticketsByModule = $cohort !== null
             ? $this->quizService->listTicketsForModules($user->id, $cohort->id, $moduleIds)
             : [];
-        $sessionsByModule = $this->liveSessionService->listSessionsByModuleIds($moduleIds);
         $lessonNav = $outline['modules'] !== []
             ? $this->lessonNavigationService->buildForLearner(
                 $courseId,
@@ -117,7 +114,6 @@ class CourseController
             'nuggetsByModule' => $outline['nuggetsByModule'],
             'quizzesByModule' => $quizzesByModule,
             'ticketsByModule' => $ticketsByModule,
-            'sessionsByModule' => $sessionsByModule,
             'lessonNav' => $lessonNav,
             'resumeLessonUrl' => $resumeLessonUrl,
         ]);

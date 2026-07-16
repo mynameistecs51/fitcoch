@@ -226,9 +226,6 @@ ob_start();
                                                 <a href="<?= escape(url('/instructor/courses/' . $courseId . '/modules/' . $module->id . '/readiness')) ?>" class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
                                                     <?= escape(__('quizzes.instructor.manage_readiness')) ?>
                                                 </a>
-                                                <a href="<?= escape(url('/instructor/courses/' . $courseId . '/modules/' . $module->id . '/live-sessions')) ?>" class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
-                                                    <?= escape(__('live.instructor.manage_sessions')) ?>
-                                                </a>
                                                 <form method="POST" action="<?= escape(url('/instructor/courses/' . $courseId . '/modules/' . $module->id . '/delete')) ?>" class="inline" onsubmit="return confirm('<?= escape(__('courses.instructor.confirm_delete_module')) ?>');">
                                                     <input type="hidden" name="csrf_token" value="<?= escape(csrf_token()) ?>">
                                                     <button type="submit" class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition">
