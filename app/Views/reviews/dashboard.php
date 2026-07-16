@@ -31,19 +31,19 @@ ob_start();
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
+        <div class="ux-stat-card rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
             <p class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400"><?= escape(__('reviews.dashboard_stats.due_today')) ?></p>
             <p class="text-3xl font-extrabold text-brand-600 dark:text-brand-accent mt-2"><?= escape((string) $dueToday) ?></p>
         </div>
-        <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
+        <div class="ux-stat-card rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
             <p class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400"><?= escape(__('reviews.dashboard_stats.reviewed_today')) ?></p>
             <p class="text-3xl font-extrabold text-slate-900 dark:text-white mt-2"><?= escape((string) ($panel['reviewed_today'] ?? 0)) ?></p>
         </div>
-        <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
+        <div class="ux-stat-card rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
             <p class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400"><?= escape(__('reviews.dashboard_stats.total_concepts')) ?></p>
             <p class="text-3xl font-extrabold text-slate-900 dark:text-white mt-2"><?= escape((string) ($panel['total_concepts'] ?? 0)) ?></p>
         </div>
-        <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
+        <div class="ux-stat-card rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
             <p class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400"><?= escape(__('reviews.dashboard_stats.today')) ?></p>
             <p class="text-lg font-bold text-slate-900 dark:text-white mt-2"><?= escape(date('d/m/Y', strtotime((string) ($panel['today'] ?? 'now')))) ?></p>
         </div>
@@ -77,7 +77,7 @@ ob_start();
             <?php else: ?>
                 <ul class="space-y-3">
                     <?php foreach ($dueItems as $item): ?>
-                        <li class="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/60 p-3">
+                        <li class="ux-list-item rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/60 p-3">
                             <p class="text-sm font-semibold text-slate-900 dark:text-white"><?= escape((string) $item['concept_name']) ?></p>
                             <p class="text-xs text-slate-500 dark:text-slate-400 mt-1"><?= escape((string) $item['course_title']) ?></p>
                             <p class="text-[11px] text-slate-400 mt-2">
@@ -104,7 +104,7 @@ ob_start();
             <?php else: ?>
                 <ul class="space-y-3">
                     <?php foreach ($upcomingItems as $item): ?>
-                        <li class="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/60 p-3">
+                        <li class="ux-list-item rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/60 p-3">
                             <p class="text-sm font-semibold text-slate-900 dark:text-white"><?= escape((string) $item['concept_name']) ?></p>
                             <p class="text-xs text-slate-500 dark:text-slate-400 mt-1"><?= escape((string) $item['course_title']) ?></p>
                             <p class="text-[11px] text-slate-400 mt-2">
@@ -131,7 +131,7 @@ ob_start();
         <?php else: ?>
             <ul class="space-y-3">
                 <?php foreach ($recentItems as $item): ?>
-                    <li class="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/60 p-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                    <li class="ux-list-item rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/60 p-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                         <div>
                             <p class="text-sm font-semibold text-slate-900 dark:text-white"><?= escape((string) $item['concept_name']) ?></p>
                             <p class="text-xs text-slate-500 dark:text-slate-400 mt-1"><?= escape((string) $item['course_title']) ?></p>

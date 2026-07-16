@@ -24,21 +24,21 @@ $badges = $gamification['badges'] ?? [];
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
+        <div class="ux-stat-card rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
             <p class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400"><?= escape(__('dashboard.stats.enrolled')) ?></p>
             <p class="text-3xl font-extrabold text-brand-600 dark:text-brand-accent mt-2"><?= escape((string) ($summary['enrolled_courses'] ?? 0)) ?></p>
         </div>
-        <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
+        <div class="ux-stat-card rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
             <p class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400"><?= escape(__('dashboard.stats.progress')) ?></p>
             <p class="text-3xl font-extrabold text-brand-600 dark:text-brand-accent mt-2"><?= escape((string) ($summary['overall_progress'] ?? 0)) ?>%</p>
         </div>
-        <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
+        <div class="ux-stat-card rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
             <p class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400"><?= escape(__('dashboard.stats.lessons')) ?></p>
             <p class="text-3xl font-extrabold text-slate-900 dark:text-white mt-2">
                 <?= escape((string) ($summary['lessons_completed'] ?? 0)) ?>/<?= escape((string) ($summary['lessons_total'] ?? 0)) ?>
             </p>
         </div>
-        <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
+        <div class="ux-stat-card rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
             <p class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400"><?= escape(__('dashboard.stats.quizzes')) ?></p>
             <p class="text-3xl font-extrabold text-slate-900 dark:text-white mt-2">
                 <?= escape((string) ($summary['quizzes_passed'] ?? 0)) ?>/<?= escape((string) ($summary['quizzes_total'] ?? 0)) ?>
@@ -52,7 +52,7 @@ $badges = $gamification['badges'] ?? [];
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div class="rounded-2xl border border-orange-500/30 bg-gradient-to-br from-orange-500/10 to-transparent p-5">
+        <div class="ux-stat-card rounded-2xl border border-orange-500/30 bg-gradient-to-br from-orange-500/10 to-transparent p-5">
             <p class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400 flex items-center gap-2">
                 <i class="fa-solid fa-fire text-orange-500"></i>
                 <?= escape(__('dashboard.gamification.streak')) ?>
@@ -65,7 +65,7 @@ $badges = $gamification['badges'] ?? [];
                 <?= escape(__('dashboard.gamification.longest_streak', ['days' => (string) ($summary['longest_streak'] ?? 0)])) ?>
             </p>
         </div>
-        <div class="rounded-2xl border border-yellow-500/30 bg-gradient-to-br from-yellow-500/10 to-transparent p-5">
+        <div class="ux-stat-card rounded-2xl border border-yellow-500/30 bg-gradient-to-br from-yellow-500/10 to-transparent p-5">
             <p class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400 flex items-center gap-2">
                 <i class="fa-solid fa-star text-yellow-500"></i>
                 <?= escape(__('dashboard.gamification.xp')) ?>
@@ -75,7 +75,7 @@ $badges = $gamification['badges'] ?? [];
             </p>
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-2"><?= escape(__('dashboard.gamification.xp_hint')) ?></p>
         </div>
-        <div class="rounded-2xl border border-brand-500/30 bg-gradient-to-br from-brand-500/10 to-transparent p-5">
+        <div class="ux-stat-card rounded-2xl border border-brand-500/30 bg-gradient-to-br from-brand-500/10 to-transparent p-5">
             <p class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400 flex items-center gap-2">
                 <i class="fa-solid fa-medal text-brand-500"></i>
                 <?= escape(__('dashboard.gamification.badges')) ?>
@@ -85,7 +85,7 @@ $badges = $gamification['badges'] ?? [];
                 <div class="flex flex-wrap gap-2 mt-3">
                     <?php foreach (array_slice($badges, 0, 4) as $badgeRow): ?>
                         <?php $badge = $badgeRow['badge'] ?? []; ?>
-                        <span class="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700 text-xs font-semibold" title="<?= escape((string) ($badge['description'] ?? '')) ?>">
+                        <span class="ux-badge-chip inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700 text-xs font-semibold" title="<?= escape((string) ($badge['description'] ?? '')) ?>">
                             <i class="fa-solid <?= escape((string) ($badge['icon_url'] ?? 'fa-award')) ?> text-brand-500"></i>
                             <?= escape(__('gamification.badges.' . ($badge['name'] ?? 'unknown'))) ?>
                         </span>

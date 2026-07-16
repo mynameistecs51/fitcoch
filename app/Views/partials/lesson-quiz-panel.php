@@ -39,7 +39,7 @@ $inputClass = 'rounded-lg border border-slate-200 dark:border-slate-700 text-sla
         <?php if ($result !== null): ?>
             <div
                 data-quiz-passed-result
-                class="p-5 rounded-2xl border <?= $result['passed'] ? 'border-brand-500/30 bg-brand-500/10 quiz-passed-card' : 'border-amber-500/30 bg-amber-500/10' ?>"
+                class="p-5 rounded-2xl border ux-alert-enter <?= $result['passed'] ? 'border-brand-500/30 bg-brand-500/10 quiz-passed-card' : 'border-amber-500/30 bg-amber-500/10' ?>"
             >
                 <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">
                     <?= escape($result['passed'] ? __('quizzes.result_passed') : __('quizzes.result_failed')) ?>

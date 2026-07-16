@@ -43,6 +43,8 @@
         if (unansweredArticles.length > 0) {
             unansweredArticles[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
+
+        banner.classList.add('ux-alert-enter');
     }
 
     function validateQuizForm(form) {

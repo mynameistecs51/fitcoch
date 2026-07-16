@@ -27,6 +27,7 @@
 - [x] **Sprint 9 (Phase 1)** — Gamification engine: migration, XP, streak (BR-02), badges, hooks + แดชบอร์ด
 - [x] **Sprint 9 (Phase 2)** — Instructor analytics `/instructor/analytics/cohort/{id}` + API
 - [x] **Sprint 9 (Phase 3)** — Certificates (verify URL + PDF download)
+- [x] **Animation** — micro-interactions, flashcard flip/slide บน `/review/daily`, hover/click polish
 
 ### ตัดออกจากแผน (Removed)
 
@@ -36,7 +37,7 @@
 
 ### รอทำ (Pending)
 
-- [ ] **Animation** (LOW priority)
+_ไม่มีงานค้างในแผนปัจจุบัน_
 
 ---
 
@@ -65,7 +66,7 @@
 
 ### ต่ำ (LOW)
 
-- [ ] Animation
+- [x] Animation — hover/click transitions, flashcard flip, review slide, badge pop
 
 ### อนาคต (Future)
 
