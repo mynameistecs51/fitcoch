@@ -19,16 +19,16 @@ class HomeController
 
     public function index(Request $request): Response
     {
-        if ($this->authService->currentUser() !== null) {
-            return Response::redirect('/dashboard');
-        }
-
         $searchQuery = trim((string) ($request->query()['q'] ?? ''));
         $landing = $this->homeService->buildLandingData($searchQuery !== '' ? $searchQuery : null);
+        $user = $this->authService->currentUser();
+        $roles = $user !== null ? $this->authService->getUserRoles($user->id) : [];
 
         return Response::view('home/landing', [
             'title' => __('home.title'),
             'landing' => $landing,
+            'user' => $user,
+            'roles' => $roles,
         ]);
     }
 }

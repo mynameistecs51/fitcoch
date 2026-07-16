@@ -15,40 +15,14 @@ class LocaleService
 
     public static function initFromRequest(?Request $request = null): void
     {
-        $supported = config('locale.supported', ['en', 'th']);
-        $default = (string) config('locale.default', 'en');
-
-        $locale = $_SESSION['locale'] ?? null;
-
-        if ($request !== null) {
-            $queryLang = $request->query()['lang'] ?? null;
-            if (is_string($queryLang) && in_array($queryLang, $supported, true)) {
-                $locale = $queryLang;
-            }
-        }
-
-        if ($locale === null) {
-            $locale = $default;
-        }
-
-        if (!in_array($locale, $supported, true)) {
-            $locale = $default;
-        }
-
-        self::set($locale);
+        self::set('th');
     }
 
     public static function set(string $locale): void
     {
-        $supported = config('locale.supported', ['en', 'th']);
-
-        if (!in_array($locale, $supported, true)) {
-            $locale = (string) config('locale.fallback', 'en');
-        }
-
-        self::$locale = $locale;
-        $_SESSION['locale'] = $locale;
-        self::load($locale);
+        self::$locale = 'th';
+        $_SESSION['locale'] = 'th';
+        self::load('th');
     }
 
     public static function get(): string
@@ -60,15 +34,6 @@ class LocaleService
     public static function translate(string $key, array $replace = []): string
     {
         $value = self::lookup($key, self::$locale);
-
-        if ($value === null) {
-            $fallback = (string) config('locale.fallback', 'en');
-
-            if ($fallback !== self::$locale) {
-                self::load($fallback);
-                $value = self::lookup($key, $fallback);
-            }
-        }
 
         if ($value === null) {
             return $key;

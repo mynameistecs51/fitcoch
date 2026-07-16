@@ -1,5 +1,9 @@
 /* Landing page — Thai MOOC inspired */
 
+.landing-header {
+    width: 100%;
+}
+
 .landing-hero-bg {
     background: linear-gradient(135deg, #0369a1 0%, #0284c7 35%, #0d9488 70%, #16a34a 100%);
 }

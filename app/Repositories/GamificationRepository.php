@@ -128,7 +128,7 @@ class GamificationRepository implements RepositoryInterface
     public function listUserBadges(int $userId): array
     {
         $stmt = $this->db->prepare(
-            'SELECT ub.*, b.name, b.description, b.icon_url
+            'SELECT ub.user_id, ub.badge_id, ub.awarded_at, b.id, b.name, b.description, b.icon_url
              FROM user_badges ub
              INNER JOIN badges b ON b.id = ub.badge_id
              WHERE ub.user_id = :user_id

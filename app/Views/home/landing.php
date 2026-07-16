@@ -13,6 +13,7 @@ $categories = $landing['categories'];
 $newestCourses = $landing['newest_courses'];
 $featuredCourses = $landing['featured_courses'];
 $allCourses = $landing['courses'];
+$user = $user ?? null;
 
 ob_start();
 ?>
@@ -202,4 +203,6 @@ ob_start();
 </div>
 <?php
 $content = ob_get_clean();
+$user = $user ?? null;
+$roles = $roles ?? [];
 require base_path('app/Views/layouts/public.php');

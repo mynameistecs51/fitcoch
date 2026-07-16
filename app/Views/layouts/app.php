@@ -62,7 +62,7 @@ $user = $user ?? null;
                 </button>
             <?php endif; ?>
 
-            <a href="<?= escape(url($showSidebar ? '/dashboard' : '/')) ?>" class="flex items-center gap-2 sm:gap-3 min-w-0">
+            <a href="<?= escape(url('/')) ?>" class="flex items-center gap-2 sm:gap-3 min-w-0">
                 <div class="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-brand-500 to-brand-accent shadow-lg shadow-brand-500/20 shrink-0">
                     <i class="fa-solid fa-dumbbell text-slate-950 text-base sm:text-lg"></i>
                 </div>

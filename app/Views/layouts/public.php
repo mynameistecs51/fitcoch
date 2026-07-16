@@ -1,5 +1,7 @@
 <?php
 $currentNav = $currentNav ?? 'home';
+$user = $user ?? null;
+$roles = $roles ?? [];
 ?>
 <!DOCTYPE html>
 <html lang="<?= escape(locale()) ?>" class="h-full">
@@ -45,9 +47,9 @@ $currentNav = $currentNav ?? 'home';
 </head>
 <body class="min-h-[100dvh] font-sans bg-slate-50 text-black dark:bg-slate-950 dark:text-white flex flex-col">
 
-    <header class="landing-header sticky top-0 z-50 border-b border-slate-200/80 dark:border-slate-800/80 bg-white/90 dark:bg-slate-950/90 backdrop-blur-md">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6">
-            <div class="flex items-center justify-between h-16 md:h-[4.5rem] gap-3">
+    <header class="landing-header sticky top-0 z-50 w-full border-b border-slate-200/80 dark:border-slate-800/80 bg-white/90 dark:bg-slate-950/90 backdrop-blur-md">
+        <div class="w-full px-4 sm:px-6 lg:px-8 xl:px-10">
+            <div class="flex items-center w-full h-16 md:h-[4.5rem] gap-3 lg:gap-6">
                 <a href="<?= escape(url('/')) ?>" class="flex items-center gap-2.5 min-w-0 shrink-0">
                     <div class="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500 to-brand-500 shadow-lg shadow-sky-500/20">
                         <i class="fa-solid fa-dumbbell text-white text-lg"></i>
@@ -62,7 +64,7 @@ $currentNav = $currentNav ?? 'home';
                     </div>
                 </a>
 
-                <nav class="hidden lg:flex items-center gap-1 text-sm font-medium">
+                <nav class="hidden lg:flex flex-1 items-center justify-center gap-1 text-sm font-medium min-w-0">
                     <?php
                     $navItems = [
                         ['id' => 'home', 'href' => url('/'), 'label' => __('home.nav.home')],
@@ -79,17 +81,39 @@ $currentNav = $currentNav ?? 'home';
                     <?php endforeach; ?>
                 </nav>
 
-                <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+                <div class="flex items-center gap-2 sm:gap-3 shrink-0 ml-auto">
                     <?php require base_path('app/Views/partials/header-controls.php'); ?>
-                    <a href="<?= escape(url('/login')) ?>" class="hidden sm:inline text-sm text-slate-600 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 font-medium whitespace-nowrap">
-                        <?= escape(__('nav.sign_in')) ?>
-                    </a>
-                    <a href="<?= escape(url('/login')) ?>" class="sm:hidden flex items-center justify-center w-10 h-10 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300" aria-label="<?= escape(__('home.nav.classroom')) ?>">
-                        <i class="fa-solid fa-right-to-bracket"></i>
-                    </a>
-                    <a href="<?= escape(url('/login')) ?>" class="px-3 sm:px-5 py-2 sm:py-2.5 bg-gradient-to-r from-sky-500 to-brand-500 text-white font-bold rounded-xl hover:opacity-90 transition text-xs sm:text-sm shadow-lg shadow-sky-500/25 whitespace-nowrap">
-                        <?= escape(__('home.nav.classroom')) ?>
-                    </a>
+                    <?php if ($user): ?>
+                        <?php
+                        $roleLabel = $roles !== []
+                            ? translate_roles($roles)
+                            : __('header.learner_label');
+                        ?>
+                        <div class="text-right hidden md:block">
+                            <p class="text-[11px] text-slate-500 dark:text-slate-400"><?= escape($roleLabel) ?></p>
+                            <p class="text-sm font-semibold text-slate-700 dark:text-slate-200 max-w-[10rem] truncate"><?= escape($user->firstName . ' ' . $user->lastName) ?></p>
+                        </div>
+                        <?php require base_path('app/Views/partials/header-user-menu.php'); ?>
+                        <form method="POST" action="<?= escape(url('/logout')) ?>" class="hidden sm:block">
+                            <input type="hidden" name="csrf_token" value="<?= escape(csrf_token()) ?>">
+                            <button type="submit" class="px-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition whitespace-nowrap">
+                                <?= escape(__('nav.sign_out')) ?>
+                            </button>
+                        </form>
+                        <a href="<?= escape(url('/dashboard')) ?>" class="px-3 sm:px-5 py-2 sm:py-2.5 bg-gradient-to-r from-sky-500 to-brand-500 text-white font-bold rounded-xl hover:opacity-90 transition text-xs sm:text-sm shadow-lg shadow-sky-500/25 whitespace-nowrap">
+                            <?= escape(__('home.nav.classroom')) ?>
+                        </a>
+                    <?php else: ?>
+                        <a href="<?= escape(url('/login')) ?>" class="hidden sm:inline text-sm text-slate-600 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 font-medium whitespace-nowrap">
+                            <?= escape(__('nav.sign_in')) ?>
+                        </a>
+                        <a href="<?= escape(url('/login')) ?>" class="sm:hidden flex items-center justify-center w-10 h-10 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300" aria-label="<?= escape(__('home.nav.classroom')) ?>">
+                            <i class="fa-solid fa-right-to-bracket"></i>
+                        </a>
+                        <a href="<?= escape(url('/login')) ?>" class="px-3 sm:px-5 py-2 sm:py-2.5 bg-gradient-to-r from-sky-500 to-brand-500 text-white font-bold rounded-xl hover:opacity-90 transition text-xs sm:text-sm shadow-lg shadow-sky-500/25 whitespace-nowrap">
+                            <?= escape(__('home.nav.classroom')) ?>
+                        </a>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -117,8 +141,14 @@ $currentNav = $currentNav ?? 'home';
                         <li><a href="<?= escape(url('/#all-courses')) ?>" class="hover:text-sky-400 transition"><?= escape(__('home.nav.courses')) ?></a></li>
                         <li><a href="<?= escape(url('/#categories')) ?>" class="hover:text-sky-400 transition"><?= escape(__('home.nav.categories')) ?></a></li>
                         <li><a href="<?= escape(url('/#features')) ?>" class="hover:text-sky-400 transition"><?= escape(__('home.nav.features')) ?></a></li>
-                        <li><a href="<?= escape(url('/login')) ?>" class="hover:text-sky-400 transition"><?= escape(__('nav.sign_in')) ?></a></li>
-                        <li><a href="<?= escape(url('/register')) ?>" class="hover:text-sky-400 transition"><?= escape(__('nav.register')) ?></a></li>
+                        <?php if ($user): ?>
+                            <li><a href="<?= escape(url('/dashboard')) ?>" class="hover:text-sky-400 transition"><?= escape(__('sidebar.dashboard')) ?></a></li>
+                            <li><a href="<?= escape(url('/courses')) ?>" class="hover:text-sky-400 transition"><?= escape(__('home.nav.courses')) ?></a></li>
+                            <li><a href="<?= escape(url('/profile')) ?>" class="hover:text-sky-400 transition"><?= escape(__('nav.profile')) ?></a></li>
+                        <?php else: ?>
+                            <li><a href="<?= escape(url('/login')) ?>" class="hover:text-sky-400 transition"><?= escape(__('nav.sign_in')) ?></a></li>
+                            <li><a href="<?= escape(url('/register')) ?>" class="hover:text-sky-400 transition"><?= escape(__('nav.register')) ?></a></li>
+                        <?php endif; ?>
                     </ul>
                 </div>
                 <div>
@@ -136,5 +166,8 @@ $currentNav = $currentNav ?? 'home';
 
     <script src="<?= escape(url('/assets/theme.js')) ?>"></script>
     <script src="<?= escape(url('/assets/landing.js')) ?>"></script>
+    <?php if ($user): ?>
+        <script src="<?= escape(url('/assets/user-menu.js')) ?>"></script>
+    <?php endif; ?>
 </body>
 </html>

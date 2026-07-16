@@ -1,5 +1,6 @@
 <?php
 $course = $course ?? ['id' => 0, 'title' => '', 'description' => '', 'module_count' => 0];
+$user = $user ?? null;
 $description = trim((string) $course['description']);
 $excerpt = $description !== ''
     ? (mb_strlen($description) > 100 ? mb_substr($description, 0, 100) . '…' : $description)
@@ -30,7 +31,7 @@ $excerpt = $description !== ''
             <?= escape($excerpt) ?>
         </p>
         <a
-            href="<?= escape(url('/login')) ?>"
+            href="<?= escape(url($user ? '/courses' : '/login')) ?>"
             class="inline-flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-sky-500/10 hover:bg-sky-500 text-sky-700 hover:text-white dark:text-sky-400 dark:hover:text-white font-semibold text-sm transition"
         >
             <?= escape(__('home.enroll_cta')) ?>

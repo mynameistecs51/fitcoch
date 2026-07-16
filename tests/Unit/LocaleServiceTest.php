@@ -12,31 +12,31 @@ class LocaleServiceTest extends TestCase
     protected function setUp(): void
     {
         $_SESSION = [];
-        LocaleService::set('en');
+        LocaleService::set('th');
     }
 
-    public function testTranslatesEnglishString(): void
+    public function testAlwaysUsesThaiLocale(): void
     {
-        $this->assertSame('Sign In', LocaleService::translate('auth.sign_in'));
+        LocaleService::set('en');
+        $this->assertSame('th', LocaleService::get());
+        $this->assertSame('เข้าสู่ระบบ', LocaleService::translate('auth.sign_in'));
     }
 
     public function testTranslatesThaiString(): void
     {
-        LocaleService::set('th');
         $this->assertSame('เข้าสู่ระบบ', LocaleService::translate('auth.sign_in'));
     }
 
     public function testReplacesPlaceholders(): void
     {
         $this->assertSame(
-            'Welcome, John!',
+            'สวัสดี, John!',
             LocaleService::translate('dashboard.welcome', ['name' => 'John'])
         );
     }
 
     public function testTranslatesRoleNames(): void
     {
-        LocaleService::set('th');
         $roles = LocaleService::translateRoles(['learner', 'admin']);
 
         $this->assertSame('ผู้เรียน', $roles[0]);
