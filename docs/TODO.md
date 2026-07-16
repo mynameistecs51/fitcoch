@@ -28,6 +28,11 @@
 - [x] **Sprint 9 (Phase 2)** — Instructor analytics `/instructor/analytics/cohort/{id}` + API
 - [x] **Sprint 9 (Phase 3)** — Certificates (verify URL + PDF download)
 - [x] **Animation** — micro-interactions, flashcard flip/slide บน `/review/daily`, hover/click polish
+- [x] **หน้าแรกสาธารณะ** — Landing แบบ Thai MOOC (`/`, `HomeController`, layout สาธารณะ, ค้นหา/สถิติ/หมวดหมู่/หลักสูตร)
+- [x] **ข้อความยังไม่อ่าน (ผู้สอน)** — migration `discussion_reads`, badge ในรายการหลักสูตร, mark read เมื่อเปิดกระดานสนทนา
+- [x] **Quiz ผู้เรียน** — แสดงประวัติคำตอบล่าสุด + ปุ่มทำซ้ำ (`?retake=1`); แก้บล็อกเมื่อ Ticket ปลดล็อกแล้วแต่ยังไม่มี attempt
+- [x] **โครงสร้างบทเรียน** — partial `course-lesson-structure`, การ์ดหลักสูตรพร้อม syllabus, ไฮไลต์บทเรียนที่เรียนจบ
+- [x] **Syllabus โมดูล Quiz-only** — แสดงลิงก์แบบทดสอบใน Unit ที่ไม่มีวิดีโอ + ปุ่มเริ่มเรียนชี้ไป quiz ได้
 
 ### ตัดออกจากแผน (Removed)
 
@@ -67,6 +72,10 @@ _ไม่มีงานค้างในแผนปัจจุบัน_
 ### ต่ำ (LOW)
 
 - [x] Animation — hover/click transitions, flashcard flip, review slide, badge pop
+- [x] หน้าแรกสาธารณะ (Landing) — hero, ค้นหา, สถิติ, หมวดหมู่, การ์ดหลักสูตร
+- [x] ข้อความยังไม่อ่านในกระดานสนทนา (คอลัมน์ผู้สอน)
+- [x] ประวัติ Quiz + ทำซ้ำ + แก้ UX เมื่อ Readiness Ticket ปลดล็อกแล้ว
+- [x] Syllabus/การ์ดหลักสูตร — โครงสร้างบทเรียน + โมดูลที่มีแค่ Quiz
 
 ### อนาคต (Future)
 

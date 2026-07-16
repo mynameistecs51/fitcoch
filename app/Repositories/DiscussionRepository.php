@@ -76,4 +76,62 @@ class DiscussionRepository implements RepositoryInterface
 
         return DiscussionPost::fromArray($row);
     }
+
+    /** @param array<int, int> $courseIds */
+    public function countUnreadLearnerPostsByCourseIds(int $userId, array $courseIds): array
+    {
+        if ($courseIds === []) {
+            return [];
+        }
+
+        $placeholders = implode(',', array_fill(0, count($courseIds), '?'));
+        $sql = 'SELECT m.course_id, COUNT(d.id) AS unread_count
+                FROM modules m
+                INNER JOIN module_discussions d ON d.module_id = m.id
+                LEFT JOIN discussion_reads r ON r.module_id = m.id AND r.user_id = ?
+                WHERE m.course_id IN (' . $placeholders . ')
+                  AND d.user_id <> ?
+                  AND d.created_at > COALESCE(r.last_read_at, \'1970-01-01 00:00:00\')
+                  AND NOT EXISTS (
+                      SELECT 1
+                      FROM user_roles ur
+                      INNER JOIN roles ro ON ro.id = ur.role_id
+                      WHERE ur.user_id = d.user_id
+                        AND ro.name IN (\'instructor\', \'admin\')
+                  )
+                GROUP BY m.course_id';
+
+        $stmt = $this->db->prepare($sql);
+        $params = array_merge([$userId], $courseIds, [$userId]);
+
+        foreach ($params as $index => $value) {
+            $stmt->bindValue($index + 1, $value, \PDO::PARAM_INT);
+        }
+
+        $stmt->execute();
+        $counts = [];
+
+        foreach ($courseIds as $courseId) {
+            $counts[$courseId] = 0;
+        }
+
+        foreach ($stmt->fetchAll() as $row) {
+            $counts[(int) $row['course_id']] = (int) $row['unread_count'];
+        }
+
+        return $counts;
+    }
+
+    public function markModuleRead(int $userId, int $moduleId): void
+    {
+        $stmt = $this->db->prepare(
+            'INSERT INTO discussion_reads (user_id, module_id, last_read_at)
+             VALUES (:user_id, :module_id, NOW())
+             ON DUPLICATE KEY UPDATE last_read_at = NOW()'
+        );
+        $stmt->execute([
+            'user_id' => $userId,
+            'module_id' => $moduleId,
+        ]);
+    }
 }

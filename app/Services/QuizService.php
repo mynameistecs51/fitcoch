@@ -34,7 +34,15 @@ class QuizService
      *     quiz: Quiz,
      *     module: Module,
      *     questions: array<int, \App\Models\Question>,
-     *     ticket: ?ReadinessTicket
+     *     ticket: ?ReadinessTicket,
+     *     course: \App\Models\Course,
+     *     latest_attempt: ?array{
+     *         attempt_id: int,
+     *         score_pct: int,
+     *         passed: bool,
+     *         completed_at: string,
+     *         responses: array<int, int>
+     *     }
      * }|null
      */
     public function getQuizForLearner(int $quizId, int $userId): ?array
@@ -57,6 +65,34 @@ class QuizService
             'questions' => $this->quizRepo->listQuestionsWithOptions($quizId, false),
             'ticket' => $context['ticket'],
             'course' => $context['course'],
+            'latest_attempt' => $this->buildLatestAttemptReview($quizId, $userId, $quiz->passingScorePct),
+        ];
+    }
+
+    /**
+     * @return array{
+     *     attempt_id: int,
+     *     score_pct: int,
+     *     passed: bool,
+     *     completed_at: string,
+     *     responses: array<int, int>
+     * }|null
+     */
+    public function buildLatestAttemptReview(int $quizId, int $userId, int $passingScorePct): ?array
+    {
+        $latestAttempts = $this->attemptRepo->findLatestByUserAndQuizIds($userId, [$quizId]);
+        $attempt = $latestAttempts[$quizId] ?? null;
+
+        if ($attempt === null) {
+            return null;
+        }
+
+        return [
+            'attempt_id' => $attempt['id'],
+            'score_pct' => $attempt['score_pct'],
+            'passed' => $attempt['score_pct'] >= $passingScorePct,
+            'completed_at' => $attempt['completed_at'],
+            'responses' => $this->attemptRepo->findResponsesByAttemptId($attempt['id']),
         ];
     }
 

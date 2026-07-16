@@ -61,6 +61,14 @@ class CertificateRepository implements RepositoryInterface
         return $created;
     }
 
+    public function countAll(): int
+    {
+        $stmt = $this->db->prepare('SELECT COUNT(*) FROM certificates');
+        $stmt->execute();
+
+        return (int) $stmt->fetchColumn();
+    }
+
     /**
      * @return array<int, Certificate>
      */

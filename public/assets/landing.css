@@ -1,0 +1,97 @@
+/* Landing page — Thai MOOC inspired */
+
+.landing-hero-bg {
+    background: linear-gradient(135deg, #0369a1 0%, #0284c7 35%, #0d9488 70%, #16a34a 100%);
+}
+
+html.dark .landing-hero-bg {
+    background: linear-gradient(135deg, #0c4a6e 0%, #075985 35%, #115e59 70%, #14532d 100%);
+}
+
+.landing-hero-pattern {
+    background-image:
+        radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.12) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 60% 80%, rgba(163, 230, 53, 0.15) 0%, transparent 45%);
+}
+
+.landing-hero-badge {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: #e0f2fe;
+    backdrop-filter: blur(8px);
+}
+
+.landing-hero-accent {
+    background: linear-gradient(90deg, #a3e635, #fef08a);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.landing-search {
+    filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.2));
+}
+
+.landing-cta-bg {
+    background: linear-gradient(135deg, #0c4a6e 0%, #0369a1 50%, #15803d 100%);
+}
+
+.landing-cta {
+    margin-bottom: 0;
+}
+
+.landing-course-thumb-pattern {
+    background-image:
+        repeating-linear-gradient(
+            -45deg,
+            transparent,
+            transparent 8px,
+            rgba(255, 255, 255, 0.06) 8px,
+            rgba(255, 255, 255, 0.06) 16px
+        );
+}
+
+.landing-category-pill.is-active {
+    border-color: rgba(14, 165, 233, 0.6);
+    background: rgba(14, 165, 233, 0.08);
+    box-shadow: 0 8px 24px rgba(14, 165, 233, 0.15);
+}
+
+.landing-course-card.is-hidden {
+    display: none;
+}
+
+.landing-feature-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.landing-feature-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 40px rgba(14, 165, 233, 0.12);
+}
+
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .landing-feature-card:hover {
+        transform: none;
+    }
+}

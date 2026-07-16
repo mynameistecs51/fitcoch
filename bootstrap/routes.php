@@ -7,6 +7,7 @@ use App\Controllers\AuthController;
 use App\Controllers\CertificateController;
 use App\Controllers\CourseController;
 use App\Controllers\DiscussionController;
+use App\Controllers\HomeController;
 use App\Controllers\InstructorAnalyticsController;
 use App\Controllers\InstructorCohortController;
 use App\Controllers\InstructorKnowledgeItemController;
@@ -31,7 +32,7 @@ $authRoleMiddleware = [AuthMiddleware::class, RoleMiddleware::class];
 $router->get('/lang/{locale}', [LocaleController::class, 'switch']);
 
 // Web routes
-$router->get('/', [AuthController::class, 'showLogin']);
+$router->get('/', [HomeController::class, 'index']);
 $router->get('/login', [AuthController::class, 'showLogin']);
 $router->post('/login', [AuthController::class, 'login']);
 $router->get('/forgot-password', [AuthController::class, 'showForgotPassword']);

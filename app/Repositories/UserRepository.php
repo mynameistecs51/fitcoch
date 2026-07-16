@@ -39,6 +39,14 @@ class UserRepository implements RepositoryInterface
         return (bool) $stmt->fetchColumn();
     }
 
+    public function countActive(): int
+    {
+        $stmt = $this->db->prepare("SELECT COUNT(*) FROM users WHERE status = 'active'");
+        $stmt->execute();
+
+        return (int) $stmt->fetchColumn();
+    }
+
     /** @param array{email: string, password_hash: string, first_name: string, last_name: string, timezone: string} $data */
     public function create(array $data): User
     {

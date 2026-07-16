@@ -48,7 +48,7 @@ class NuggetController
             $lesson['module']->id,
             $nuggetId,
         );
-        $moduleQuizData = $this->resolveModuleQuizData($lesson['module']->id, $user->id);
+        $moduleQuizData = $this->resolveModuleQuizData($lesson['module']->id, $user->id, $request);
 
         return Response::view('courses/nugget', array_merge([
             'title' => $lesson['nugget']->title,
@@ -65,6 +65,9 @@ class NuggetController
             'moduleQuiz' => $moduleQuizData['quiz'],
             'moduleQuizQuestions' => $moduleQuizData['questions'],
             'moduleQuizTicket' => $moduleQuizData['ticket'],
+            'moduleQuizLatestAttempt' => $moduleQuizData['latest_attempt'],
+            'moduleQuizRetake' => ($request->query()['retake'] ?? '') === '1',
+            'moduleQuizRetakeUrl' => url('/nuggets/' . $nuggetId . '?retake=1'),
             'moduleQuizResult' => null,
             'moduleQuizError' => null,
         ], $this->discussionService->buildViewContext(
@@ -75,8 +78,8 @@ class NuggetController
         )));
     }
 
-    /** @return array{quiz: ?\App\Models\Quiz, questions: array<int, \App\Models\Question>, ticket: ?\App\Models\ReadinessTicket} */
-    private function resolveModuleQuizData(int $moduleId, int $userId): array
+    /** @return array{quiz: ?\App\Models\Quiz, questions: array<int, \App\Models\Question>, ticket: ?\App\Models\ReadinessTicket, latest_attempt: ?array<string, mixed>} */
+    private function resolveModuleQuizData(int $moduleId, int $userId, Request $request): array
     {
         $quizzes = $this->quizService->listQuizzesByModuleIds([$moduleId]);
         $quiz = $quizzes[$moduleId] ?? null;
@@ -86,6 +89,7 @@ class NuggetController
                 'quiz' => null,
                 'questions' => [],
                 'ticket' => null,
+                'latest_attempt' => null,
             ];
         }
 
@@ -96,6 +100,7 @@ class NuggetController
                 'quiz' => null,
                 'questions' => [],
                 'ticket' => null,
+                'latest_attempt' => null,
             ];
         }
 
@@ -103,6 +108,7 @@ class NuggetController
             'quiz' => $quizData['quiz'],
             'questions' => $quizData['questions'],
             'ticket' => $quizData['ticket'],
+            'latest_attempt' => $quizData['latest_attempt'],
         ];
     }
 

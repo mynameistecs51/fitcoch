@@ -4,6 +4,7 @@ ob_start();
 $thClass = 'px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase';
 $tdClass = 'px-4 py-3 text-sm text-slate-700 dark:text-slate-300';
 $enrollmentCounts = $enrollmentCounts ?? [];
+$unreadCounts = $unreadCounts ?? [];
 ?>
 <section class="space-y-6">
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -34,6 +35,7 @@ $enrollmentCounts = $enrollmentCounts ?? [];
                         <th class="<?= escape($thClass) ?>"><?= escape(__('courses.table.status')) ?></th>
                         <th class="<?= escape($thClass) ?>"><?= escape(__('courses.instructor.progress_stats.enrolled')) ?></th>
                         <th class="<?= escape($thClass) ?> text-right"><?= escape(__('courses.table.actions')) ?></th>
+                        <th class="<?= escape($thClass) ?> text-center"><?= escape(__('discussion.unread_column')) ?></th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-200 dark:divide-slate-800 bg-white dark:bg-slate-900">
@@ -67,6 +69,12 @@ $enrollmentCounts = $enrollmentCounts ?? [];
                                     </a>
                                 </div>
                             </td>
+                            <?php
+                                $courseId = $course->id;
+                                $unreadCount = (int) ($unreadCounts[$course->id] ?? 0);
+                                $linkUrl = url('/instructor/courses/' . $course->id . '/edit');
+                                require base_path('app/Views/partials/course-unread-messages.php');
+                            ?>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
