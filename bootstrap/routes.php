@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Controllers\AdminController;
 use App\Controllers\AuthController;
+use App\Controllers\CertificateController;
 use App\Controllers\CourseController;
 use App\Controllers\DiscussionController;
 use App\Controllers\InstructorAnalyticsController;
@@ -48,6 +49,7 @@ $router->post('/profile', [UserController::class, 'updateProfile'], $authMiddlew
 $router->get('/courses', [CourseController::class, 'index'], $authMiddleware);
 $router->post('/courses/{courseId}/enroll', [CourseController::class, 'enroll'], $authMiddleware);
 $router->get('/courses/{courseId}', [CourseController::class, 'show'], $authMiddleware);
+$router->get('/courses/{courseId}/certificate', [CertificateController::class, 'showForCourse'], $authMiddleware);
 
 // Nugget lesson routes (learner)
 $router->get('/nuggets/{nuggetId}', [NuggetController::class, 'show'], $authMiddleware);
@@ -66,6 +68,10 @@ $router->post('/quizzes/{quizId}/attempts', [QuizController::class, 'submit'], $
 $router->get('/review/dashboard', [ReviewController::class, 'showDashboard'], $authMiddleware);
 $router->get('/review/daily', [ReviewController::class, 'showDaily'], $authMiddleware);
 $router->post('/review/daily/{knowledgeItemId}/respond', [ReviewController::class, 'respond'], $authMiddleware);
+
+// Certificate routes (public verification + learner issue)
+$router->get('/certificate/{hash}/download', [CertificateController::class, 'download']);
+$router->get('/certificate/{hash}', [CertificateController::class, 'show']);
 
 // Instructor course management
 $instructorRoles = ['instructor', 'admin'];
@@ -134,6 +140,9 @@ $router->post('/api/v1/quizzes/{quizId}/attempts', [QuizController::class, 'apiS
 $router->get('/api/v1/reviews/dashboard', [ReviewController::class, 'apiDashboard'], $authMiddleware);
 $router->get('/api/v1/reviews/daily', [ReviewController::class, 'apiDaily'], $authMiddleware);
 $router->post('/api/v1/reviews/{knowledgeItemId}/respond', [ReviewController::class, 'respond'], $authMiddleware);
+
+// API routes — Certificates (public verification)
+$router->get('/api/v1/certificates/{hash}', [CertificateController::class, 'apiShow']);
 
 // API routes — RBAC demo (instructor/admin only)
 $router->get('/api/v1/instructor/ping', [UserController::class, 'instructorPing'], $authRoleMiddleware, ['instructor', 'admin']);

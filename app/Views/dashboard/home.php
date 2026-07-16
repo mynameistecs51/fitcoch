@@ -200,6 +200,12 @@ $badges = $gamification['badges'] ?? [];
                                         <?= escape(__('dashboard.continue_learning')) ?>
                                     </a>
                                 <?php endif; ?>
+                                <?php if (!empty($entry['certificate_url'])): ?>
+                                    <a href="<?= escape((string) $entry['certificate_url']) ?>" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-amber-500/40 text-amber-700 dark:text-amber-300 font-bold text-sm hover:bg-amber-500/10 transition">
+                                        <i class="fa-solid fa-award"></i>
+                                        <?= escape(__('certificates.view_cta')) ?>
+                                    </a>
+                                <?php endif; ?>
                             </div>
                         </div>
 

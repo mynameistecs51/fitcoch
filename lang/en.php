@@ -661,6 +661,23 @@ return [
             'learners_title' => 'Individual learner status',
         ],
     ],
+    'certificates' => [
+        'title' => 'Certificate of Mastery',
+        'not_found_title' => 'Certificate not found',
+        'verified' => 'This certificate is verifiable',
+        'mastery_label' => 'Certificate of Mastery',
+        'awarded_to' => 'Awarded to',
+        'completion_text' => 'Has successfully completed the course and met all readiness requirements',
+        'awarded_on' => 'Awarded on :date',
+        'verify_code' => 'Verification code: :hash',
+        'download_pdf' => 'Download PDF',
+        'copy_link' => 'Copy verification link',
+        'view_cta' => 'Certificate',
+        'validation' => [
+            'not_found' => 'Certificate or verification code not found.',
+            'not_eligible' => 'Course completion requirements are not met yet.',
+        ],
+    ],
     'gamification' => [
         'badges' => [
             'first_nugget' => 'First Lesson',

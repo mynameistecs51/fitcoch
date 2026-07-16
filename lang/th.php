@@ -661,6 +661,23 @@ return [
             'learners_title' => 'สถานะผู้เรียนรายบุคคล',
         ],
     ],
+    'certificates' => [
+        'title' => 'ใบรับรองความเชี่ยวชาญ',
+        'not_found_title' => 'ไม่พบใบรับรอง',
+        'verified' => 'ใบรับรองนี้ตรวจสอบได้',
+        'mastery_label' => 'Certificate of Mastery',
+        'awarded_to' => 'มอบให้แก่',
+        'completion_text' => 'ได้สำเร็จหลักสูตรและผ่านเกณฑ์การประเมินความพร้อมครบถ้วน',
+        'awarded_on' => 'ออกให้เมื่อ :date',
+        'verify_code' => 'รหัสตรวจสอบ: :hash',
+        'download_pdf' => 'ดาวน์โหลด PDF',
+        'copy_link' => 'คัดลอกลิงก์ตรวจสอบ',
+        'view_cta' => 'ใบรับรอง',
+        'validation' => [
+            'not_found' => 'ไม่พบใบรับรองหรือรหัสตรวจสอบไม่ถูกต้อง',
+            'not_eligible' => 'ยังไม่ครบเงื่อนไขการรับใบรับรอง',
+        ],
+    ],
     'gamification' => [
         'badges' => [
             'first_nugget' => 'บทเรียนแรก',

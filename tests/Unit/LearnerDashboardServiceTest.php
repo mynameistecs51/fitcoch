@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Repositories\NuggetProgressRepository;
 use App\Repositories\QuizAttemptRepository;
 use App\Repositories\UserRepository;
+use App\Services\CertificateService;
 use App\Services\CourseService;
 use App\Services\GamificationService;
 use App\Services\LearnerDashboardService;
@@ -89,6 +90,10 @@ class LearnerDashboardServiceTest extends TestCase
             'badges' => [],
         ]);
 
+        $certificateService = $this->createMock(CertificateService::class);
+        $certificateService->method('findLearnerCertificate')->willReturn(null);
+        $certificateService->method('isEligible')->willReturn(false);
+
         $service = new LearnerDashboardService(
             $courseService,
             $quizService,
@@ -98,6 +103,7 @@ class LearnerDashboardServiceTest extends TestCase
             $attemptRepo,
             $userRepo,
             $gamificationService,
+            $certificateService,
         );
 
         $overview = $service->buildOverview(7);

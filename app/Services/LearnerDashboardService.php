@@ -23,6 +23,7 @@ class LearnerDashboardService
         private readonly QuizAttemptRepository $attemptRepo,
         private readonly UserRepository $userRepo,
         private readonly GamificationService $gamificationService,
+        private readonly CertificateService $certificateService,
     ) {
     }
 
@@ -201,6 +202,14 @@ class LearnerDashboardService
                 ? (int) round($courseProgressTotal / $courseLessonCount)
                 : 0;
             $resumeNuggetId = $this->lessonNavigationService->findResumeNuggetId($course->id, $userId);
+            $existingCertificate = $this->certificateService->findLearnerCertificate($userId, $course->id);
+            $certificateUrl = null;
+
+            if ($existingCertificate !== null) {
+                $certificateUrl = url('/certificate/' . $existingCertificate->verificationHash);
+            } elseif ($this->certificateService->isEligible($userId, $course->id)) {
+                $certificateUrl = url('/courses/' . $course->id . '/certificate');
+            }
 
             $courses[] = [
                 'course' => $course,
@@ -208,6 +217,7 @@ class LearnerDashboardService
                 'lessons_completed' => $courseLessonsCompleted,
                 'lessons_total' => $courseLessonCount,
                 'resume_url' => $resumeNuggetId !== null ? url('/nuggets/' . $resumeNuggetId) : null,
+                'certificate_url' => $certificateUrl,
                 'modules' => $moduleRows,
             ];
         }
