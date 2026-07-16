@@ -1,10 +1,12 @@
 <?php
 
 ob_start();
-$overview = $overview ?? ['summary' => [], 'courses' => [], 'retake_items' => []];
+$overview = $overview ?? ['summary' => [], 'courses' => [], 'retake_items' => [], 'gamification' => []];
 $summary = $overview['summary'] ?? [];
 $courses = $overview['courses'] ?? [];
 $retakeItems = $overview['retake_items'] ?? [];
+$gamification = $overview['gamification'] ?? ['badges' => []];
+$badges = $gamification['badges'] ?? [];
 ?>
 <section class="space-y-8">
     <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-white via-slate-50 to-brand-50 dark:from-slate-900 dark:via-slate-900 dark:to-brand-dark/20 p-6 md:p-10 border border-slate-200 dark:border-slate-800">
@@ -45,6 +47,52 @@ $retakeItems = $overview['retake_items'] ?? [];
                 <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">
                     <?= escape(__('dashboard.stats.average_score', ['score' => (string) $summary['average_quiz_score']])) ?>
                 </p>
+            <?php endif; ?>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="rounded-2xl border border-orange-500/30 bg-gradient-to-br from-orange-500/10 to-transparent p-5">
+            <p class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400 flex items-center gap-2">
+                <i class="fa-solid fa-fire text-orange-500"></i>
+                <?= escape(__('dashboard.gamification.streak')) ?>
+            </p>
+            <p class="text-3xl font-extrabold text-orange-600 dark:text-orange-400 mt-2">
+                <?= escape((string) ($summary['current_streak'] ?? 0)) ?>
+                <span class="text-sm font-semibold text-slate-500 dark:text-slate-400"><?= escape(__('dashboard.gamification.days')) ?></span>
+            </p>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">
+                <?= escape(__('dashboard.gamification.longest_streak', ['days' => (string) ($summary['longest_streak'] ?? 0)])) ?>
+            </p>
+        </div>
+        <div class="rounded-2xl border border-yellow-500/30 bg-gradient-to-br from-yellow-500/10 to-transparent p-5">
+            <p class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400 flex items-center gap-2">
+                <i class="fa-solid fa-star text-yellow-500"></i>
+                <?= escape(__('dashboard.gamification.xp')) ?>
+            </p>
+            <p class="text-3xl font-extrabold text-yellow-600 dark:text-yellow-400 mt-2">
+                <?= escape(number_format((int) ($summary['total_xp'] ?? 0))) ?>
+            </p>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-2"><?= escape(__('dashboard.gamification.xp_hint')) ?></p>
+        </div>
+        <div class="rounded-2xl border border-brand-500/30 bg-gradient-to-br from-brand-500/10 to-transparent p-5">
+            <p class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400 flex items-center gap-2">
+                <i class="fa-solid fa-medal text-brand-500"></i>
+                <?= escape(__('dashboard.gamification.badges')) ?>
+            </p>
+            <p class="text-3xl font-extrabold text-brand-600 dark:text-brand-accent mt-2"><?= escape((string) count($badges)) ?></p>
+            <?php if ($badges !== []): ?>
+                <div class="flex flex-wrap gap-2 mt-3">
+                    <?php foreach (array_slice($badges, 0, 4) as $badgeRow): ?>
+                        <?php $badge = $badgeRow['badge'] ?? []; ?>
+                        <span class="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700 text-xs font-semibold" title="<?= escape((string) ($badge['description'] ?? '')) ?>">
+                            <i class="fa-solid <?= escape((string) ($badge['icon_url'] ?? 'fa-award')) ?> text-brand-500"></i>
+                            <?= escape(__('gamification.badges.' . ($badge['name'] ?? 'unknown'))) ?>
+                        </span>
+                    <?php endforeach; ?>
+                </div>
+            <?php else: ?>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-2"><?= escape(__('dashboard.gamification.no_badges')) ?></p>
             <?php endif; ?>
         </div>
     </div>

@@ -25,6 +25,7 @@ class QuizService
         private readonly CourseRepository $courseRepo,
         private readonly CohortRepository $cohortRepo,
         private readonly LessonUnlockService $unlockService,
+        private readonly GamificationService $gamificationService,
     ) {
     }
 
@@ -80,9 +81,20 @@ class QuizService
         $questions = $this->quizRepo->listQuestionsWithOptions($quizId, true);
         $responses = $this->normalizeResponses($payload, $questions);
         $scorePct = $this->calculateScorePct($questions, $responses);
+        $hadPassedBefore = $this->attemptRepo->hasPassingAttempt($userId, $quizId, $quiz->passingScorePct);
         $attempt = $this->attemptRepo->create($userId, $quizId, $scorePct, $responses);
         $passed = $scorePct >= $quiz->passingScorePct;
         $ticket = $context['ticket'];
+        $xpAwarded = 0;
+
+        if ($passed && !$hadPassedBefore) {
+            $gamification = $this->gamificationService->recordQuizPassed(
+                $userId,
+                $scorePct,
+                $quiz->quizType,
+            );
+            $xpAwarded = $gamification['xp_awarded'];
+        }
 
         if ($quiz->quizType === 'readiness' && $passed) {
             $ticket = $this->ticketRepo->unlock(
@@ -103,7 +115,7 @@ class QuizService
             'score_pct' => $scorePct,
             'passed' => $passed,
             'readiness_ticket' => $ticket->toArray(),
-            'xp_awarded' => $passed ? 150 : 0,
+            'xp_awarded' => $xpAwarded,
         ];
     }
 

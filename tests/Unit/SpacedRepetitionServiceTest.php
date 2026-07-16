@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
+use App\Services\GamificationService;
 use App\Services\SpacedRepetitionService;
 use App\Repositories\SpacedRepetitionRepository;
 use PHPUnit\Framework\TestCase;
@@ -14,6 +15,7 @@ class SpacedRepetitionServiceTest extends TestCase
     {
         return new SpacedRepetitionService(
             $this->createMock(SpacedRepetitionRepository::class),
+            $this->createMock(GamificationService::class),
         );
     }
 
@@ -86,7 +88,10 @@ class SpacedRepetitionServiceTest extends TestCase
         $repo->method('listUpcomingForUser')->willReturn([]);
         $repo->method('listRecentlyReviewedForUser')->willReturn([]);
 
-        $service = new SpacedRepetitionService($repo);
+        $service = new SpacedRepetitionService(
+            $repo,
+            $this->createMock(GamificationService::class),
+        );
         $panel = $service->getDashboardPanel($user);
 
         $this->assertSame(1, $panel['due_today']);

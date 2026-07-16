@@ -16,6 +16,7 @@ class SpacedRepetitionService
 
     public function __construct(
         private readonly SpacedRepetitionRepository $repo,
+        private readonly GamificationService $gamificationService,
     ) {
     }
 
@@ -166,11 +167,14 @@ class SpacedRepetitionService
             'next_review_date' => $nextReviewDate,
         ]);
 
+        $gamification = $this->gamificationService->recordSpacedRepSubmitted($user->id);
+
         return [
             'next_review_date' => $nextReviewDate,
             'interval_days' => $result['interval_days'],
             'easiness_factor' => $result['easiness_factor'],
             'repetition_number' => $result['repetition_number'],
+            'xp_awarded' => $gamification['xp_awarded'],
         ];
     }
 

@@ -22,6 +22,7 @@ class LearnerDashboardService
         private readonly NuggetProgressRepository $progressRepo,
         private readonly QuizAttemptRepository $attemptRepo,
         private readonly UserRepository $userRepo,
+        private readonly GamificationService $gamificationService,
     ) {
     }
 
@@ -213,6 +214,7 @@ class LearnerDashboardService
 
         $enrolledCount = count($courses);
         $overallProgress = $lessonsTotal > 0 ? (int) round($progressTotal / $lessonsTotal) : 0;
+        $gamification = $this->gamificationService->getSummary($userId);
 
         return [
             'summary' => [
@@ -224,9 +226,13 @@ class LearnerDashboardService
                 'quizzes_total' => $quizzesTotal,
                 'average_quiz_score' => $quizScoreCount > 0 ? (int) round($quizScoreTotal / $quizScoreCount) : null,
                 'reviews_due' => $reviewsDue,
+                'current_streak' => $gamification['current_streak'],
+                'longest_streak' => $gamification['longest_streak'],
+                'total_xp' => $gamification['total_xp'],
             ],
             'courses' => $courses,
             'retake_items' => $retakeItems,
+            'gamification' => $gamification,
         ];
     }
 }

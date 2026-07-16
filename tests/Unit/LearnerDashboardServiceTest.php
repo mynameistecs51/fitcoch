@@ -13,6 +13,7 @@ use App\Repositories\NuggetProgressRepository;
 use App\Repositories\QuizAttemptRepository;
 use App\Repositories\UserRepository;
 use App\Services\CourseService;
+use App\Services\GamificationService;
 use App\Services\LearnerDashboardService;
 use App\Services\LessonNavigationService;
 use App\Services\QuizService;
@@ -80,6 +81,14 @@ class LearnerDashboardServiceTest extends TestCase
             'now',
         ));
 
+        $gamificationService = $this->createMock(GamificationService::class);
+        $gamificationService->method('getSummary')->willReturn([
+            'current_streak' => 0,
+            'longest_streak' => 0,
+            'total_xp' => 0,
+            'badges' => [],
+        ]);
+
         $service = new LearnerDashboardService(
             $courseService,
             $quizService,
@@ -88,6 +97,7 @@ class LearnerDashboardServiceTest extends TestCase
             $progressRepo,
             $attemptRepo,
             $userRepo,
+            $gamificationService,
         );
 
         $overview = $service->buildOverview(7);

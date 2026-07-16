@@ -145,4 +145,20 @@ class QuizAttemptRepository implements RepositoryInterface
 
         return $indexed;
     }
+
+    public function hasPassingAttempt(int $userId, int $quizId, int $passingScorePct): bool
+    {
+        $stmt = $this->db->prepare(
+            'SELECT 1 FROM quiz_attempts
+             WHERE user_id = :user_id AND quiz_id = :quiz_id AND score_pct >= :passing_score
+             LIMIT 1'
+        );
+        $stmt->execute([
+            'user_id' => $userId,
+            'quiz_id' => $quizId,
+            'passing_score' => $passingScorePct,
+        ]);
+
+        return (bool) $stmt->fetch();
+    }
 }

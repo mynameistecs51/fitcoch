@@ -99,6 +99,7 @@ class ReviewController
                 'interval_days' => $result['interval_days'],
                 'easiness_factor' => $result['easiness_factor'],
                 'repetition_number' => $result['repetition_number'],
+                'xp_awarded' => $result['xp_awarded'] ?? 0,
             ]);
         }
 

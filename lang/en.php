@@ -204,6 +204,15 @@ return [
             'passed' => 'Passed',
             'failed' => 'Not passed',
         ],
+        'gamification' => [
+            'streak' => 'Learning streak',
+            'days' => 'days',
+            'longest_streak' => 'Best record :days days',
+            'xp' => 'XP points',
+            'xp_hint' => 'Earned from lessons, quizzes, and reviews',
+            'badges' => 'Badges',
+            'no_badges' => 'No badges yet — learn and review to unlock',
+        ],
         'sprint_title' => 'Sprint 3 complete — Course curriculum & syllabus',
         'sprint_message' => 'Microlearning videos and progress tracking arrive in Sprint 4.',
     ],
@@ -627,6 +636,15 @@ return [
                 'enrolled' => 'Learner added to cohort.',
                 'dropped' => 'Learner removed from cohort.',
             ],
+        ],
+    ],
+    'gamification' => [
+        'badges' => [
+            'first_nugget' => 'First Lesson',
+            'quiz_passed' => 'Quiz Ready',
+            'streak_7' => '7-Day Streak',
+            'review_10' => 'Review Master',
+            'unknown' => 'Badge',
         ],
     ],
     'errors' => [

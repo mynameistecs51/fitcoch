@@ -22,6 +22,7 @@ class NuggetService
         private readonly NuggetProgressRepository $progressRepo,
         private readonly VideoService $videoService,
         private readonly LessonUnlockService $unlockService,
+        private readonly GamificationService $gamificationService,
     ) {
     }
 
@@ -121,13 +122,24 @@ class NuggetService
             ]);
         }
 
+        $existing = $this->progressRepo->find($userId, $nuggetId);
+        $wasCompleted = ($existing['status'] ?? '') === 'completed';
+
         $record = $this->progressRepo->upsert($userId, $nuggetId, $percentage);
+
+        $xpAwarded = 0;
+
+        if (!$wasCompleted && ($record['status'] ?? '') === 'completed') {
+            $gamification = $this->gamificationService->recordNuggetCompleted($userId);
+            $xpAwarded = $gamification['xp_awarded'];
+        }
 
         return [
             'nugget_id' => $nuggetId,
             'progress_percentage' => (int) $record['progress_percentage'],
             'status' => (string) $record['status'],
             'completed_at' => $record['completed_at'],
+            'xp_awarded' => $xpAwarded,
         ];
     }
 }

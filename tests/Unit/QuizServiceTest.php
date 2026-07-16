@@ -16,6 +16,7 @@ use App\Repositories\ModuleRepository;
 use App\Repositories\QuizAttemptRepository;
 use App\Repositories\QuizRepository;
 use App\Repositories\ReadinessTicketRepository;
+use App\Services\GamificationService;
 use App\Services\LessonUnlockService;
 use App\Services\QuizService;
 use App\Services\ValidationException;
@@ -46,6 +47,7 @@ class QuizServiceTest extends TestCase
             $courseRepo ?? $this->createMock(CourseRepository::class),
             $cohortRepo ?? $this->createMock(CohortRepository::class),
             $unlock,
+            $this->createMock(GamificationService::class),
         );
     }
 
@@ -76,6 +78,7 @@ class QuizServiceTest extends TestCase
         $cohortRepo->method('findActiveEnrollmentForUser')->willReturn($cohort);
 
         $attemptRepo = $this->createMock(QuizAttemptRepository::class);
+        $attemptRepo->method('hasPassingAttempt')->willReturn(false);
         $attemptRepo->expects($this->once())->method('create')->willReturn([
             'id' => 501,
             'score_pct' => 100,
