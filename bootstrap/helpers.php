@@ -126,3 +126,42 @@ if (!function_exists('default_timezone')) {
         return (string) config('app.default_timezone', 'Asia/Bangkok');
     }
 }
+
+if (!function_exists('timezone_options')) {
+    /** @return array<string, string> */
+    function timezone_options(): array
+    {
+        $preferred = [
+            'Asia/Bangkok',
+            'Asia/Singapore',
+            'Asia/Jakarta',
+            'Asia/Ho_Chi_Minh',
+            'Asia/Manila',
+            'Asia/Tokyo',
+            'Asia/Seoul',
+            'Asia/Shanghai',
+            'Asia/Kolkata',
+            'UTC',
+            'Europe/London',
+            'America/New_York',
+            'America/Los_Angeles',
+        ];
+
+        $options = [];
+
+        foreach ($preferred as $timezone) {
+            if (in_array($timezone, timezone_identifiers_list(), true)) {
+                $options[$timezone] = $timezone;
+            }
+        }
+
+        return $options;
+    }
+}
+
+if (!function_exists('is_valid_timezone')) {
+    function is_valid_timezone(string $timezone): bool
+    {
+        return in_array($timezone, timezone_identifiers_list(), true);
+    }
+}

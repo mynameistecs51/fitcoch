@@ -153,6 +153,13 @@ return [
     'profile' => [
         'title' => 'Profile Settings',
         'subtitle' => 'Manage your account details.',
+        'menu_label' => 'Profile menu',
+        'edit_profile' => 'Edit profile',
+        'personal_info' => 'Personal information',
+        'personal_info_hint' => 'Update your name and timezone used across the platform.',
+        'account_info' => 'Account information',
+        'account_info_hint' => 'These details cannot be changed from this page.',
+        'timezone_hint' => 'Used for streak tracking and daily review scheduling in your local time.',
         'roles' => 'Roles',
         'save' => 'Save Changes',
         'updated' => 'Profile updated successfully.',

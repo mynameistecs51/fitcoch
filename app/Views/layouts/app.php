@@ -97,9 +97,7 @@ $user = $user ?? null;
                     <p class="text-xs text-slate-500 dark:text-slate-400"><?= escape($roleLabel) ?></p>
                     <p class="text-sm font-semibold text-slate-700 dark:text-slate-200 max-w-[10rem] truncate"><?= escape($user->firstName . ' ' . $user->lastName) ?></p>
                 </div>
-                <div class="relative w-9 h-9 sm:w-10 sm:h-10 overflow-hidden rounded-full border-2 border-brand-500/50 bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
-                    <i class="fa-solid fa-user-tie text-brand-600 dark:text-brand-accent text-sm"></i>
-                </div>
+                <?php require base_path('app/Views/partials/header-user-menu.php'); ?>
                 <form method="POST" action="<?= escape(url('/logout')) ?>" class="hidden md:block">
                     <input type="hidden" name="csrf_token" value="<?= escape(csrf_token()) ?>">
                     <button type="submit" class="px-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition whitespace-nowrap">
@@ -137,6 +135,9 @@ $user = $user ?? null;
     <script src="<?= escape(url('/assets/password-toggle.js')) ?>"></script>
     <?php if ($showSidebar): ?>
         <script src="<?= escape(url('/assets/app.js')) ?>"></script>
+        <?php if ($user): ?>
+            <script src="<?= escape(url('/assets/user-menu.js')) ?>"></script>
+        <?php endif; ?>
     <?php endif; ?>
 </body>
 </html>

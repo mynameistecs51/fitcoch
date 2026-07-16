@@ -669,6 +669,21 @@ html.dark .review-xp-toast {
     color: #a3e635;
 }
 
+.header-user-dropdown:not(.hidden) {
+    animation: ux-dropdown-enter 0.18s ease-out;
+}
+
+@keyframes ux-dropdown-enter {
+    from {
+        opacity: 0;
+        transform: translateY(-6px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
 @keyframes review-slide-out {
     to {
         transform: translateX(-115%);
@@ -724,7 +739,8 @@ html.dark .review-xp-toast {
     .flashcard-inner,
     .app-modal:not(.hidden) .app-modal-panel,
     .app-modal:not(.hidden) .app-modal-backdrop,
-    .review-xp-toast {
+    .review-xp-toast,
+    .header-user-dropdown:not(.hidden) {
         animation: none !important;
         transition: none !important;
     }

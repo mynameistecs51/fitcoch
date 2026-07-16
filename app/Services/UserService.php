@@ -27,7 +27,7 @@ class UserService
         return $this->buildProfileResponse($user);
     }
 
-    /** @param array{first_name?: string, last_name?: string} $data */
+    /** @param array{first_name?: string, last_name?: string, timezone?: string} $data */
     public function updateProfile(int $userId, array $data): User
     {
         $errors = $this->validateProfileUpdate($data);
@@ -36,9 +36,16 @@ class UserService
             throw new ValidationException(__('errors.validation_failed'), $errors);
         }
 
+        $timezone = trim((string) ($data['timezone'] ?? default_timezone()));
+
+        if ($timezone === '') {
+            $timezone = default_timezone();
+        }
+
         $user = $this->userRepo->updateProfile($userId, [
             'first_name' => trim((string) ($data['first_name'] ?? '')),
             'last_name' => trim((string) ($data['last_name'] ?? '')),
+            'timezone' => $timezone,
         ]);
 
         return $user;
@@ -79,6 +86,12 @@ class UserService
 
         if (empty($data['last_name'])) {
             $errors['last_name'] = [__('validation.last_name_required')];
+        }
+
+        $timezone = trim((string) ($data['timezone'] ?? ''));
+
+        if ($timezone !== '' && !is_valid_timezone($timezone)) {
+            $errors['timezone'] = [__('validation.timezone_invalid')];
         }
 
         return $errors;
