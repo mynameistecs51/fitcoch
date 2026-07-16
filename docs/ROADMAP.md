@@ -368,12 +368,12 @@ erDiagram
 *   **Effort Estimate:** 13 Story Points (8 developer days)
 *   **Priority:** Medium
 *   **Dependencies:** Sprint 5 (Quiz structures)
-*   **Status:** ✅ MVP complete (`/review/daily`, SM-2 engine, API, dashboard CTA) — CRON scheduler & review dashboard pending
+*   **Status:** ✅ Complete (`/review/daily`, SM-2 engine, API, `/review/dashboard`) — CRON scheduler removed from plan
 *   **Deliverables:**
     1.  Create `knowledge_items` and `spaced_rep_schedules` schemas.
     2.  Build `QuizService::calculateSM2` formulas.
-    3.  Deploy a CRON background scheduler routing daily queues based on user timezones.
-    4.  Build rapid-fire review quiz card layouts.
+    3.  ~~Deploy a CRON background scheduler routing daily queues based on user timezones.~~ *(removed from plan)*
+    4.  Build rapid-fire review quiz card layouts and `/review/dashboard` overview.
 
 ---
 

@@ -65,6 +65,7 @@ $router->get('/quizzes/{quizId}', [QuizController::class, 'show'], $authMiddlewa
 $router->post('/quizzes/{quizId}/attempts', [QuizController::class, 'submit'], $authMiddleware);
 
 // Spaced repetition review routes (learner)
+$router->get('/review/dashboard', [ReviewController::class, 'showDashboard'], $authMiddleware);
 $router->get('/review/daily', [ReviewController::class, 'showDaily'], $authMiddleware);
 $router->post('/review/daily/{knowledgeItemId}/respond', [ReviewController::class, 'respond'], $authMiddleware);
 
@@ -143,6 +144,7 @@ $router->get('/api/v1/quizzes/{quizId}', [QuizController::class, 'apiShow'], $au
 $router->post('/api/v1/quizzes/{quizId}/attempts', [QuizController::class, 'apiSubmitAttempt'], $authMiddleware);
 
 // API routes — Spaced Repetition Reviews
+$router->get('/api/v1/reviews/dashboard', [ReviewController::class, 'apiDashboard'], $authMiddleware);
 $router->get('/api/v1/reviews/daily', [ReviewController::class, 'apiDaily'], $authMiddleware);
 $router->post('/api/v1/reviews/{knowledgeItemId}/respond', [ReviewController::class, 'respond'], $authMiddleware);
 

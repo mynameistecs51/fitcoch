@@ -21,16 +21,17 @@
 - [x] **Cohort & Readiness UX** — UI จัดการรุ่น + คะแนน quiz/ล็อกกลับในหน้า Readiness
 - [x] **Sprint 8 (MVP)** — Spaced Repetition SM-2, `/review/daily`, API, แดชบอร์ด CTA
 - [x] **Sprint 8 (Instructor)** — จัดการแนวคิดทบทวน (ตาราง + modal เพิ่ม/แก้ไข)
+- [x] **Sprint 8 (Dashboard)** — หน้า `/review/dashboard` สรุปคิวทบทวนและประวัติ
 - [x] **UX Defaults** — โหมดสว่าง + ภาษาไทยเป็นค่าเริ่มต้น
 
 ### ตัดออกจากแผน (Removed)
 
 - ~~**Sprint 6/7 (Live interactions)**~~ — Poll, Chat, WebSocket (แทนด้วยกระดานสนทนา)
   - โค้ดห้องเรียนสดพื้นฐานยังอยู่ใน repo แต่ไม่พัฒนาต่อ
+- ~~**Sprint 8 CRON แจ้งเตือน**~~ — ไม่ทำในแผนปัจจุบัน
 
 ### รอทำ (Pending)
 
-- [ ] **Sprint 8 (ต่อ)** — CRON scheduler แจ้งเตือนรายวัน + หน้า `/review/dashboard`
 - [ ] **Sprint 9** — Gamification, Analytics & Certificates
 
 ---

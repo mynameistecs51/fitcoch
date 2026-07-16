@@ -99,6 +99,109 @@ class SpacedRepetitionRepository implements RepositoryInterface
         return $rows;
     }
 
+    public function countTotalForUser(int $userId): int
+    {
+        $stmt = $this->db->prepare(
+            'SELECT COUNT(*) FROM spaced_rep_schedules WHERE user_id = :user_id'
+        );
+        $stmt->execute(['user_id' => $userId]);
+
+        return (int) $stmt->fetchColumn();
+    }
+
+    public function countReviewedOnDate(int $userId, string $date): int
+    {
+        $stmt = $this->db->prepare(
+            'SELECT COUNT(*)
+             FROM spaced_rep_schedules
+             WHERE user_id = :user_id
+               AND last_reviewed_at IS NOT NULL
+               AND DATE(last_reviewed_at) = :date'
+        );
+        $stmt->execute([
+            'user_id' => $userId,
+            'date' => $date,
+        ]);
+
+        return (int) $stmt->fetchColumn();
+    }
+
+    /**
+     * @return array<int, array{
+     *     item: KnowledgeItem,
+     *     schedule: SpacedRepSchedule,
+     *     course_title: string
+     * }>
+     */
+    public function listUpcomingForUser(int $userId, string $today, int $limit = 10): array
+    {
+        $stmt = $this->db->prepare(
+            'SELECT ki.*, srs.*, c.title AS course_title
+             FROM spaced_rep_schedules srs
+             INNER JOIN knowledge_items ki ON ki.id = srs.knowledge_item_id
+             INNER JOIN courses c ON c.id = ki.course_id
+             WHERE srs.user_id = :user_id
+               AND srs.next_review_date > :today
+             ORDER BY srs.next_review_date ASC, ki.id ASC
+             LIMIT :limit'
+        );
+        $stmt->bindValue('user_id', $userId, \PDO::PARAM_INT);
+        $stmt->bindValue('today', $today);
+        $stmt->bindValue('limit', $limit, \PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $this->mapScheduleRows($stmt->fetchAll());
+    }
+
+    /**
+     * @return array<int, array{
+     *     item: KnowledgeItem,
+     *     schedule: SpacedRepSchedule,
+     *     course_title: string
+     * }>
+     */
+    public function listRecentlyReviewedForUser(int $userId, int $limit = 10): array
+    {
+        $stmt = $this->db->prepare(
+            'SELECT ki.*, srs.*, c.title AS course_title
+             FROM spaced_rep_schedules srs
+             INNER JOIN knowledge_items ki ON ki.id = srs.knowledge_item_id
+             INNER JOIN courses c ON c.id = ki.course_id
+             WHERE srs.user_id = :user_id
+               AND srs.last_reviewed_at IS NOT NULL
+             ORDER BY srs.last_reviewed_at DESC, ki.id ASC
+             LIMIT :limit'
+        );
+        $stmt->bindValue('user_id', $userId, \PDO::PARAM_INT);
+        $stmt->bindValue('limit', $limit, \PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $this->mapScheduleRows($stmt->fetchAll());
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $rows
+     * @return array<int, array{
+     *     item: KnowledgeItem,
+     *     schedule: SpacedRepSchedule,
+     *     course_title: string
+     * }>
+     */
+    private function mapScheduleRows(array $rows): array
+    {
+        $mapped = [];
+
+        foreach ($rows as $row) {
+            $mapped[] = [
+                'item' => KnowledgeItem::fromArray($row),
+                'schedule' => SpacedRepSchedule::fromArray($row),
+                'course_title' => (string) $row['course_title'],
+            ];
+        }
+
+        return $mapped;
+    }
+
     public function findSchedule(int $userId, int $knowledgeItemId): ?SpacedRepSchedule
     {
         $stmt = $this->db->prepare(

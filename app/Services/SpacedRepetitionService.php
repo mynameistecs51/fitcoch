@@ -44,6 +44,70 @@ class SpacedRepetitionService
         ];
     }
 
+    /**
+     * @return array{
+     *     today: string,
+     *     due_today: int,
+     *     total_concepts: int,
+     *     reviewed_today: int,
+     *     due_items: array<int, array<string, mixed>>,
+     *     upcoming_items: array<int, array<string, mixed>>,
+     *     recent_items: array<int, array<string, mixed>>
+     * }
+     */
+    public function getDashboardPanel(User $user): array
+    {
+        $today = $this->todayForUser($user);
+        $this->repo->ensureSchedulesForUser($user->id, $today);
+
+        $dueItems = $this->repo->listDueForUser($user->id, $today);
+
+        return [
+            'today' => $today,
+            'due_today' => count($dueItems),
+            'total_concepts' => $this->repo->countTotalForUser($user->id),
+            'reviewed_today' => $this->repo->countReviewedOnDate($user->id, $today),
+            'due_items' => array_map(
+                fn (array $row): array => $this->serializeScheduleRow($row),
+                $dueItems,
+            ),
+            'upcoming_items' => array_map(
+                fn (array $row): array => $this->serializeScheduleRow($row),
+                $this->repo->listUpcomingForUser($user->id, $today),
+            ),
+            'recent_items' => array_map(
+                fn (array $row): array => $this->serializeScheduleRow($row, true),
+                $this->repo->listRecentlyReviewedForUser($user->id),
+            ),
+        ];
+    }
+
+    /**
+     * @param array{
+     *     item: \App\Models\KnowledgeItem,
+     *     schedule: \App\Models\SpacedRepSchedule,
+     *     course_title: string
+     * } $row
+     * @return array<string, mixed>
+     */
+    private function serializeScheduleRow(array $row, bool $includeLastReviewed = false): array
+    {
+        $payload = [
+            'knowledge_item_id' => $row['item']->id,
+            'concept_name' => $row['item']->conceptName,
+            'course_title' => $row['course_title'],
+            'interval_days' => $row['schedule']->intervalDays,
+            'repetition_number' => $row['schedule']->repetitionNumber,
+            'next_review_date' => $row['schedule']->nextReviewDate,
+        ];
+
+        if ($includeLastReviewed) {
+            $payload['last_reviewed_at'] = $row['schedule']->lastReviewedAt;
+        }
+
+        return $payload;
+    }
+
     public function countDueToday(User $user): int
     {
         $today = $this->todayForUser($user);

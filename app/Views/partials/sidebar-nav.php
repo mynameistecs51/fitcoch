@@ -37,7 +37,7 @@
         </span>
 
         <a
-            href="<?= escape(url('/review/daily')) ?>"
+            href="<?= escape(url('/review/dashboard')) ?>"
             class="nav-item flex items-center w-full px-4 py-3 text-sm font-medium rounded-xl transition duration-200 <?= ($currentNav ?? '') === 'reviews' ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white border-l-4 border-brand-500' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' ?>"
         >
             <i class="fa-solid fa-brain w-6 shrink-0 <?= ($currentNav ?? '') === 'reviews' ? 'text-brand-500' : 'text-slate-400' ?>"></i>

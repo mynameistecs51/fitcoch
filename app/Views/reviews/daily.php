@@ -15,8 +15,8 @@ ob_start();
             </h1>
             <p class="text-sm text-slate-500 dark:text-slate-400 mt-1"><?= escape(__('reviews.daily_subtitle')) ?></p>
         </div>
-        <a href="<?= escape(url('/dashboard')) ?>" class="text-sm text-brand-600 dark:text-brand-500 hover:text-brand-accent">
-            <?= escape(__('reviews.back_dashboard')) ?>
+        <a href="<?= escape(url('/review/dashboard')) ?>" class="text-sm text-brand-600 dark:text-brand-500 hover:text-brand-accent">
+            <?= escape(__('reviews.back_review_dashboard')) ?>
         </a>
     </div>
 

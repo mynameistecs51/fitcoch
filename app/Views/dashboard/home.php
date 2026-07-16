@@ -60,7 +60,7 @@ $retakeItems = $overview['retake_items'] ?? [];
                     <?= escape(__('dashboard.reviews_hint', ['count' => (string) ($summary['reviews_due'] ?? 0)])) ?>
                 </p>
             </div>
-            <a href="<?= escape(url('/review/daily')) ?>" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-brand-500 text-slate-950 font-bold rounded-xl hover:bg-brand-accent text-sm shadow-lg shadow-brand-500/20 shrink-0">
+            <a href="<?= escape(url('/review/dashboard')) ?>" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-brand-500 text-slate-950 font-bold rounded-xl hover:bg-brand-accent text-sm shadow-lg shadow-brand-500/20 shrink-0">
                 <?= escape(__('dashboard.reviews_cta')) ?>
             </a>
         </div>

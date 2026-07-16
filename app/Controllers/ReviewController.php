@@ -41,6 +41,26 @@ class ReviewController
         ]);
     }
 
+    public function showDashboard(Request $request): Response
+    {
+        $user = $this->authService->currentUser();
+
+        if ($user === null) {
+            return Response::redirect('/login');
+        }
+
+        $roles = $this->authService->getUserRoles($user->id);
+        $panel = $this->reviewService->getDashboardPanel($user);
+
+        return Response::view('reviews/dashboard', [
+            'title' => __('reviews.dashboard_title'),
+            'user' => $user,
+            'roles' => $roles,
+            'isAdmin' => in_array('admin', $roles, true),
+            'panel' => $panel,
+        ]);
+    }
+
     public function respond(Request $request, int $knowledgeItemId): Response
     {
         $user = $this->authService->currentUser();
@@ -83,6 +103,17 @@ class ReviewController
         }
 
         return Response::redirect('/review/daily?success=rated');
+    }
+
+    public function apiDashboard(Request $request): Response
+    {
+        $user = $this->authService->currentUser();
+
+        if ($user === null) {
+            return Response::apiError('UNAUTHORIZED', __('errors.unauthorized'), 401);
+        }
+
+        return Response::apiSuccess($this->reviewService->getDashboardPanel($user));
     }
 
     public function apiDaily(Request $request): Response
