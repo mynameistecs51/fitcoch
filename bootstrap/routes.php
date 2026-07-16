@@ -6,6 +6,7 @@ use App\Controllers\AdminController;
 use App\Controllers\AuthController;
 use App\Controllers\CourseController;
 use App\Controllers\DiscussionController;
+use App\Controllers\InstructorAnalyticsController;
 use App\Controllers\InstructorCohortController;
 use App\Controllers\InstructorKnowledgeItemController;
 use App\Controllers\InstructorCourseController;
@@ -97,6 +98,8 @@ $router->post('/instructor/courses/{courseId}/modules/{moduleId}/quiz', [Instruc
 $router->post('/instructor/courses/{courseId}/modules/{moduleId}/quiz/{quizId}/delete', [InstructorQuizController::class, 'deleteQuiz'], $authRoleMiddleware, $instructorRoles);
 $router->post('/instructor/courses/{courseId}/modules/{moduleId}/quiz/{quizId}/questions', [InstructorQuizController::class, 'saveQuestion'], $authRoleMiddleware, $instructorRoles);
 $router->post('/instructor/courses/{courseId}/modules/{moduleId}/quiz/{quizId}/questions/{questionId}/delete', [InstructorQuizController::class, 'deleteQuestion'], $authRoleMiddleware, $instructorRoles);
+$router->get('/instructor/analytics/cohort/{cohortId}', [InstructorAnalyticsController::class, 'show'], $authRoleMiddleware, $instructorRoles);
+
 // Admin routes (admin only)
 $adminRoles = ['admin'];
 $router->get('/admin/users', [AdminController::class, 'index'], $authRoleMiddleware, $adminRoles);
@@ -134,6 +137,7 @@ $router->post('/api/v1/reviews/{knowledgeItemId}/respond', [ReviewController::cl
 
 // API routes — RBAC demo (instructor/admin only)
 $router->get('/api/v1/instructor/ping', [UserController::class, 'instructorPing'], $authRoleMiddleware, ['instructor', 'admin']);
+$router->get('/api/v1/instructor/analytics/cohorts/{cohortId}/modules/{moduleId}', [InstructorAnalyticsController::class, 'apiModuleMetrics'], $authRoleMiddleware, ['instructor', 'admin']);
 
 // API routes — Admin
 $router->get('/api/v1/admin/users', [AdminController::class, 'apiListUsers'], $authRoleMiddleware, $adminRoles);

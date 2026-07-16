@@ -77,6 +77,9 @@ ob_start();
                                 <?= escape(__('cohorts.instructor.enrollment_count', ['count' => (string) $entry['enrollment_count']])) ?>
                             </p>
                         </div>
+                        <a href="<?= escape(url('/instructor/analytics/cohort/' . $cohort->id)) ?>" class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-lg bg-brand-500/10 text-brand-700 dark:text-brand-accent hover:bg-brand-500/20 transition shrink-0">
+                            <i class="fa-solid fa-chart-pie"></i><?= escape(__('analytics.instructor.view')) ?>
+                        </a>
                     </div>
 
                     <form method="POST" action="<?= escape(url('/instructor/courses/' . $course->id . '/cohorts/' . $cohort->id)) ?>" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">

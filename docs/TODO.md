@@ -25,6 +25,7 @@
 - [x] **UX Defaults** — โหมดสว่าง + ภาษาไทยเป็นค่าเริ่มต้น
 - [x] **Live cleanup** — ลบโค้ดห้องเรียนสด, routes, เมนู sidebar และ UI ผู้สอน
 - [x] **Sprint 9 (Phase 1)** — Gamification engine: migration, XP, streak (BR-02), badges, hooks + แดชบอร์ด
+- [x] **Sprint 9 (Phase 2)** — Instructor analytics `/instructor/analytics/cohort/{id}` + API
 
 ### ตัดออกจากแผน (Removed)
 
@@ -34,7 +35,6 @@
 
 ### รอทำ (Pending)
 
-- [ ] **Sprint 9 (Phase 2)** — Instructor analytics (`/instructor/analytics/cohort/{id}`)
 - [ ] **Sprint 9 (Phase 3)** — Certificates (verify URL + PDF download)
 
 ---

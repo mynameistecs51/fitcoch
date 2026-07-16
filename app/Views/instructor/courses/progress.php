@@ -27,6 +27,11 @@ ob_start();
             </p>
         </div>
         <div class="flex flex-wrap items-center gap-3">
+            <?php if ($cohort !== null): ?>
+                <a href="<?= escape(url('/instructor/analytics/cohort/' . $cohort->id)) ?>" class="text-sm text-brand-600 dark:text-brand-500 hover:text-brand-accent font-semibold">
+                    <?= escape(__('analytics.instructor.view')) ?>
+                </a>
+            <?php endif; ?>
             <a href="<?= escape(url('/instructor/courses/' . $course->id . '/knowledge-items')) ?>" class="text-sm text-brand-600 dark:text-brand-500 hover:text-brand-accent font-semibold">
                 <?= escape(__('knowledge_items.instructor.manage')) ?>
             </a>

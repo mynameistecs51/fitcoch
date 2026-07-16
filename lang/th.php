@@ -638,6 +638,29 @@ return [
             ],
         ],
     ],
+    'analytics' => [
+        'validation' => [
+            'cohort_not_found' => 'ไม่พบรุ่นเรียน',
+        ],
+        'instructor' => [
+            'title' => 'วิเคราะห์ความพร้อมรุ่นเรียน',
+            'view' => 'Analytics',
+            'select_module' => 'เลือกโมดูล',
+            'refresh' => 'อัปเดต',
+            'alert_title' => 'เตือนความพร้อมต่ำ',
+            'alert_message' => 'อัตราความพร้อม :pct% ต่ำกว่าเกณฑ์ :threshold%',
+            'total_enrolled' => 'ผู้เรียนในรุ่น',
+            'completed_prep' => 'เตรียมพร้อมแล้ว',
+            'readiness_index' => 'ดัชนีความพร้อม',
+            'misconceptions_title' => 'ข้อสงสัยที่พบบ่อย',
+            'no_quiz' => 'โมดูลนี้ยังไม่มีแบบทดสอบ',
+            'no_misconceptions' => 'ยังไม่มีข้อมูลคำตอบผิด',
+            'incorrect_ratio' => 'ตอบผิด :ratio%',
+            'at_risk_title' => 'ผู้เรียนเสี่ยง (ยังไม่พร้อม)',
+            'no_at_risk' => 'ผู้เรียนทุกคนเตรียมพร้อมแล้ว',
+            'learners_title' => 'สถานะผู้เรียนรายบุคคล',
+        ],
+    ],
     'gamification' => [
         'badges' => [
             'first_nugget' => 'บทเรียนแรก',

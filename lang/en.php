@@ -638,6 +638,29 @@ return [
             ],
         ],
     ],
+    'analytics' => [
+        'validation' => [
+            'cohort_not_found' => 'Cohort not found.',
+        ],
+        'instructor' => [
+            'title' => 'Cohort Readiness Analytics',
+            'view' => 'Analytics',
+            'select_module' => 'Select module',
+            'refresh' => 'Refresh',
+            'alert_title' => 'Low readiness warning',
+            'alert_message' => 'Preparation rate is :pct%, below the :threshold% threshold.',
+            'total_enrolled' => 'Enrolled learners',
+            'completed_prep' => 'Prepared',
+            'readiness_index' => 'Readiness index',
+            'misconceptions_title' => 'Top misconceptions',
+            'no_quiz' => 'This module has no quiz yet.',
+            'no_misconceptions' => 'No incorrect answer data yet.',
+            'incorrect_ratio' => ':ratio% incorrect',
+            'at_risk_title' => 'At-risk learners',
+            'no_at_risk' => 'All learners are prepared.',
+            'learners_title' => 'Individual learner status',
+        ],
+    ],
     'gamification' => [
         'badges' => [
             'first_nugget' => 'First Lesson',
