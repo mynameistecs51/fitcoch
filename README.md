@@ -23,21 +23,35 @@ composer install
 copy .env.example .env
 ```
 
-3. Create the database and `users` table:
+3. Create the database — run migrations **in numeric order** (`001` → `018`):
 
 **Windows (PowerShell + XAMPP):**
 
 ```powershell
+$migrations = 1..18 | ForEach-Object { '{0:D3}' -f $_ }
+foreach ($n in $migrations) {
+    Get-ChildItem "database\migrations\${n}_*.sql" | ForEach-Object {
+        Write-Host "Running $($_.Name)..."
+        Get-Content $_.FullName -Raw | D:\xamp\mysql\bin\mysql.exe -u root
+    }
+}
+```
+
+Or run files individually, for example:
+
+```powershell
 Get-Content database\migrations\001_create_users_table.sql -Raw | D:\xamp\mysql\bin\mysql.exe -u root
-Get-Content database\migrations\002_create_roles_tables.sql -Raw | D:\xamp\mysql\bin\mysql.exe -u root
-Get-Content database\migrations\003_assign_admin_to_first_user.sql -Raw | D:\xamp\mysql\bin\mysql.exe -u root
+# ... through ...
+Get-Content database\migrations\018_create_discussion_reads.sql -Raw | D:\xamp\mysql\bin\mysql.exe -u root
 ```
 
 **Linux / macOS:**
 
 ```bash
-mysql -u root < database/migrations/001_create_users_table.sql
+for f in database/migrations/*.sql; do mysql -u root < "$f"; done
 ```
+
+Key migrations include `015` (module discussions), `016` (gamification), `017` (certificates), and `018` (discussion read tracking for instructor unread badges).
 
 4. Access the application:
 
@@ -85,12 +99,7 @@ http://localhost/fitcoch
 
 ## Localization
 
-The web UI supports **English** and **Thai**. Use the language switcher in the header, or visit:
-
-- `http://localhost/fitcoch/public/lang/en` — English
-- `http://localhost/fitcoch/public/lang/th` — ไทย
-
-Preference is stored in the session. API error messages follow the active locale.
+The web UI is **Thai only** (`config/locale.php` — `supported: ['th']`). Copy lives in `lang/th.php`. The `lang/en.php` file remains for reference but is not exposed in the UI.
 
 ## Tests
 

@@ -129,7 +129,7 @@ class QuizService
                 $scorePct,
                 $quiz->quizType,
             );
-            $xpAwarded = $gamification['xp_awarded'];
+            $xpAwarded = $gamification['xp_awarded'] ?? 0;
         }
 
         if ($quiz->quizType === 'readiness' && $passed) {
