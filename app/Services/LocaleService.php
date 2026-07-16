@@ -28,7 +28,7 @@ class LocaleService
         }
 
         if ($locale === null) {
-            $locale = self::detectFromHeader() ?? $default;
+            $locale = $default;
         }
 
         if (!in_array($locale, $supported, true)) {
@@ -90,25 +90,6 @@ class LocaleService
                 : $role,
             $roles
         );
-    }
-
-    private static function detectFromHeader(): ?string
-    {
-        $header = $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? '';
-
-        if ($header === '') {
-            return null;
-        }
-
-        if (str_starts_with(strtolower($header), 'th')) {
-            return 'th';
-        }
-
-        if (str_starts_with(strtolower($header), 'en')) {
-            return 'en';
-        }
-
-        return null;
     }
 
     private static function load(string $locale): void

@@ -6,14 +6,14 @@
         title="<?= escape(__('theme.toggle')) ?>"
         aria-label="<?= escape(__('theme.toggle')) ?>"
     >
-        <i class="fa-solid fa-moon text-brand-500" data-theme-icon-dark></i>
-        <i class="fa-solid fa-sun text-yellow-500 hidden" data-theme-icon-light></i>
+        <i class="fa-solid fa-moon text-brand-500 hidden" data-theme-icon-dark></i>
+        <i class="fa-solid fa-sun text-yellow-500" data-theme-icon-light></i>
         <span
             class="hidden sm:inline"
             data-theme-label
             data-label-dark="<?= escape(__('theme.dark')) ?>"
             data-label-light="<?= escape(__('theme.light')) ?>"
-        ><?= escape(__('theme.dark')) ?></span>
+        ><?= escape(__('theme.light')) ?></span>
     </button>
 
     <div class="flex items-center gap-1 rounded-xl border border-slate-200 dark:border-slate-700 p-1 bg-slate-50 dark:bg-slate-800">

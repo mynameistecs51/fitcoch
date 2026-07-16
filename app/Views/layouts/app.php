@@ -14,7 +14,7 @@ $user = $user ?? null;
     <title><?= escape($title ?? __('app.name')) ?> — <?= escape(__('app.name')) ?></title>
     <script>
         (function () {
-            const t = localStorage.getItem('fitcoch-theme');
+            const t = localStorage.getItem('fitcoch-theme') || 'light';
             document.documentElement.classList.toggle('dark', t === 'dark');
         })();
     </script>
