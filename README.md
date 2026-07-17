@@ -23,7 +23,7 @@ composer install
 copy .env.example .env
 ```
 
-3. Create the database — run migrations **in numeric order** (`001` → `018`):
+3. Create the database — run migrations **in numeric order** (`001` → `020`):
 
 **Windows (PowerShell + XAMPP):**
 
@@ -51,7 +51,7 @@ Get-Content database\migrations\018_create_discussion_reads.sql -Raw | D:\xamp\m
 for f in database/migrations/*.sql; do mysql -u root < "$f"; done
 ```
 
-Key migrations include `015` (module discussions), `016` (gamification), `017` (certificates), and `018` (discussion read tracking for instructor unread badges).
+Key migrations include `015` (module discussions), `016` (gamification), `017` (certificates), `018` (discussion read tracking for instructor unread badges), `019` (student ID / title prefix), and `020` (demo user accounts — see [`docs/DEMO_ACCOUNTS.md`](docs/DEMO_ACCOUNTS.md)).
 
 4. Access the application:
 
