@@ -2,31 +2,56 @@
 
 $thClass = 'px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase';
 $tdClass = 'px-4 py-3 text-sm text-slate-700 dark:text-slate-300';
-$inputClass = 'w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-200 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20';
+$inputClass = 'ux-input';
+$instructorQuickLinkClass = 'inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:border-brand-500/30 hover:text-brand-600 dark:hover:text-brand-accent transition';
+
+$totalCohorts = count($cohorts);
+$totalEnrolled = (int) array_sum(array_map(static fn (array $entry): int => (int) ($entry['enrollment_count'] ?? 0), $cohorts));
+
+$heroTitle = __('cohorts.instructor.title');
+$heroSubtitle = $course->title;
+$heroBadgeIcon = 'fa-users-between-lines';
+ob_start();
+?>
+<a href="<?= escape(url('/instructor/courses/' . $course->id . '/progress')) ?>" class="<?= escape($instructorQuickLinkClass) ?>">
+    <i class="fa-solid fa-chart-line text-brand-500"></i>
+    <?= escape(__('courses.instructor.view_progress')) ?>
+</a>
+<a href="<?= escape(url('/instructor/courses/' . $course->id . '/edit')) ?>" class="<?= escape($instructorQuickLinkClass) ?>">
+    <i class="fa-solid fa-pen-to-square text-violet-500"></i>
+    <?= escape(__('courses.instructor.edit')) ?>
+</a>
+<a href="<?= escape(url('/instructor/courses')) ?>" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/80 transition">
+    <i class="fa-solid fa-arrow-left text-xs"></i>
+    <?= escape(__('courses.instructor.back')) ?>
+</a>
+<?php
+$heroActions = ob_get_clean();
 
 ob_start();
 ?>
-<section class="space-y-6">
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div>
-            <h1 class="text-2xl font-extrabold text-slate-900 dark:text-white flex items-center gap-3">
-                <i class="fa-solid fa-users-between-lines text-brand-500"></i>
-                <?= escape(__('cohorts.instructor.title')) ?>
-            </h1>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1"><?= escape($course->title) ?></p>
+<section class="space-y-8">
+    <?php require base_path('app/Views/partials/instructor-page-hero.php'); ?>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6">
+        <div class="ux-stat-card ux-card p-5 md:p-6">
+            <div class="ux-stat-icon bg-brand-500/10 text-brand-600 dark:text-brand-accent">
+                <i class="fa-solid fa-layer-group"></i>
+            </div>
+            <p class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold"><?= escape(__('cohorts.instructor.title')) ?></p>
+            <p class="text-3xl md:text-4xl font-extrabold text-brand-600 dark:text-brand-accent mt-1"><?= escape((string) $totalCohorts) ?></p>
         </div>
-        <div class="flex flex-wrap items-center gap-3">
-            <a href="<?= escape(url('/instructor/courses/' . $course->id . '/edit')) ?>" class="text-sm text-brand-600 dark:text-brand-500 hover:text-brand-accent">
-                <?= escape(__('courses.instructor.edit')) ?>
-            </a>
-            <a href="<?= escape(url('/instructor/courses')) ?>" class="text-sm text-slate-500 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-500">
-                <?= escape(__('courses.instructor.back')) ?>
-            </a>
+        <div class="ux-stat-card ux-card p-5 md:p-6">
+            <div class="ux-stat-icon bg-violet-500/10 text-violet-600 dark:text-violet-400">
+                <i class="fa-solid fa-users"></i>
+            </div>
+            <p class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold"><?= escape(__('courses.instructor.progress_stats.enrolled')) ?></p>
+            <p class="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white mt-1"><?= escape((string) $totalEnrolled) ?></p>
         </div>
     </div>
 
     <?php if (!empty($success)): ?>
-        <div class="p-4 rounded-xl bg-brand-500/10 border border-brand-500/20 text-brand-700 dark:text-brand-accent text-sm">
+        <div class="ux-alert-enter p-4 rounded-xl bg-brand-500/10 border border-brand-500/20 text-brand-700 dark:text-brand-accent text-sm">
             <?= escape(__('cohorts.instructor.success.' . $success)) ?>
         </div>
     <?php endif; ?>
@@ -37,20 +62,23 @@ ob_start();
         </div>
     <?php endif; ?>
 
-    <div class="bg-white dark:bg-slate-900 p-6 md:p-8 rounded-3xl border border-slate-200 dark:border-slate-800 space-y-4">
-        <h2 class="text-lg font-bold text-slate-900 dark:text-white"><?= escape(__('cohorts.instructor.create_title')) ?></h2>
+    <div class="ux-card p-6 md:p-8 space-y-4">
+        <h2 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <i class="fa-solid fa-plus text-brand-500"></i>
+            <?= escape(__('cohorts.instructor.create_title')) ?>
+        </h2>
         <form method="POST" action="<?= escape(url('/instructor/courses/' . $course->id . '/cohorts')) ?>" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
             <input type="hidden" name="csrf_token" value="<?= escape(csrf_token()) ?>">
             <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"><?= escape(__('cohorts.form.name')) ?></label>
+                <label class="ux-label"><?= escape(__('cohorts.form.name')) ?></label>
                 <input type="text" name="name" required class="<?= escape($inputClass) ?>" placeholder="<?= escape(__('cohorts.form.name_placeholder')) ?>">
             </div>
             <div>
-                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"><?= escape(__('cohorts.form.start_date')) ?></label>
+                <label class="ux-label"><?= escape(__('cohorts.form.start_date')) ?></label>
                 <input type="date" name="start_date" required class="<?= escape($inputClass) ?>" value="<?= escape(date('Y-m-d')) ?>">
             </div>
             <div>
-                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"><?= escape(__('cohorts.form.end_date')) ?></label>
+                <label class="ux-label"><?= escape(__('cohorts.form.end_date')) ?></label>
                 <input type="date" name="end_date" required class="<?= escape($inputClass) ?>" value="<?= escape(date('Y-m-d', strtotime('+1 year'))) ?>">
             </div>
             <div class="md:col-span-4">
@@ -62,14 +90,17 @@ ob_start();
     </div>
 
     <?php if ($cohorts === []): ?>
-        <div class="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-200 dark:border-slate-800 text-center text-sm text-slate-500 dark:text-slate-400">
-            <?= escape(__('cohorts.instructor.empty')) ?>
+        <div class="ux-card p-10 flex flex-col items-center justify-center text-center">
+            <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-brand-500/10 text-brand-600 dark:text-brand-accent mb-4">
+                <i class="fa-solid fa-users-between-lines text-xl"></i>
+            </div>
+            <p class="text-sm text-slate-500 dark:text-slate-400"><?= escape(__('cohorts.instructor.empty')) ?></p>
         </div>
     <?php else: ?>
         <div class="space-y-6">
             <?php foreach ($cohorts as $entry): ?>
                 <?php $cohort = $entry['cohort']; ?>
-                <article class="bg-white dark:bg-slate-900 p-6 md:p-8 rounded-3xl border border-slate-200 dark:border-slate-800 space-y-6">
+                <article class="ux-card p-6 md:p-8 space-y-6">
                     <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
                         <div>
                             <h2 class="text-lg font-bold text-slate-900 dark:text-white"><?= escape($cohort->name) ?></h2>
@@ -89,11 +120,11 @@ ob_start();
                             <input type="text" name="name" required value="<?= escape($cohort->name) ?>" class="<?= escape($inputClass) ?>">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"><?= escape(__('cohorts.form.start_date')) ?></label>
+                            <label class="ux-label"><?= escape(__('cohorts.form.start_date')) ?></label>
                             <input type="date" name="start_date" required value="<?= escape($cohort->startDate) ?>" class="<?= escape($inputClass) ?>">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"><?= escape(__('cohorts.form.end_date')) ?></label>
+                            <label class="ux-label"><?= escape(__('cohorts.form.end_date')) ?></label>
                             <input type="date" name="end_date" required value="<?= escape($cohort->endDate) ?>" class="<?= escape($inputClass) ?>">
                         </div>
                         <div class="md:col-span-4">
@@ -110,7 +141,7 @@ ob_start();
                             <form method="POST" action="<?= escape(url('/instructor/courses/' . $course->id . '/cohorts/' . $cohort->id . '/enroll')) ?>" class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-end">
                                 <input type="hidden" name="csrf_token" value="<?= escape(csrf_token()) ?>">
                                 <div class="flex-1">
-                                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"><?= escape(__('cohorts.instructor.add_learner')) ?></label>
+                                    <label class="ux-label"><?= escape(__('cohorts.instructor.add_learner')) ?></label>
                                     <select name="user_id" required class="<?= escape($inputClass) ?>">
                                         <option value=""><?= escape(__('cohorts.instructor.select_learner')) ?></option>
                                         <?php foreach ($availableLearners as $learner): ?>

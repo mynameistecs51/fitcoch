@@ -9,60 +9,70 @@ $learners = $report['learners'] ?? [];
 
 $thClass = 'px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase';
 $tdClass = 'px-4 py-3 text-sm text-slate-700 dark:text-slate-300';
+$instructorQuickLinkClass = 'inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:border-brand-500/30 hover:text-brand-600 dark:hover:text-brand-accent transition';
+
+$heroSubtitle = trim(($course?->title ?? '') . ($cohort !== null ? ' · ' . $cohort->name : ''));
+ob_start();
+?>
+<?php if ($cohort !== null): ?>
+    <a href="<?= escape(url('/instructor/analytics/cohort/' . $cohort->id)) ?>" class="<?= escape($instructorQuickLinkClass) ?>">
+        <i class="fa-solid fa-chart-pie text-brand-500"></i>
+        <?= escape(__('analytics.instructor.view')) ?>
+    </a>
+<?php endif; ?>
+<a href="<?= escape(url('/instructor/courses/' . $course->id . '/knowledge-items')) ?>" class="<?= escape($instructorQuickLinkClass) ?>">
+    <i class="fa-solid fa-lightbulb text-amber-500"></i>
+    <?= escape(__('knowledge_items.instructor.manage')) ?>
+</a>
+<a href="<?= escape(url('/instructor/courses/' . $course->id . '/edit')) ?>" class="<?= escape($instructorQuickLinkClass) ?>">
+    <i class="fa-solid fa-pen-to-square text-violet-500"></i>
+    <?= escape(__('courses.instructor.edit')) ?>
+</a>
+<a href="<?= escape(url('/instructor/courses')) ?>" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/80 transition">
+    <i class="fa-solid fa-arrow-left text-xs"></i>
+    <?= escape(__('courses.instructor.back')) ?>
+</a>
+<?php
+$heroActions = ob_get_clean();
+$heroTitle = __('courses.instructor.progress_title');
+$heroBadgeIcon = 'fa-chart-line';
 
 ob_start();
 ?>
-<section class="space-y-6">
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div>
-            <h1 class="text-2xl font-extrabold text-slate-900 dark:text-white flex items-center gap-3">
-                <i class="fa-solid fa-chart-line text-brand-500"></i>
-                <?= escape(__('courses.instructor.progress_title')) ?>
-            </h1>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                <?= escape($course?->title ?? '') ?>
-                <?php if ($cohort !== null): ?>
-                    · <?= escape($cohort->name) ?>
-                <?php endif; ?>
-            </p>
-        </div>
-        <div class="flex flex-wrap items-center gap-3">
-            <?php if ($cohort !== null): ?>
-                <a href="<?= escape(url('/instructor/analytics/cohort/' . $cohort->id)) ?>" class="text-sm text-brand-600 dark:text-brand-500 hover:text-brand-accent font-semibold">
-                    <?= escape(__('analytics.instructor.view')) ?>
-                </a>
-            <?php endif; ?>
-            <a href="<?= escape(url('/instructor/courses/' . $course->id . '/knowledge-items')) ?>" class="text-sm text-brand-600 dark:text-brand-500 hover:text-brand-accent font-semibold">
-                <?= escape(__('knowledge_items.instructor.manage')) ?>
-            </a>
-            <a href="<?= escape(url('/instructor/courses/' . $course->id . '/edit')) ?>" class="text-sm text-brand-600 dark:text-brand-500 hover:text-brand-accent">
-                <?= escape(__('courses.instructor.edit')) ?>
-            </a>
-            <a href="<?= escape(url('/instructor/courses')) ?>" class="text-sm text-slate-500 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-500">
-                <?= escape(__('courses.instructor.back')) ?>
-            </a>
-        </div>
-    </div>
+<section class="space-y-8">
+    <?php require base_path('app/Views/partials/instructor-page-hero.php'); ?>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
-            <p class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400"><?= escape(__('courses.instructor.progress_stats.enrolled')) ?></p>
-            <p class="text-3xl font-extrabold text-brand-600 dark:text-brand-accent mt-2"><?= escape((string) ($summary['total_enrolled'] ?? 0)) ?></p>
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 lg:gap-6">
+        <div class="ux-stat-card ux-card p-5 md:p-6">
+            <div class="ux-stat-icon bg-brand-500/10 text-brand-600 dark:text-brand-accent">
+                <i class="fa-solid fa-users"></i>
+            </div>
+            <p class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold"><?= escape(__('courses.instructor.progress_stats.enrolled')) ?></p>
+            <p class="text-3xl md:text-4xl font-extrabold text-brand-600 dark:text-brand-accent mt-1"><?= escape((string) ($summary['total_enrolled'] ?? 0)) ?></p>
         </div>
-        <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
-            <p class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400"><?= escape(__('courses.instructor.progress_stats.avg_progress')) ?></p>
-            <p class="text-3xl font-extrabold text-brand-600 dark:text-brand-accent mt-2"><?= escape((string) ($summary['avg_progress_pct'] ?? 0)) ?>%</p>
+        <div class="ux-stat-card ux-card p-5 md:p-6">
+            <div class="ux-stat-icon bg-sky-500/10 text-sky-600 dark:text-sky-400">
+                <i class="fa-solid fa-chart-line"></i>
+            </div>
+            <p class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold"><?= escape(__('courses.instructor.progress_stats.avg_progress')) ?></p>
+            <p class="text-3xl md:text-4xl font-extrabold text-brand-600 dark:text-brand-accent mt-1"><?= escape((string) ($summary['avg_progress_pct'] ?? 0)) ?>%</p>
         </div>
-        <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
-            <p class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400"><?= escape(__('courses.instructor.progress_stats.lessons')) ?></p>
-            <p class="text-3xl font-extrabold text-slate-900 dark:text-white mt-2">
+        <div class="ux-stat-card ux-card p-5 md:p-6">
+            <div class="ux-stat-icon bg-violet-500/10 text-violet-600 dark:text-violet-400">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <p class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold"><?= escape(__('courses.instructor.progress_stats.lessons')) ?></p>
+            <p class="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white mt-1">
                 <?= escape(number_format((float) ($summary['lessons_completed_avg'] ?? 0), 1)) ?>/<?= escape((string) ($summary['lessons_total'] ?? 0)) ?>
             </p>
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-2"><?= escape(__('courses.instructor.progress_stats.lessons_hint')) ?></p>
         </div>
-        <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
-            <p class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400"><?= escape(__('courses.instructor.progress_stats.quizzes')) ?></p>
-            <p class="text-3xl font-extrabold text-slate-900 dark:text-white mt-2">
+        <div class="ux-stat-card ux-card p-5 md:p-6">
+            <div class="ux-stat-icon bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                <i class="fa-solid fa-clipboard-check"></i>
+            </div>
+            <p class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold"><?= escape(__('courses.instructor.progress_stats.quizzes')) ?></p>
+            <p class="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white mt-1">
                 <?= escape(number_format((float) ($summary['quizzes_passed_avg'] ?? 0), 1)) ?>/<?= escape((string) ($summary['quizzes_total'] ?? 0)) ?>
             </p>
             <?php if (($summary['average_quiz_score'] ?? null) !== null): ?>
@@ -73,9 +83,12 @@ ob_start();
         </div>
     </div>
 
-    <div class="bg-white dark:bg-slate-900 p-6 md:p-8 rounded-3xl border border-slate-200 dark:border-slate-800 space-y-4">
+    <div class="ux-card p-6 md:p-8 space-y-4">
         <div>
-            <h2 class="text-lg font-bold text-slate-900 dark:text-white"><?= escape(__('courses.instructor.module_overview_title')) ?></h2>
+            <h2 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <i class="fa-solid fa-table-columns text-brand-500"></i>
+                <?= escape(__('courses.instructor.module_overview_title')) ?>
+            </h2>
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-1"><?= escape(__('courses.instructor.module_overview_subtitle')) ?></p>
         </div>
 
@@ -123,9 +136,12 @@ ob_start();
         <?php endif; ?>
     </div>
 
-    <div class="bg-white dark:bg-slate-900 p-6 md:p-8 rounded-3xl border border-slate-200 dark:border-slate-800 space-y-4">
+    <div class="ux-card p-6 md:p-8 space-y-4">
         <div>
-            <h2 class="text-lg font-bold text-slate-900 dark:text-white"><?= escape(__('courses.instructor.learners_title')) ?></h2>
+            <h2 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <i class="fa-solid fa-user-graduate text-brand-500"></i>
+                <?= escape(__('courses.instructor.learners_title')) ?>
+            </h2>
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-1"><?= escape(__('courses.instructor.learners_subtitle')) ?></p>
         </div>
 
@@ -134,7 +150,7 @@ ob_start();
         <?php else: ?>
             <div class="space-y-4">
                 <?php foreach ($learners as $learner): ?>
-                    <details class="group rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+                    <details class="group rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden bg-slate-50/60 dark:bg-slate-950/40">
                         <summary class="cursor-pointer list-none p-4 md:p-5 bg-slate-50/70 dark:bg-slate-950/50 hover:bg-slate-100/80 dark:hover:bg-slate-900 transition">
                             <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                                 <div class="min-w-0">
