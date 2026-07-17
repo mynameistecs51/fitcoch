@@ -12,7 +12,15 @@ use Exception;
 class UserImportService
 {
     private const ALLOWED_ROLES = ['learner', 'instructor', 'admin'];
-    private const HEADERS = ['first_name', 'last_name', 'email', 'password', 'role'];
+    private const HEADERS = ['student_id', 'title_prefix', 'first_name', 'last_name', 'password', 'role'];
+    private const HEADER_ALIASES = [
+        'student_id' => ['student_id', 'รหัสนักศึกษา'],
+        'title_prefix' => ['title_prefix', 'คำนำหน้า'],
+        'first_name' => ['first_name', 'ชื่อ'],
+        'last_name' => ['last_name', 'นามสกุล'],
+        'password' => ['password', 'รหัสผ่าน'],
+        'role' => ['role', 'บทบาท'],
+    ];
     private const MAX_FILE_BYTES = 2_097_152;
 
     public function __construct(
@@ -28,15 +36,19 @@ class UserImportService
 
     public function buildTemplateBinary(): string
     {
-        return SimpleSpreadsheet::toXlsx(self::HEADERS, [
+        return SimpleSpreadsheet::toXlsx(
+            ['รหัสนักศึกษา', 'คำนำหน้า', 'ชื่อ', 'นามสกุล', 'รหัสผ่าน', 'role'],
             [
-                'Somchai',
-                'Jaidee',
-                'somchai@example.com',
-                'ChangeMe123!',
-                'learner',
-            ],
-        ]);
+                [
+                    '6501234567',
+                    'นาย',
+                    'สมชาย',
+                    'ใจดี',
+                    'ChangeMe123!',
+                    'learner',
+                ],
+            ]
+        );
     }
 
     /** @param array<string, mixed> $file */
@@ -61,7 +73,7 @@ class UserImportService
         }
 
         $headerRow = array_map(
-            static fn (string $value): string => strtolower(trim($value)),
+            static fn (string $value): string => mb_strtolower(trim($value)),
             $rows[0]
         );
 
@@ -82,16 +94,18 @@ class UserImportService
             try {
                 $validated = $this->validateRecord($record, $rowNumber);
 
-                if ($this->userRepo->emailExists($validated['email'])) {
+                if ($this->userRepo->studentIdExists($validated['student_id'])) {
                     $skipped++;
-                    $errors[$rowNumber] = __('admin.import.validation.duplicate_email', [
-                        'email' => $validated['email'],
+                    $errors[$rowNumber] = __('admin.import.validation.duplicate_student_id', [
+                        'student_id' => $validated['student_id'],
                     ]);
                     continue;
                 }
 
                 $user = $this->userRepo->create([
-                    'email' => $validated['email'],
+                    'student_id' => $validated['student_id'],
+                    'title_prefix' => $validated['title_prefix'],
+                    'email' => strtolower($validated['student_id']) . '@student.fitcoch.local',
                     'password_hash' => password_hash($validated['password'], PASSWORD_ARGON2ID),
                     'first_name' => $validated['first_name'],
                     'last_name' => $validated['last_name'],
@@ -152,8 +166,16 @@ class UserImportService
     {
         $columnMap = [];
 
-        foreach (self::HEADERS as $header) {
-            $index = array_search($header, $headerRow, true);
+        foreach (self::HEADER_ALIASES as $header => $aliases) {
+            $index = false;
+
+            foreach ($aliases as $alias) {
+                $index = array_search(mb_strtolower($alias), $headerRow, true);
+
+                if ($index !== false) {
+                    break;
+                }
+            }
 
             if ($index === false) {
                 throw new Exception(__('admin.import.validation.missing_columns'));
@@ -195,15 +217,28 @@ class UserImportService
 
     /**
      * @param array<string, string> $record
-     * @return array{first_name: string, last_name: string, email: string, password: string, role: string}
+     * @return array{student_id: string, title_prefix: string, first_name: string, last_name: string, password: string, role: string}
      */
     private function validateRecord(array $record, int $rowNumber): array
     {
-        $firstName = $record['first_name'] ?? '';
-        $lastName = $record['last_name'] ?? '';
-        $email = strtolower($record['email'] ?? '');
+        $studentId = strtoupper(trim($record['student_id'] ?? ''));
+        $titlePrefix = trim($record['title_prefix'] ?? '');
+        $firstName = trim($record['first_name'] ?? '');
+        $lastName = trim($record['last_name'] ?? '');
         $password = $record['password'] ?? '';
         $role = strtolower($record['role'] !== '' ? $record['role'] : 'learner');
+
+        if ($studentId === '') {
+            throw new Exception(__('admin.import.validation.row_student_id', ['row' => $rowNumber]));
+        }
+
+        if (!preg_match('/^[A-Za-z0-9_-]{3,20}$/', $studentId)) {
+            throw new Exception(__('admin.import.validation.row_student_id_invalid', ['row' => $rowNumber]));
+        }
+
+        if ($titlePrefix === '') {
+            throw new Exception(__('admin.import.validation.row_title_prefix', ['row' => $rowNumber]));
+        }
 
         if ($firstName === '') {
             throw new Exception(__('admin.import.validation.row_first_name', ['row' => $rowNumber]));
@@ -211,10 +246,6 @@ class UserImportService
 
         if ($lastName === '') {
             throw new Exception(__('admin.import.validation.row_last_name', ['row' => $rowNumber]));
-        }
-
-        if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            throw new Exception(__('admin.import.validation.row_email', ['row' => $rowNumber]));
         }
 
         $passwordErrors = $this->validatePassword($password);
@@ -231,9 +262,10 @@ class UserImportService
         }
 
         return [
+            'student_id' => $studentId,
+            'title_prefix' => $titlePrefix,
             'first_name' => $firstName,
             'last_name' => $lastName,
-            'email' => $email,
             'password' => $password,
             'role' => $role,
         ];

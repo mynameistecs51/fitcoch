@@ -11,7 +11,7 @@
 
 <aside
     id="app-sidebar"
-    class="fixed inset-y-0 left-0 z-50 flex flex-col w-[min(88vw,18rem)] md:relative md:z-auto md:w-64 bg-white/95 dark:bg-slate-900/95 md:bg-white/90 dark:md:bg-slate-900/90 border-r border-slate-200 dark:border-slate-800 shrink-0 -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out md:transition-none py-4 md:py-6 shadow-2xl md:shadow-none"
+    class="fixed inset-y-0 left-0 z-50 flex flex-col w-[min(88vw,18rem)] md:relative md:z-auto md:w-64 bg-white/95 dark:bg-slate-900/95 md:bg-white/90 dark:md:bg-slate-900/90 border-r border-slate-200/80 dark:border-slate-800/80 shrink-0 -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out md:transition-none py-4 md:py-6 shadow-2xl md:shadow-none backdrop-blur-xl"
     aria-label="<?= escape(__('nav.menu')) ?>"
 >
     <div class="flex items-center justify-between px-4 pb-4 border-b border-slate-200 dark:border-slate-800 md:hidden shrink-0">

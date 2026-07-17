@@ -66,7 +66,9 @@ class AuthMiddleware implements MiddlewareInterface
 
     private function refreshSessionTimeout(): void
     {
-        $lifetime = (int) config('app.session_lifetime', 1800);
+        $lifetime = !empty($_SESSION['remember_me'])
+            ? 60 * 60 * 24 * 30
+            : (int) config('app.session_lifetime', 1800);
 
         if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $lifetime) {
             $this->authService->logout();

@@ -28,6 +28,8 @@ class AuthServiceTest extends TestCase
         $password = 'Password123!';
         $user = new User(
             7,
+            '6501234567',
+            'นาย',
             'learner@example.com',
             password_hash($password, PASSWORD_ARGON2ID),
             'Learner',
@@ -41,7 +43,7 @@ class AuthServiceTest extends TestCase
         $storedToken = null;
 
         $userRepo = $this->createMock(UserRepository::class);
-        $userRepo->method('findByEmail')->with('learner@example.com')->willReturn($user);
+        $userRepo->method('findByStudentId')->with('6501234567')->willReturn($user);
         $userRepo->expects($this->once())
             ->method('updateSessionToken')
             ->with(7, $this->callback(function (string $token) use (&$storedToken): bool {
@@ -57,7 +59,7 @@ class AuthServiceTest extends TestCase
             $this->createMock(JwtService::class),
         );
 
-        $authenticated = $service->authenticate('learner@example.com', $password);
+        $authenticated = $service->authenticate('6501234567', $password);
 
         $this->assertSame($user, $authenticated);
         $this->assertSame(7, $_SESSION['user_id']);

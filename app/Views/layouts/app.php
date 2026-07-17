@@ -47,15 +47,15 @@ $user = $user ?? null;
     </script>
     <link rel="stylesheet" href="<?= escape(url('/assets/app.css')) ?>">
 </head>
-<body class="flex flex-col min-h-[100dvh] md:h-full md:overflow-hidden font-sans bg-slate-50 text-black dark:bg-slate-950 dark:text-white">
+<body class="flex flex-col min-h-[100dvh] md:h-full md:overflow-hidden font-sans bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-50 antialiased">
 
-    <header class="flex items-center justify-between gap-2 px-3 sm:px-4 md:px-6 py-3 md:py-4 border-b shrink-0 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 z-50">
+    <header class="ux-glass-header flex items-center justify-between gap-2 px-3 sm:px-4 md:px-6 py-3 md:py-4 border-b shrink-0 border-slate-200/80 dark:border-slate-800/80 z-50">
         <div class="flex items-center gap-2 sm:gap-3 min-w-0">
             <?php if ($showSidebar): ?>
                 <button
                     type="button"
                     id="sidebar-open-btn"
-                    class="md:hidden flex items-center justify-center w-10 h-10 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 shrink-0"
+                    class="md:hidden flex items-center justify-center w-10 h-10 rounded-xl border border-slate-200/80 dark:border-slate-700/80 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 shrink-0 transition"
                     aria-label="<?= escape(__('nav.open_menu')) ?>"
                 >
                     <i class="fa-solid fa-bars"></i>
@@ -67,8 +67,8 @@ $user = $user ?? null;
                     <i class="fa-solid fa-dumbbell text-slate-950 text-base sm:text-lg"></i>
                 </div>
                 <div class="min-w-0">
-                    <span class="text-lg sm:text-xl font-bold tracking-wider text-black dark:text-white truncate block">
-                        FIT<span class="text-brand-500">-FLIPPED</span>
+                    <span class="text-lg sm:text-xl font-bold tracking-wider text-slate-900 dark:text-white truncate block">
+                        FIT<span class="text-brand-500 dark:text-brand-accent">-FLIPPED</span>
                     </span>
                     <span class="hidden sm:inline-block px-2 py-0.5 text-[10px] uppercase tracking-widest font-semibold rounded bg-brand-50 dark:bg-brand-dark text-brand-600 dark:text-brand-accent border border-brand-500/30">
                         <?= escape(__('header.platform_badge')) ?>
@@ -95,12 +95,12 @@ $user = $user ?? null;
                 ?>
                 <div class="text-right hidden lg:block">
                     <p class="text-xs text-slate-500 dark:text-slate-400"><?= escape($roleLabel) ?></p>
-                    <p class="text-sm font-semibold text-slate-700 dark:text-slate-200 max-w-[10rem] truncate"><?= escape($user->firstName . ' ' . $user->lastName) ?></p>
+                    <p class="text-sm font-semibold text-slate-700 dark:text-slate-200 max-w-[10rem] truncate"><?= escape($user->fullName()) ?></p>
                 </div>
                 <?php require base_path('app/Views/partials/header-user-menu.php'); ?>
                 <form method="POST" action="<?= escape(url('/logout')) ?>" class="hidden md:block">
                     <input type="hidden" name="csrf_token" value="<?= escape(csrf_token()) ?>">
-                    <button type="submit" class="px-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition whitespace-nowrap">
+                    <button type="submit" class="px-3 py-1.5 text-xs rounded-xl border border-slate-200/80 dark:border-slate-700/80 text-slate-600 dark:text-slate-300 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 hover:border-red-300/50 dark:hover:border-red-500/30 hover:text-red-600 dark:hover:text-red-400 transition whitespace-nowrap">
                         <?= escape(__('nav.sign_out')) ?>
                     </button>
                 </form>
@@ -116,7 +116,7 @@ $user = $user ?? null;
     <?php if ($showSidebar): ?>
         <div class="flex flex-1 min-h-0 overflow-hidden relative">
             <?php require base_path('app/Views/partials/sidebar.php'); ?>
-            <main class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden bg-slate-50 dark:bg-slate-950 p-3 sm:p-4 md:p-8 pb-[calc(4.5rem+env(safe-area-inset-bottom))] md:pb-8">
+            <main class="app-shell-bg flex-1 flex flex-col overflow-y-auto overflow-x-hidden p-3 sm:p-4 md:p-8 pb-[calc(4.5rem+env(safe-area-inset-bottom))] md:pb-8">
                 <?= $content ?? '' ?>
             </main>
         </div>

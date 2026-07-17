@@ -35,18 +35,18 @@ class UserImportServiceTest extends TestCase
         @unlink($tempFile);
     }
 
-    public function testImportRowsSkipsDuplicateEmail(): void
+    public function testImportRowsSkipsDuplicateStudentId(): void
     {
         $userRepo = $this->createMock(UserRepository::class);
         $roleRepo = $this->createMock(RoleRepository::class);
 
-        $userRepo->method('emailExists')->willReturn(true);
+        $userRepo->method('studentIdExists')->willReturn(true);
 
         $service = new UserImportService($userRepo, $roleRepo);
 
         $result = $service->importRows([
-            ['first_name', 'last_name', 'email', 'password', 'role'],
-            ['Somchai', 'Jaidee', 'somchai@example.com', 'ChangeMe123!', 'learner'],
+            ['รหัสนักศึกษา', 'คำนำหน้า', 'ชื่อ', 'นามสกุล', 'รหัสผ่าน', 'role'],
+            ['6501234567', 'นาย', 'สมชาย', 'ใจดี', 'ChangeMe123!', 'learner'],
         ]);
 
         $this->assertSame(0, $result['created']);

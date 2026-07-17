@@ -126,6 +126,7 @@ ob_start();
                 <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-800">
                     <thead class="bg-slate-50 dark:bg-slate-950">
                         <tr>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase"><?= escape(__('admin.table.student_id')) ?></th>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase"><?= escape(__('admin.table.name')) ?></th>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase"><?= escape(__('admin.table.email')) ?></th>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase"><?= escape(__('admin.table.roles')) ?></th>
@@ -137,8 +138,9 @@ ob_start();
                         <?php foreach ($accounts as $entry): ?>
                             <?php $accountUser = $entry['user']; ?>
                             <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
+                                <td class="px-4 py-3 text-sm font-mono text-slate-600 dark:text-slate-400"><?= escape($accountUser->studentId ?? '—') ?></td>
                                 <td class="px-4 py-3 text-sm font-medium text-slate-900 dark:text-slate-200">
-                                    <?= escape($accountUser->firstName . ' ' . $accountUser->lastName) ?>
+                                    <?= escape($accountUser->fullName()) ?>
                                 </td>
                                 <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400"><?= escape($accountUser->email) ?></td>
                                 <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400"><?= escape(translate_roles($entry['roles'])) ?></td>

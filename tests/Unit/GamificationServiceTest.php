@@ -27,6 +27,8 @@ class GamificationServiceTest extends TestCase
     {
         return new User(
             1,
+            '6501234567',
+            'นาย',
             'learner@test.com',
             'hash',
             'Test',

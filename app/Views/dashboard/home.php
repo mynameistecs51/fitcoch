@@ -9,38 +9,51 @@ $gamification = $overview['gamification'] ?? ['badges' => []];
 $badges = $gamification['badges'] ?? [];
 ?>
 <section class="space-y-8">
-    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-white via-slate-50 to-brand-50 dark:from-slate-900 dark:via-slate-900 dark:to-brand-dark/20 p-6 md:p-10 border border-slate-200 dark:border-slate-800">
-        <div class="max-w-3xl space-y-3 relative">
-            <span class="inline-block px-3 py-1 text-xs font-semibold rounded-full bg-brand-500/10 text-brand-600 dark:text-brand-accent border border-brand-500/20">
+    <div class="ux-hero ux-card p-6 md:p-10">
+        <div class="max-w-3xl space-y-4 relative z-10">
+            <span class="inline-flex items-center gap-2 px-3 py-1 text-xs font-semibold rounded-full bg-brand-500/10 text-brand-700 dark:text-brand-accent border border-brand-500/20">
+                <i class="fa-solid fa-sparkles text-[10px]"></i>
                 <?= escape(__('dashboard.badge')) ?>
             </span>
-            <h1 class="text-2xl md:text-4xl font-extrabold text-slate-900 dark:text-white leading-tight">
+            <h1 class="text-2xl md:text-4xl font-extrabold text-slate-900 dark:text-white leading-tight tracking-tight">
                 <?= escape(__('dashboard.welcome', ['name' => $user->firstName])) ?>
             </h1>
-            <p class="text-sm md:text-base text-slate-600 dark:text-slate-300 leading-relaxed">
+            <p class="text-sm md:text-base text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl">
                 <?= escape(__('dashboard.overview_subtitle')) ?>
             </p>
         </div>
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        <div class="ux-stat-card rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
-            <p class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400"><?= escape(__('dashboard.stats.enrolled')) ?></p>
-            <p class="text-3xl font-extrabold text-brand-600 dark:text-brand-accent mt-2"><?= escape((string) ($summary['enrolled_courses'] ?? 0)) ?></p>
+        <div class="ux-stat-card ux-card p-5">
+            <div class="ux-stat-icon bg-brand-500/10 text-brand-600 dark:text-brand-accent">
+                <i class="fa-solid fa-book-open"></i>
+            </div>
+            <p class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold"><?= escape(__('dashboard.stats.enrolled')) ?></p>
+            <p class="text-3xl font-extrabold text-brand-600 dark:text-brand-accent mt-1"><?= escape((string) ($summary['enrolled_courses'] ?? 0)) ?></p>
         </div>
-        <div class="ux-stat-card rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
-            <p class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400"><?= escape(__('dashboard.stats.progress')) ?></p>
-            <p class="text-3xl font-extrabold text-brand-600 dark:text-brand-accent mt-2"><?= escape((string) ($summary['overall_progress'] ?? 0)) ?>%</p>
+        <div class="ux-stat-card ux-card p-5">
+            <div class="ux-stat-icon bg-sky-500/10 text-sky-600 dark:text-sky-400">
+                <i class="fa-solid fa-chart-line"></i>
+            </div>
+            <p class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold"><?= escape(__('dashboard.stats.progress')) ?></p>
+            <p class="text-3xl font-extrabold text-brand-600 dark:text-brand-accent mt-1"><?= escape((string) ($summary['overall_progress'] ?? 0)) ?>%</p>
         </div>
-        <div class="ux-stat-card rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
-            <p class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400"><?= escape(__('dashboard.stats.lessons')) ?></p>
-            <p class="text-3xl font-extrabold text-slate-900 dark:text-white mt-2">
+        <div class="ux-stat-card ux-card p-5">
+            <div class="ux-stat-icon bg-violet-500/10 text-violet-600 dark:text-violet-400">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <p class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold"><?= escape(__('dashboard.stats.lessons')) ?></p>
+            <p class="text-3xl font-extrabold text-slate-900 dark:text-white mt-1">
                 <?= escape((string) ($summary['lessons_completed'] ?? 0)) ?>/<?= escape((string) ($summary['lessons_total'] ?? 0)) ?>
             </p>
         </div>
-        <div class="ux-stat-card rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
-            <p class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400"><?= escape(__('dashboard.stats.quizzes')) ?></p>
-            <p class="text-3xl font-extrabold text-slate-900 dark:text-white mt-2">
+        <div class="ux-stat-card ux-card p-5">
+            <div class="ux-stat-icon bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                <i class="fa-solid fa-clipboard-check"></i>
+            </div>
+            <p class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold"><?= escape(__('dashboard.stats.quizzes')) ?></p>
+            <p class="text-3xl font-extrabold text-slate-900 dark:text-white mt-1">
                 <?= escape((string) ($summary['quizzes_passed'] ?? 0)) ?>/<?= escape((string) ($summary['quizzes_total'] ?? 0)) ?>
             </p>
             <?php if (($summary['average_quiz_score'] ?? null) !== null): ?>
@@ -52,7 +65,7 @@ $badges = $gamification['badges'] ?? [];
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div class="ux-stat-card rounded-2xl border border-orange-500/30 bg-gradient-to-br from-orange-500/10 to-transparent p-5">
+        <div class="ux-stat-card ux-card border-orange-500/20 bg-gradient-to-br from-orange-500/8 to-transparent p-5">
             <p class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400 flex items-center gap-2">
                 <i class="fa-solid fa-fire text-orange-500"></i>
                 <?= escape(__('dashboard.gamification.streak')) ?>
@@ -65,7 +78,7 @@ $badges = $gamification['badges'] ?? [];
                 <?= escape(__('dashboard.gamification.longest_streak', ['days' => (string) ($summary['longest_streak'] ?? 0)])) ?>
             </p>
         </div>
-        <div class="ux-stat-card rounded-2xl border border-yellow-500/30 bg-gradient-to-br from-yellow-500/10 to-transparent p-5">
+        <div class="ux-stat-card ux-card border-yellow-500/20 bg-gradient-to-br from-yellow-500/8 to-transparent p-5">
             <p class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400 flex items-center gap-2">
                 <i class="fa-solid fa-star text-yellow-500"></i>
                 <?= escape(__('dashboard.gamification.xp')) ?>
@@ -75,7 +88,7 @@ $badges = $gamification['badges'] ?? [];
             </p>
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-2"><?= escape(__('dashboard.gamification.xp_hint')) ?></p>
         </div>
-        <div class="ux-stat-card rounded-2xl border border-brand-500/30 bg-gradient-to-br from-brand-500/10 to-transparent p-5">
+        <div class="ux-stat-card ux-card border-brand-500/20 bg-gradient-to-br from-brand-500/8 to-transparent p-5">
             <p class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400 flex items-center gap-2">
                 <i class="fa-solid fa-medal text-brand-500"></i>
                 <?= escape(__('dashboard.gamification.badges')) ?>
@@ -98,7 +111,7 @@ $badges = $gamification['badges'] ?? [];
     </div>
 
     <?php if (($summary['reviews_due'] ?? 0) > 0): ?>
-        <div class="rounded-3xl border border-brand-500/30 bg-gradient-to-r from-brand-500/10 to-brand-500/5 p-5 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="ux-card border-brand-500/25 bg-gradient-to-r from-brand-500/10 to-brand-500/5 p-5 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
                 <h2 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
                     <i class="fa-solid fa-brain text-brand-500"></i>
@@ -115,7 +128,7 @@ $badges = $gamification['badges'] ?? [];
     <?php endif; ?>
 
     <?php if ($retakeItems !== []): ?>
-        <div class="rounded-3xl border border-amber-500/30 bg-amber-500/10 p-5 md:p-6 space-y-4">
+        <div class="ux-card border-amber-500/25 bg-amber-500/8 p-5 md:p-6 space-y-4">
             <div>
                 <h2 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
                     <i class="fa-solid fa-rotate-right text-amber-600 dark:text-amber-400"></i>
@@ -125,7 +138,7 @@ $badges = $gamification['badges'] ?? [];
             </div>
             <div class="space-y-3">
                 <?php foreach ($retakeItems as $item): ?>
-                    <div class="rounded-2xl border border-amber-500/20 bg-white/80 dark:bg-slate-900/80 p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                    <div class="ux-card p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-amber-500/15">
                         <div>
                             <p class="text-sm font-bold text-slate-900 dark:text-white"><?= escape($item['quiz_title']) ?></p>
                             <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
@@ -156,7 +169,7 @@ $badges = $gamification['badges'] ?? [];
         </div>
     <?php endif; ?>
 
-    <div class="bg-white dark:bg-slate-900 p-6 md:p-8 rounded-3xl border border-slate-200 dark:border-slate-800 space-y-5">
+    <div class="ux-card p-6 md:p-8 space-y-5">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
                 <h2 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
@@ -181,8 +194,8 @@ $badges = $gamification['badges'] ?? [];
             <div class="space-y-5">
                 <?php foreach ($courses as $entry): ?>
                     <?php $course = $entry['course']; ?>
-                    <article class="rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
-                        <div class="p-5 border-b border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/50 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                    <article class="ux-card overflow-hidden">
+                        <div class="p-5 border-b border-slate-200/80 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-950/40 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                             <div class="min-w-0">
                                 <h3 class="text-lg font-bold text-slate-900 dark:text-white"><?= escape($course->title) ?></h3>
                                 <?php if ($course->description): ?>
