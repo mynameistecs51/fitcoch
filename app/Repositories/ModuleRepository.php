@@ -22,6 +22,18 @@ class ModuleRepository implements RepositoryInterface
         return $row ? Module::fromArray($row) : null;
     }
 
+    public function countPublishedModules(): int
+    {
+        $stmt = $this->db->prepare(
+            "SELECT COUNT(*) FROM modules m
+             INNER JOIN courses c ON c.id = m.course_id
+             WHERE c.status = 'published'"
+        );
+        $stmt->execute();
+
+        return (int) $stmt->fetchColumn();
+    }
+
     /** @return array<int, Module> */
     public function listByCourseId(int $courseId): array
     {

@@ -6,6 +6,9 @@ $tdClass = 'px-4 py-3 text-sm text-slate-700 dark:text-slate-300';
 $availableCourses = $availableCourses ?? [];
 $success = $success ?? null;
 $error = $error ?? null;
+$isInstructor = $isInstructor ?? false;
+$unreadCounts = $unreadCounts ?? [];
+$courseOutlines = $courseOutlines ?? [];
 ?>
 <section class="space-y-8">
     <div>
@@ -68,40 +71,7 @@ $error = $error ?? null;
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-1"><?= escape(__('courses.enrollment.my_courses_subtitle')) ?></p>
         </div>
 
-        <?php if ($courses === []): ?>
-            <p class="text-sm text-slate-500 dark:text-slate-400 text-center py-8"><?= escape(__('courses.empty')) ?></p>
-        <?php else: ?>
-            <div class="table-responsive rounded-2xl border border-slate-200 dark:border-slate-800">
-                <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-800">
-                    <thead class="bg-slate-50 dark:bg-slate-950">
-                        <tr>
-                            <th class="<?= escape($thClass) ?>"><?= escape(__('courses.table.title')) ?></th>
-                            <th class="<?= escape($thClass) ?>"><?= escape(__('courses.table.status')) ?></th>
-                            <th class="<?= escape($thClass) ?> text-right"><?= escape(__('courses.table.actions')) ?></th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-200 dark:divide-slate-800 bg-white dark:bg-slate-900">
-                        <?php foreach ($courses as $course): ?>
-                            <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
-                                <td class="<?= escape($tdClass) ?> font-semibold text-slate-900 dark:text-slate-200">
-                                    <?= escape($course->title) ?>
-                                </td>
-                                <td class="<?= escape($tdClass) ?>">
-                                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-brand-500/10 text-brand-700 dark:text-brand-accent">
-                                        <?= escape(__('courses.status.' . $course->status)) ?>
-                                    </span>
-                                </td>
-                                <td class="<?= escape($tdClass) ?> text-right">
-                                    <a href="<?= escape(url('/courses/' . $course->id)) ?>" class="text-sm text-brand-600 dark:text-brand-500 hover:text-brand-accent font-medium">
-                                        <?= escape(__('courses.view_syllabus')) ?>
-                                    </a>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
-        <?php endif; ?>
+        <?php require base_path('app/Views/courses/index-my-courses.php'); ?>
     </div>
 </section>
 <?php

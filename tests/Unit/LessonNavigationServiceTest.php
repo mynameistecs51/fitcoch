@@ -158,4 +158,52 @@ class LessonNavigationServiceTest extends TestCase
 
         $this->assertSame(101, $service->findResumeNuggetId(1, 7));
     }
+
+    public function testBuildSyllabusSummaryIncludesQuizOnlyModuleWhenUnlocked(): void
+    {
+        $course = new Course(1, 'Test Course', 'Desc', 'published', 'now', 'now');
+        $moduleOne = new Module(10, 1, 'Unit 1', 1, 'now');
+        $moduleTwo = new Module(11, 1, 'Unit 2', 2, 'now');
+        $nuggetOne = new Nugget(100, 10, 'Lesson 1', 'video', 'https://youtu.be/a', null, 180, 1, 'now');
+        $quizOne = new Quiz(50, 10, 'readiness', 'Unit 1 Quiz', 80, 'now');
+        $quizTwo = new Quiz(51, 11, 'readiness', 'Unit 2 Quiz', 80, 'now');
+
+        $courseService = $this->createMock(CourseService::class);
+        $courseService->method('getCourseOutline')->willReturn([
+            'course' => $course,
+            'modules' => [$moduleOne, $moduleTwo],
+            'nuggetsByModule' => [
+                10 => [$nuggetOne],
+                11 => [],
+            ],
+        ]);
+
+        $progressRepo = $this->createMock(NuggetProgressRepository::class);
+        $progressRepo->method('listByUserAndNuggetIds')->willReturn([]);
+
+        $quizRepo = $this->createMock(QuizRepository::class);
+        $quizRepo->method('listByModuleIds')->willReturn([
+            10 => $quizOne,
+            11 => $quizTwo,
+        ]);
+
+        $attemptRepo = $this->createMock(QuizAttemptRepository::class);
+        $attemptRepo->method('findLatestByUserAndQuizIds')->willReturn([
+            50 => [
+                'id' => 1,
+                'quiz_id' => 50,
+                'score_pct' => 100,
+                'completed_at' => 'now',
+            ],
+        ]);
+
+        $service = $this->createService($courseService, $progressRepo, $quizRepo, $attemptRepo);
+        $summary = $service->buildSyllabusSummary(1, 7);
+
+        $this->assertNotNull($summary);
+        $this->assertCount(1, $summary['lessons_by_module'][11]);
+        $this->assertTrue($summary['lessons_by_module'][11][0]['quiz_only']);
+        $this->assertContains($summary['lessons_by_module'][11][0]['state'], ['available', 'current']);
+        $this->assertStringEndsWith('/quizzes/51', (string) $service->findResumeLessonUrl(1, 7));
+    }
 }

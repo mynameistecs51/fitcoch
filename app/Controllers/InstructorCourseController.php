@@ -8,6 +8,7 @@ use App\Core\Request;
 use App\Core\Response;
 use App\Services\AuthService;
 use App\Services\CourseService;
+use App\Services\DiscussionService;
 use App\Services\InstructorCourseProgressService;
 use App\Services\QuizService;
 use App\Services\ValidationException;
@@ -20,6 +21,7 @@ class InstructorCourseController
         private readonly CourseService $courseService,
         private readonly QuizService $quizService,
         private readonly InstructorCourseProgressService $progressService,
+        private readonly DiscussionService $discussionService,
     ) {
     }
 
@@ -30,6 +32,9 @@ class InstructorCourseController
         $courses = $this->courseService->listManageableCourses();
         $courseIds = array_map(static fn ($course) => $course->id, $courses);
         $enrollmentCounts = $this->progressService->countEnrollmentsByCourseIds($courseIds);
+        $unreadCounts = $user !== null
+            ? $this->discussionService->countUnreadByCourseIds($user->id, $courseIds)
+            : [];
 
         return Response::view('instructor/courses/index', [
             'title' => __('courses.instructor.title'),
@@ -38,6 +43,7 @@ class InstructorCourseController
             'isAdmin' => in_array('admin', $roles, true),
             'courses' => $courses,
             'enrollmentCounts' => $enrollmentCounts,
+            'unreadCounts' => $unreadCounts,
             'success' => $request->query()['success'] ?? null,
         ]);
     }

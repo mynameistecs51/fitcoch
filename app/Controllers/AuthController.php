@@ -48,7 +48,8 @@ class AuthController
             return Response::view('auth/login', [
                 'title' => __('auth.sign_in'),
                 'error' => __('errors.invalid_csrf'),
-                'email' => $data['email'] ?? '',
+                'form' => $data,
+                'login' => $this->authService->resolveLoginId($data),
             ]);
         }
 
@@ -60,8 +61,9 @@ class AuthController
 
         try {
             $user = $this->authService->authenticate(
-                (string) $data['email'],
-                (string) $data['password']
+                $this->authService->resolveLoginId($data),
+                (string) $data['password'],
+                !empty($data['remember'])
             );
         } catch (Exception $e) {
             return $this->respondWithAuthFailure($request, $e->getMessage(), $data);
@@ -272,7 +274,7 @@ class AuthController
             'title' => $view === 'login' ? __('auth.sign_in') : __('auth.create_account'),
             'errors' => $errors,
             'form' => $data,
-            'email' => $data['email'] ?? '',
+            'login' => $this->authService->resolveLoginId($data),
         ]);
     }
 
@@ -286,7 +288,8 @@ class AuthController
         return Response::view('auth/login', [
             'title' => __('auth.sign_in'),
             'error' => $message,
-            'email' => $data['email'] ?? '',
+            'form' => $data,
+            'login' => $this->authService->resolveLoginId($data),
         ]);
     }
 }

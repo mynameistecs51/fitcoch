@@ -161,4 +161,23 @@ class QuizAttemptRepository implements RepositoryInterface
 
         return (bool) $stmt->fetch();
     }
+
+    /** @return array<int, int> */
+    public function findResponsesByAttemptId(int $attemptId): array
+    {
+        $stmt = $this->db->prepare(
+            'SELECT question_id, selected_option_number
+             FROM quiz_responses
+             WHERE quiz_attempt_id = :attempt_id'
+        );
+        $stmt->execute(['attempt_id' => $attemptId]);
+
+        $responses = [];
+
+        foreach ($stmt->fetchAll() as $row) {
+            $responses[(int) $row['question_id']] = (int) $row['selected_option_number'];
+        }
+
+        return $responses;
+    }
 }

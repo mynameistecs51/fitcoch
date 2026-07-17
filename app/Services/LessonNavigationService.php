@@ -103,6 +103,7 @@ class LessonNavigationService
                 'module' => $nuggetModule ?? $module,
                 'state' => $state,
                 'progress_percentage' => $progressPercentage,
+                'video_completed' => $isCompleted,
                 'url' => url('/nuggets/' . $nugget->id),
                 'duration_label' => $this->formatDuration($nugget->durationSeconds),
                 'quiz' => $moduleQuiz,
@@ -113,11 +114,28 @@ class LessonNavigationService
             $previousModuleId = $nugget->moduleId;
         }
 
+        $this->appendQuizOnlyModules($lessons, $outline, $context, $activeQuizId);
+
+        foreach ($lessons as $lesson) {
+            if (empty($lesson['quiz_only'])) {
+                continue;
+            }
+
+            $quizState = (string) ($lesson['quiz_state'] ?? 'not_started');
+            $progressTotal += $quizState === 'passed'
+                ? 100
+                : ($quizState === 'failed' ? 50 : 0);
+        }
+
         if ($activeNuggetId === null && $activeQuizId !== null) {
             foreach ($lessons as $index => $lesson) {
                 if (($lesson['quiz']?->id ?? null) === $activeQuizId) {
                     $lessons[$index]['state'] = 'current';
                     break;
+                }
+
+                if (!empty($lesson['quiz_only'])) {
+                    continue;
                 }
 
                 if ($lesson['nugget']->moduleId === $moduleId) {
@@ -165,6 +183,17 @@ class LessonNavigationService
 
     public function findResumeNuggetId(int $courseId, int $userId): ?int
     {
+        $url = $this->findResumeLessonUrl($courseId, $userId);
+
+        if ($url === null || !preg_match('#/nuggets/(\d+)#', $url, $matches)) {
+            return null;
+        }
+
+        return (int) $matches[1];
+    }
+
+    public function findResumeLessonUrl(int $courseId, int $userId): ?string
+    {
         $outline = $this->courseService->getCourseOutline($courseId, $userId);
 
         if ($outline === null || $outline['modules'] === []) {
@@ -181,25 +210,96 @@ class LessonNavigationService
             return null;
         }
 
-        foreach ($navigation['lessons'] as $lesson) {
-            if ($lesson['state'] === 'current') {
-                return $lesson['nugget']->id;
+        foreach (['current', 'available'] as $targetState) {
+            foreach ($navigation['lessons'] as $lesson) {
+                if (($lesson['state'] ?? '') !== $targetState) {
+                    continue;
+                }
+
+                $resumeUrl = $this->resolveLessonResumeUrl($lesson);
+
+                if ($resumeUrl !== null) {
+                    return $resumeUrl;
+                }
             }
         }
 
         foreach ($navigation['lessons'] as $lesson) {
-            if ($lesson['state'] === 'available') {
-                return $lesson['nugget']->id;
+            if (($lesson['state'] ?? '') === 'locked') {
+                continue;
+            }
+
+            $resumeUrl = $this->resolveLessonResumeUrl($lesson);
+
+            if ($resumeUrl !== null) {
+                return $resumeUrl;
             }
         }
+
+        return $this->resolveLessonResumeUrl($navigation['lessons'][0]);
+    }
+
+    /**
+     * @param array<string, mixed> $lesson
+     */
+    private function resolveLessonResumeUrl(array $lesson): ?string
+    {
+        if (!empty($lesson['quiz_only'])) {
+            return $lesson['quiz_url'] ?? null;
+        }
+
+        $videoCompleted = !empty($lesson['video_completed']);
+        $quizState = (string) ($lesson['quiz_state'] ?? 'not_started');
+        $quizUrl = $lesson['quiz_url'] ?? null;
+
+        if ($videoCompleted && $quizUrl !== null && $quizState !== 'passed') {
+            return $quizUrl;
+        }
+
+        return $lesson['url'] ?? null;
+    }
+
+    /**
+     * @return array{
+     *     course: Course,
+     *     modules: array<int, Module>,
+     *     nuggets_by_module: array<int, array<int, Nugget>>,
+     *     lessons_by_module: array<int, array<int, array<string, mixed>>>,
+     *     overall_progress: int
+     * }|null
+     */
+    public function buildSyllabusSummary(int $courseId, int $userId): ?array
+    {
+        $outline = $this->courseService->getCourseOutline($courseId, $userId);
+
+        if ($outline === null || $outline['modules'] === []) {
+            return null;
+        }
+
+        $navigation = $this->buildForLearner(
+            $courseId,
+            $userId,
+            $outline['modules'][0]->id,
+        );
+
+        if ($navigation === null) {
+            return null;
+        }
+
+        $lessonsByModule = [];
 
         foreach ($navigation['lessons'] as $lesson) {
-            if ($lesson['state'] !== 'locked') {
-                return $lesson['nugget']->id;
-            }
+            $moduleId = $lesson['module']->id;
+            $lessonsByModule[$moduleId][] = $lesson;
         }
 
-        return $navigation['lessons'][0]['nugget']->id;
+        return [
+            'course' => $outline['course'],
+            'modules' => $outline['modules'],
+            'nuggets_by_module' => $outline['nuggetsByModule'],
+            'lessons_by_module' => $lessonsByModule,
+            'overall_progress' => $navigation['overall_progress'],
+        ];
     }
 
     /**
@@ -236,6 +336,77 @@ class LessonNavigationService
         }
 
         return null;
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $lessons
+     * @param array{
+     *     modules: array<int, Module>,
+     *     nuggetsByModule: array<int, array<int, Nugget>>
+     * } $outline
+     * @param array{
+     *     quizzes_by_module: array<int, Quiz>,
+     *     latest_attempts: array<int, array<string, mixed>>
+     * } $context
+     */
+    private function appendQuizOnlyModules(
+        array &$lessons,
+        array $outline,
+        array $context,
+        ?int $activeQuizId = null,
+    ): void {
+        $moduleIdsWithVideo = [];
+
+        foreach ($lessons as $lesson) {
+            if (!empty($lesson['quiz_only'])) {
+                continue;
+            }
+
+            $moduleIdsWithVideo[$lesson['module']->id] = true;
+        }
+
+        $canAccess = true;
+        $previousModuleId = null;
+
+        foreach ($outline['modules'] as $module) {
+            if ($previousModuleId !== null && !$this->unlockService->isModuleCleared($previousModuleId, $context)) {
+                $canAccess = false;
+            }
+
+            if (isset($moduleIdsWithVideo[$module->id])) {
+                $previousModuleId = $module->id;
+                continue;
+            }
+
+            $quiz = $context['quizzes_by_module'][$module->id] ?? null;
+
+            if ($quiz === null) {
+                $previousModuleId = $module->id;
+                continue;
+            }
+
+            $quizState = $this->unlockService->resolveQuizState($quiz, $context['latest_attempts']);
+            $state = !$canAccess ? 'locked' : ($quizState === 'passed' ? 'completed' : 'available');
+
+            if ($activeQuizId === $quiz->id) {
+                $state = 'current';
+            }
+
+            $lessons[] = [
+                'quiz_only' => true,
+                'module' => $module,
+                'state' => $state,
+                'progress_percentage' => $quizState === 'passed' ? 100 : ($quizState === 'failed' ? 50 : 0),
+                'video_completed' => false,
+                'url' => null,
+                'duration_label' => '',
+                'quiz' => $quiz,
+                'quiz_url' => url('/quizzes/' . $quiz->id),
+                'quiz_state' => $quizState,
+            ];
+
+            $previousModuleId = $module->id;
+        }
     }
 
     private function formatDuration(int $seconds): string

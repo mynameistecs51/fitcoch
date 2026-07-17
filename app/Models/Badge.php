@@ -18,7 +18,7 @@ class Badge
     public static function fromArray(array $row): self
     {
         return new self(
-            id: (int) $row['id'],
+            id: (int) ($row['id'] ?? $row['badge_id'] ?? 0),
             name: (string) $row['name'],
             description: (string) $row['description'],
             iconUrl: (string) $row['icon_url'],

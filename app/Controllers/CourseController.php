@@ -9,6 +9,7 @@ use App\Core\Response;
 use App\Repositories\CohortRepository;
 use App\Services\AuthService;
 use App\Services\CourseService;
+use App\Services\DiscussionService;
 use App\Services\LessonNavigationService;
 use App\Services\QuizService;
 
@@ -20,6 +21,7 @@ class CourseController
         private readonly QuizService $quizService,
         private readonly CohortRepository $cohortRepo,
         private readonly LessonNavigationService $lessonNavigationService,
+        private readonly DiscussionService $discussionService,
     ) {
     }
 
@@ -32,13 +34,31 @@ class CourseController
         }
 
         $roles = $this->authService->getUserRoles($user->id);
+        $courses = $this->courseService->listEnrolledCourses($user->id);
+        $courseIds = array_map(static fn ($course) => $course->id, $courses);
+        $isInstructor = in_array('instructor', $roles, true) || in_array('admin', $roles, true);
+        $unreadCounts = $isInstructor
+            ? $this->discussionService->countUnreadByCourseIds($user->id, $courseIds)
+            : [];
+        $courseOutlines = [];
+
+        foreach ($courses as $course) {
+            $summary = $this->lessonNavigationService->buildSyllabusSummary($course->id, $user->id);
+
+            if ($summary !== null) {
+                $courseOutlines[$course->id] = $summary;
+            }
+        }
 
         return Response::view('courses/index', [
             'title' => __('courses.title'),
             'user' => $user,
             'roles' => $roles,
             'isAdmin' => in_array('admin', $roles, true),
-            'courses' => $this->courseService->listEnrolledCourses($user->id),
+            'isInstructor' => $isInstructor,
+            'courses' => $courses,
+            'courseOutlines' => $courseOutlines,
+            'unreadCounts' => $unreadCounts,
             'availableCourses' => $this->courseService->listAvailableCourses($user->id),
             'success' => $request->query()['success'] ?? null,
             'error' => $request->query()['error'] ?? null,
@@ -82,10 +102,10 @@ class CourseController
             ]);
         }
 
-        $resumeNuggetId = $this->lessonNavigationService->findResumeNuggetId($courseId, $user->id);
+        $resumeLessonUrl = $this->lessonNavigationService->findResumeLessonUrl($courseId, $user->id);
 
-        if ($resumeNuggetId !== null && ($request->query()['view'] ?? '') !== 'syllabus') {
-            return Response::redirect('/nuggets/' . $resumeNuggetId);
+        if ($resumeLessonUrl !== null && ($request->query()['view'] ?? '') !== 'syllabus') {
+            return Response::redirect($resumeLessonUrl);
         }
 
         $roles = $this->authService->getUserRoles($user->id);
@@ -102,7 +122,7 @@ class CourseController
                 $outline['modules'][0]->id,
             )
             : null;
-        $resumeLessonUrl = $resumeNuggetId !== null ? url('/nuggets/' . $resumeNuggetId) : null;
+        $syllabusSummary = $this->lessonNavigationService->buildSyllabusSummary($courseId, $user->id);
 
         return Response::view('courses/show', [
             'title' => $outline['course']->title,
@@ -116,6 +136,7 @@ class CourseController
             'ticketsByModule' => $ticketsByModule,
             'lessonNav' => $lessonNav,
             'resumeLessonUrl' => $resumeLessonUrl,
+            'syllabusSummary' => $syllabusSummary,
         ]);
     }
 

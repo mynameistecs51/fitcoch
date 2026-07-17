@@ -19,9 +19,9 @@ class AuthService
     ) {
     }
 
-    public function authenticate(string $email, string $password): User
+    public function authenticate(string $loginId, string $password, bool $remember = false): User
     {
-        $user = $this->userRepo->findByEmail($email);
+        $user = $this->findUserByLoginId($loginId);
 
         if ($user === null) {
             throw new Exception(__('errors.invalid_credentials'));
@@ -35,12 +35,22 @@ class AuthService
             throw new Exception(__('errors.invalid_credentials'));
         }
 
-        $this->startSession($user);
+        $this->startSession($user, $remember);
 
         return $user;
     }
 
-    /** @param array{email: string, password: string, first_name: string, last_name: string, timezone?: string} $data */
+    /**
+     * @param array{
+     *     student_id: string,
+     *     title_prefix: string,
+     *     first_name: string,
+     *     last_name: string,
+     *     email: string,
+     *     password: string,
+     *     password_confirmation?: string
+     * } $data
+     */
     public function register(array $data): User
     {
         $errors = $this->validateRegistration($data);
@@ -49,14 +59,25 @@ class AuthService
             throw new ValidationException(__('errors.validation_failed'), $errors);
         }
 
-        if ($this->userRepo->emailExists($data['email'])) {
+        $studentId = $this->normalizeStudentId($data['student_id']);
+        $email = strtolower(trim($data['email']));
+
+        if ($this->userRepo->studentIdExists($studentId)) {
+            throw new ValidationException(__('errors.validation_failed'), [
+                'student_id' => [__('validation.student_id_taken')],
+            ]);
+        }
+
+        if ($this->userRepo->emailExists($email)) {
             throw new ValidationException(__('errors.validation_failed'), [
                 'email' => [__('validation.email_taken')],
             ]);
         }
 
         $user = $this->userRepo->create([
-            'email' => strtolower(trim($data['email'])),
+            'student_id' => $studentId,
+            'title_prefix' => trim($data['title_prefix']),
+            'email' => $email,
             'password_hash' => password_hash($data['password'], PASSWORD_ARGON2ID),
             'first_name' => trim($data['first_name']),
             'last_name' => trim($data['last_name']),
@@ -65,7 +86,7 @@ class AuthService
 
         $this->roleRepo->assignRole($user->id, 'learner');
 
-        $this->startSession($user);
+        $this->startSession($user, false);
 
         return $user;
     }
@@ -148,8 +169,8 @@ class AuthService
     {
         $errors = [];
 
-        if (empty($data['email']) || !filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-            $errors['email'] = [__('validation.email_required')];
+        if ($this->resolveLoginId($data) === '') {
+            $errors['login'] = [__('validation.login_required')];
         }
 
         if (empty($data['password'])) {
@@ -164,8 +185,16 @@ class AuthService
     {
         $errors = [];
 
-        if (empty($data['email']) || !filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-            $errors['email'] = [__('validation.email_required')];
+        $studentId = $this->normalizeStudentId((string) ($data['student_id'] ?? ''));
+
+        if ($studentId === '') {
+            $errors['student_id'] = [__('validation.student_id_required')];
+        } elseif (!preg_match('/^[A-Za-z0-9_-]{3,20}$/', $studentId)) {
+            $errors['student_id'] = [__('validation.student_id_invalid')];
+        }
+
+        if (empty($data['title_prefix'])) {
+            $errors['title_prefix'] = [__('validation.title_prefix_required')];
         }
 
         if (empty($data['first_name'])) {
@@ -176,10 +205,25 @@ class AuthService
             $errors['last_name'] = [__('validation.last_name_required')];
         }
 
+        $email = strtolower(trim((string) ($data['email'] ?? '')));
+
+        if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $errors['email'] = [__('validation.email_required')];
+        }
+
         $passwordErrors = $this->validatePassword((string) ($data['password'] ?? ''));
 
         if ($passwordErrors !== []) {
             $errors['password'] = $passwordErrors;
+        }
+
+        $password = (string) ($data['password'] ?? '');
+        $passwordConfirmation = (string) ($data['password_confirmation'] ?? '');
+
+        if ($passwordConfirmation === '') {
+            $errors['password_confirmation'] = [__('validation.password_confirmation_required')];
+        } elseif ($password !== $passwordConfirmation) {
+            $errors['password_confirmation'] = [__('auth.password_confirmation_mismatch')];
         }
 
         return $errors;
@@ -213,7 +257,44 @@ class AuthService
         return $errors;
     }
 
-    private function startSession(User $user): void
+    /** @param array<string, mixed> $data */
+    public function resolveLoginId(array $data): string
+    {
+        return trim((string) ($data['login'] ?? $data['student_id'] ?? $data['email'] ?? ''));
+    }
+
+    private function findUserByLoginId(string $loginId): ?User
+    {
+        $loginId = trim($loginId);
+
+        if ($loginId === '') {
+            return null;
+        }
+
+        $user = $this->userRepo->findByStudentId($this->normalizeStudentId($loginId));
+
+        if ($user !== null) {
+            return $user;
+        }
+
+        if (filter_var($loginId, FILTER_VALIDATE_EMAIL)) {
+            return $this->userRepo->findByEmail(strtolower($loginId));
+        }
+
+        return null;
+    }
+
+    private function normalizeStudentId(string $studentId): string
+    {
+        return strtoupper(trim($studentId));
+    }
+
+    private function syntheticEmailForStudentId(string $studentId): string
+    {
+        return strtolower($studentId) . '@student.fitcoch.local';
+    }
+
+    private function startSession(User $user, bool $remember = false): void
     {
         $sessionToken = bin2hex(random_bytes(32));
         $this->userRepo->updateSessionToken($user->id, $sessionToken);
@@ -222,5 +303,19 @@ class AuthService
         $_SESSION['user_id'] = $user->id;
         $_SESSION['session_token'] = $sessionToken;
         $_SESSION['last_activity'] = time();
+        $_SESSION['remember_me'] = $remember;
+
+        if ($remember) {
+            $lifetime = 60 * 60 * 24 * 30;
+            $params = session_get_cookie_params();
+            setcookie(session_name(), session_id(), [
+                'expires' => time() + $lifetime,
+                'path' => $params['path'],
+                'domain' => $params['domain'],
+                'secure' => (bool) $params['secure'],
+                'httponly' => (bool) $params['httponly'],
+                'samesite' => $params['samesite'] ?? 'Lax',
+            ]);
+        }
     }
 }

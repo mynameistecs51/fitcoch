@@ -22,35 +22,51 @@ $labelClass = 'block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1
 $thClass = 'px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase';
 $tdClass = 'px-4 py-3 text-sm text-slate-700 dark:text-slate-300';
 $labelTdClass = 'px-4 py-3 text-sm font-medium text-slate-500 dark:text-slate-400 whitespace-nowrap w-40';
+$instructorQuickLinkClass = 'inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:border-brand-500/30 hover:text-brand-600 dark:hover:text-brand-accent transition';
 
 ob_start();
 ?>
-<section class="space-y-6">
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div>
-            <h1 class="text-2xl font-extrabold text-slate-900 dark:text-white">
-                <?= escape($isEdit ? __('courses.instructor.edit_title') : __('courses.instructor.create_title')) ?>
-            </h1>
-        </div>
-        <div class="flex flex-wrap items-center gap-3">
-            <?php if ($isEdit): ?>
-                <a href="<?= escape(url('/instructor/courses/' . $courseId . '/cohorts')) ?>" class="text-sm text-brand-600 dark:text-brand-500 hover:text-brand-accent font-semibold">
-                    <?= escape(__('cohorts.instructor.manage')) ?>
+<section class="space-y-8">
+    <div class="ux-hero ux-card p-6 md:p-8 lg:p-10">
+        <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 relative z-10">
+            <div class="max-w-3xl space-y-4">
+                <span class="inline-flex items-center gap-2 px-3 py-1 text-xs font-semibold rounded-full bg-brand-500/10 text-brand-700 dark:text-brand-accent border border-brand-500/20">
+                    <i class="fa-solid fa-chalkboard-user text-[10px]"></i>
+                    <?= escape(__('courses.instructor.badge')) ?>
+                </span>
+                <h1 class="text-2xl md:text-3xl lg:text-4xl font-extrabold text-slate-900 dark:text-white leading-tight tracking-tight">
+                    <?= escape($isEdit ? __('courses.instructor.edit_title') : __('courses.instructor.create_title')) ?>
+                </h1>
+                <?php if ($isEdit && $course instanceof Course): ?>
+                    <p class="text-sm md:text-base text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl">
+                        <?= escape($course->title) ?>
+                    </p>
+                <?php endif; ?>
+            </div>
+            <div class="flex flex-wrap items-center gap-2 shrink-0">
+                <?php if ($isEdit): ?>
+                    <a href="<?= escape(url('/instructor/courses/' . $courseId . '/progress')) ?>" class="<?= escape($instructorQuickLinkClass) ?>">
+                        <i class="fa-solid fa-chart-line text-brand-500"></i>
+                        <?= escape(__('courses.instructor.view_progress')) ?>
+                    </a>
+                    <a href="<?= escape(url('/instructor/courses/' . $courseId . '/knowledge-items')) ?>" class="<?= escape($instructorQuickLinkClass) ?>">
+                        <i class="fa-solid fa-lightbulb text-amber-500"></i>
+                        <?= escape(__('knowledge_items.instructor.manage')) ?>
+                    </a>
+                    <a href="<?= escape(url('/instructor/courses/' . $courseId . '/cohorts')) ?>" class="<?= escape($instructorQuickLinkClass) ?>">
+                        <i class="fa-solid fa-user-group text-sky-500"></i>
+                        <?= escape(__('cohorts.instructor.manage')) ?>
+                    </a>
+                <?php endif; ?>
+                <a href="<?= escape(url('/instructor/courses')) ?>" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/80 transition">
+                    <i class="fa-solid fa-arrow-left text-xs"></i>
+                    <?= escape(__('courses.instructor.back')) ?>
                 </a>
-                <a href="<?= escape(url('/instructor/courses/' . $courseId . '/knowledge-items')) ?>" class="text-sm text-brand-600 dark:text-brand-500 hover:text-brand-accent font-semibold">
-                    <?= escape(__('knowledge_items.instructor.manage')) ?>
-                </a>
-                <a href="<?= escape(url('/instructor/courses/' . $courseId . '/progress')) ?>" class="text-sm text-brand-600 dark:text-brand-500 hover:text-brand-accent font-semibold">
-                    <?= escape(__('courses.instructor.view_progress')) ?>
-                </a>
-            <?php endif; ?>
-            <a href="<?= escape(url('/instructor/courses')) ?>" class="text-sm text-brand-600 dark:text-brand-500 hover:text-brand-accent">
-                <?= escape(__('courses.instructor.back')) ?>
-            </a>
+            </div>
         </div>
     </div>
 
-    <div class="bg-white dark:bg-slate-900 p-6 md:p-8 rounded-3xl border border-slate-200 dark:border-slate-800 space-y-8">
+    <div class="ux-card p-6 md:p-8 space-y-8">
         <?php if ($error === 'csrf' || $error === __('errors.invalid_csrf')): ?>
             <div class="p-4 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-red-700 dark:text-red-400 text-sm">
                 <?= escape(__('errors.invalid_csrf')) ?>

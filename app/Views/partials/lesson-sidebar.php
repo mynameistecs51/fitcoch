@@ -25,13 +25,56 @@ $lessonCount = (int) ($lessonNav['lesson_count'] ?? count($lessons));
                     $quiz = $lesson['quiz'] ?? null;
                     $quizUrl = $lesson['quiz_url'] ?? null;
                     $quizState = (string) ($lesson['quiz_state'] ?? 'not_started');
+                    $quizOnly = !empty($lesson['quiz_only']);
                     $lessonLocked = $state === 'locked';
+                    $quizLocked = $lessonLocked;
+                    $quizInteractive = !$quizLocked && $quizUrl !== null;
+                    ?>
+                    <?php if ($quizOnly): ?>
+                        <?php
+                        $quizIconClass = match ($quizState) {
+                            'passed' => 'fa-circle-check text-brand-500',
+                            'failed' => 'fa-rotate-right text-amber-500',
+                            default => 'fa-clipboard-question text-brand-500',
+                        };
+                        $quizItemClass = $quizLocked
+                            ? 'border-slate-200 dark:border-slate-800 bg-slate-100/70 dark:bg-slate-950/40 opacity-70'
+                            : ($quizState === 'passed'
+                                ? 'border-brand-500/30 bg-brand-500/5 hover:border-brand-500/40'
+                                : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-brand-500/30');
+                        ?>
+                        <li class="space-y-2">
+                            <?php if ($quizInteractive): ?>
+                                <a href="<?= escape((string) $quizUrl) ?>" class="lesson-sidebar-item flex items-center gap-3 p-3 rounded-xl border transition <?= escape($quizItemClass) ?>">
+                                    <span class="w-6 text-center shrink-0">
+                                        <i class="fa-solid <?= escape($quizIconClass) ?>"></i>
+                                    </span>
+                                    <span class="min-w-0 flex-1">
+                                        <span class="block text-xs font-semibold text-slate-800 dark:text-slate-200"><?= escape($quiz->title) ?></span>
+                                        <span class="block text-[10px] text-slate-500 dark:text-slate-400 mt-0.5"><?= escape(__('lesson.sidebar_quiz_label')) ?></span>
+                                    </span>
+                                </a>
+                            <?php else: ?>
+                                <div class="flex items-center gap-3 p-3 rounded-xl border <?= escape($quizItemClass) ?>">
+                                    <span class="w-6 text-center shrink-0">
+                                        <i class="fa-solid fa-lock text-amber-500"></i>
+                                    </span>
+                                    <span class="min-w-0 flex-1">
+                                        <span class="block text-xs font-semibold text-slate-800 dark:text-slate-200"><?= escape($quiz->title) ?></span>
+                                        <span class="block text-[10px] text-slate-500 dark:text-slate-400 mt-0.5"><?= escape(__('lesson.sidebar_quiz_locked')) ?></span>
+                                    </span>
+                                </div>
+                            <?php endif; ?>
+                        </li>
+                        <?php continue; ?>
+                    <?php endif; ?>
+                    <?php
                     $quizLocked = $lessonLocked;
                     $quizInteractive = !$quizLocked && $quizUrl !== null;
                     $lessonInteractive = !$lessonLocked;
                     $itemClass = match ($state) {
                         'current' => 'border-brand-500/40 bg-brand-500/10',
-                        'completed' => 'border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/60',
+                        'completed' => 'border-brand-500/35 bg-brand-500/10',
                         'available' => 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-brand-500/30',
                         default => 'border-slate-200 dark:border-slate-800 bg-slate-100/70 dark:bg-slate-950/40 opacity-70',
                     };

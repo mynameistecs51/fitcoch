@@ -72,6 +72,8 @@ class LearnerDashboardServiceTest extends TestCase
         $userRepo = $this->createMock(UserRepository::class);
         $userRepo->method('findById')->willReturn(new User(
             7,
+            '6501234567',
+            'นาย',
             'learner@test.com',
             'hash',
             'Test',

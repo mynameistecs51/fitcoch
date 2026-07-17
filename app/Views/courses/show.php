@@ -6,6 +6,7 @@ $quizzesByModule = $quizzesByModule ?? [];
 $ticketsByModule = $ticketsByModule ?? [];
 $lessonNav = $lessonNav ?? null;
 $resumeLessonUrl = $resumeLessonUrl ?? null;
+$syllabusSummary = $syllabusSummary ?? null;
 ?>
 <section class="lesson-page max-w-[1400px] mx-auto space-y-5">
     <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
@@ -52,78 +53,16 @@ $resumeLessonUrl = $resumeLessonUrl ?? null;
                     <?= escape(__('courses.syllabus_title')) ?>
                 </h2>
 
-                <?php if ($modules === []): ?>
+                <?php if ($syllabusSummary !== null): ?>
+                    <?php
+                        $syllabus = $syllabusSummary;
+                        $compact = false;
+                        require base_path('app/Views/partials/course-lesson-structure.php');
+                    ?>
+                <?php elseif ($modules === []): ?>
                     <p class="text-sm text-slate-500 dark:text-slate-400"><?= escape(__('courses.no_modules')) ?></p>
                 <?php else: ?>
-                    <div class="space-y-4">
-                        <?php foreach ($modules as $module): ?>
-                            <?php
-                            $moduleNuggets = $nuggetsByModule[$module->id] ?? [];
-                            $moduleQuiz = $quizzesByModule[$module->id] ?? null;
-                            $moduleTicket = $ticketsByModule[$module->id] ?? null;
-                            $hasContent = $moduleNuggets !== [] || $moduleQuiz !== null;
-                            ?>
-                            <article class="rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
-                                <div class="px-4 py-3 bg-slate-50 dark:bg-slate-950/70 border-b border-slate-200 dark:border-slate-800 flex items-center gap-3">
-                                    <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-brand-500/15 text-brand-700 dark:text-brand-accent text-sm font-bold shrink-0">
-                                        <?= escape((string) $module->sequenceOrder) ?>
-                                    </span>
-                                    <h3 class="text-sm md:text-base font-semibold text-slate-900 dark:text-white"><?= escape($module->title) ?></h3>
-                                </div>
-
-                                <div class="p-4">
-                                    <?php if (!$hasContent): ?>
-                                        <p class="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-2">
-                                            <i class="fa-regular fa-folder-open"></i>
-                                            <?= escape(__('courses.no_nuggets')) ?>
-                                        </p>
-                                    <?php else: ?>
-                                        <ul class="space-y-2">
-                                            <?php foreach ($moduleNuggets as $nugget): ?>
-                                                <li>
-                                                    <a
-                                                        href="<?= escape(url('/nuggets/' . $nugget->id)) ?>"
-                                                        class="flex items-center gap-3 p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-brand-500/40 hover:bg-brand-500/5 transition"
-                                                    >
-                                                        <span class="w-9 h-9 rounded-full bg-brand-500/15 flex items-center justify-center shrink-0">
-                                                            <i class="fa-solid fa-circle-play text-brand-500"></i>
-                                                        </span>
-                                                        <span class="min-w-0 flex-1">
-                                                            <span class="block text-sm font-semibold text-slate-900 dark:text-white"><?= escape($nugget->title) ?></span>
-                                                            <span class="block text-xs text-slate-500 dark:text-slate-400 mt-0.5"><?= escape(__('courses.nugget_video')) ?></span>
-                                                        </span>
-                                                        <i class="fa-solid fa-chevron-right text-slate-400 text-xs"></i>
-                                                    </a>
-                                                </li>
-                                            <?php endforeach; ?>
-
-                                            <?php if ($moduleQuiz !== null): ?>
-                                                <li>
-                                                    <a
-                                                        href="<?= escape(url('/quizzes/' . $moduleQuiz->id)) ?>"
-                                                        class="flex items-center gap-3 p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-brand-500/40 hover:bg-brand-500/5 transition"
-                                                    >
-                                                        <span class="w-9 h-9 rounded-full bg-brand-500/15 flex items-center justify-center shrink-0">
-                                                            <i class="fa-solid fa-clipboard-question text-brand-500"></i>
-                                                        </span>
-                                                        <span class="min-w-0 flex-1">
-                                                            <span class="block text-sm font-semibold text-slate-900 dark:text-white"><?= escape($moduleQuiz->title) ?></span>
-                                                            <span class="block text-xs text-slate-500 dark:text-slate-400 mt-0.5"><?= escape(__('lesson.pretest_title')) ?></span>
-                                                        </span>
-                                                        <?php if ($moduleTicket !== null): ?>
-                                                            <span class="inline-flex px-2 py-0.5 rounded text-[10px] font-bold <?= $moduleTicket->isOpen() ? 'bg-brand-500/15 text-brand-700 dark:text-brand-accent' : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300' ?>">
-                                                                <?= escape(__('quizzes.ticket_status.' . $moduleTicket->status)) ?>
-                                                            </span>
-                                                        <?php endif; ?>
-                                                    </a>
-                                                </li>
-                                            <?php endif; ?>
-                                        </ul>
-                                    <?php endif; ?>
-                                </div>
-                            </article>
-                        <?php endforeach; ?>
-                    </div>
+                    <p class="text-sm text-slate-500 dark:text-slate-400"><?= escape(__('courses.no_nuggets')) ?></p>
                 <?php endif; ?>
             </div>
         </div>

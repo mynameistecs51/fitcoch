@@ -31,6 +31,15 @@ class UserRepository implements RepositoryInterface
         return $row ? User::fromArray($row) : null;
     }
 
+    public function findByStudentId(string $studentId): ?User
+    {
+        $stmt = $this->db->prepare('SELECT * FROM users WHERE student_id = :student_id LIMIT 1');
+        $stmt->execute(['student_id' => $studentId]);
+        $row = $stmt->fetch();
+
+        return $row ? User::fromArray($row) : null;
+    }
+
     public function emailExists(string $email): bool
     {
         $stmt = $this->db->prepare('SELECT 1 FROM users WHERE email = :email LIMIT 1');
@@ -39,15 +48,33 @@ class UserRepository implements RepositoryInterface
         return (bool) $stmt->fetchColumn();
     }
 
-    /** @param array{email: string, password_hash: string, first_name: string, last_name: string, timezone: string} $data */
+    public function studentIdExists(string $studentId): bool
+    {
+        $stmt = $this->db->prepare('SELECT 1 FROM users WHERE student_id = :student_id LIMIT 1');
+        $stmt->execute(['student_id' => $studentId]);
+
+        return (bool) $stmt->fetchColumn();
+    }
+
+    public function countActive(): int
+    {
+        $stmt = $this->db->prepare("SELECT COUNT(*) FROM users WHERE status = 'active'");
+        $stmt->execute();
+
+        return (int) $stmt->fetchColumn();
+    }
+
+    /** @param array{student_id?: ?string, title_prefix?: string, email: string, password_hash: string, first_name: string, last_name: string, timezone: string} $data */
     public function create(array $data): User
     {
         $stmt = $this->db->prepare(
-            'INSERT INTO users (email, password_hash, first_name, last_name, timezone)
-             VALUES (:email, :password_hash, :first_name, :last_name, :timezone)'
+            'INSERT INTO users (student_id, title_prefix, email, password_hash, first_name, last_name, timezone)
+             VALUES (:student_id, :title_prefix, :email, :password_hash, :first_name, :last_name, :timezone)'
         );
 
         $stmt->execute([
+            'student_id' => $data['student_id'] ?? null,
+            'title_prefix' => $data['title_prefix'] ?? '',
             'email' => $data['email'],
             'password_hash' => $data['password_hash'],
             'first_name' => $data['first_name'],
@@ -64,12 +91,13 @@ class UserRepository implements RepositoryInterface
         return $user;
     }
 
-    /** @param array{first_name: string, last_name: string, timezone: string} $data */
+    /** @param array{title_prefix: string, first_name: string, last_name: string, timezone: string} $data */
     public function updateProfile(int $userId, array $data): User
     {
         $stmt = $this->db->prepare(
             'UPDATE users
-             SET first_name = :first_name,
+             SET title_prefix = :title_prefix,
+                 first_name = :first_name,
                  last_name = :last_name,
                  timezone = :timezone
              WHERE id = :id'
@@ -77,6 +105,7 @@ class UserRepository implements RepositoryInterface
 
         $stmt->execute([
             'id' => $userId,
+            'title_prefix' => $data['title_prefix'],
             'first_name' => $data['first_name'],
             'last_name' => $data['last_name'],
             'timezone' => $data['timezone'],
