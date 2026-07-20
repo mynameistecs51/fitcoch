@@ -1,5 +1,5 @@
-# รันไฟล์ SQL ผ่าน MySQL client ของ XAMPP
-# ใช้: .\scripts\run-sql.ps1 database\fixes\001_fix_cohort_name_encoding.sql
+# รันไฟล์ SQL ผ่าน MySQL client ของ XAMPP (รองรับ UTF-8 / ภาษาไทย)
+# ใช้: .\scripts\run-sql.ps1 database\fixes\003_fix_demo_user_names.sql
 
 param(
     [Parameter(Mandatory = $true)]
@@ -23,5 +23,11 @@ if (-not (Test-Path $SqlFile)) {
     exit 1
 }
 
-Get-Content -Path $SqlFile -Encoding UTF8 | & $mysql -u root --default-character-set=utf8mb4 fitcoch
+$resolved = (Resolve-Path $SqlFile).Path
+$exitCode = cmd /c "`"$mysql`" -u root --default-character-set=utf8mb4 fitcoch < `"$resolved`""
+
+if ($exitCode -ne 0) {
+    exit $exitCode
+}
+
 Write-Host 'เสร็จแล้ว'

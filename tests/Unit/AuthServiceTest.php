@@ -66,6 +66,40 @@ class AuthServiceTest extends TestCase
         $this->assertSame($storedToken, $_SESSION['session_token']);
     }
 
+    public function testAuthenticateWithEmailUsesEmailLookupFirst(): void
+    {
+        $password = 'Password123!';
+        $user = new User(
+            3,
+            null,
+            '',
+            'te.chaiwat@gmail.com',
+            password_hash($password, PASSWORD_ARGON2ID),
+            'Test',
+            'User',
+            'active',
+            'Asia/Bangkok',
+            'now',
+            'now'
+        );
+
+        $userRepo = $this->createMock(UserRepository::class);
+        $userRepo->expects($this->never())->method('findByStudentId');
+        $userRepo->method('findByEmail')->with('te.chaiwat@gmail.com')->willReturn($user);
+        $userRepo->method('updateSessionToken');
+
+        $service = new AuthService(
+            $userRepo,
+            $this->createMock(RoleRepository::class),
+            $this->createMock(AuthorizationService::class),
+            $this->createMock(JwtService::class),
+        );
+
+        $authenticated = $service->authenticate('te.chaiwat@gmail.com', $password);
+
+        $this->assertSame($user, $authenticated);
+    }
+
     public function testIsActiveWebSessionReturnsFalseWhenSessionTokenMissing(): void
     {
         $_SESSION['user_id'] = 7;

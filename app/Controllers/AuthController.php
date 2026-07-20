@@ -11,6 +11,8 @@ use App\Services\LearnerDashboardService;
 use App\Services\PasswordResetService;
 use App\Services\ValidationException;
 use Exception;
+use PDOException;
+use Throwable;
 
 class AuthController
 {
@@ -65,8 +67,8 @@ class AuthController
                 (string) $data['password'],
                 !empty($data['remember'])
             );
-        } catch (Exception $e) {
-            return $this->respondWithAuthFailure($request, $e->getMessage(), $data);
+        } catch (Throwable $e) {
+            return $this->respondWithAuthFailure($request, $this->loginErrorMessage($e), $data);
         }
 
         if ($request->isApi()) {
@@ -276,6 +278,25 @@ class AuthController
             'form' => $data,
             'login' => $this->authService->resolveLoginId($data),
         ]);
+    }
+
+    private function loginErrorMessage(Throwable $e): string
+    {
+        $message = $e->getMessage();
+
+        if ($e instanceof PDOException || str_contains($message, 'SQLSTATE')) {
+            if (str_contains($message, 'student_id') || str_contains($message, 'title_prefix')) {
+                return __('errors.database_migration_required');
+            }
+
+            return __('errors.unexpected');
+        }
+
+        if (str_contains($message, 'Unknown column')) {
+            return __('errors.database_migration_required');
+        }
+
+        return $message;
     }
 
     /** @param array<string, mixed> $data */

@@ -99,6 +99,12 @@ class AdminService
         $firstName = trim((string) ($data['first_name'] ?? ''));
         $lastName = trim((string) ($data['last_name'] ?? ''));
         $email = strtolower(trim((string) ($data['email'] ?? '')));
+        $titlePrefix = trim((string) ($data['title_prefix'] ?? ''));
+        $timezone = trim((string) ($data['timezone'] ?? default_timezone()));
+
+        if ($titlePrefix === '') {
+            $errors['title_prefix'][] = __('validation.title_prefix_required');
+        }
 
         if ($firstName === '') {
             $errors['first_name'][] = __('validation.first_name_required');
@@ -114,14 +120,22 @@ class AdminService
             $errors['email'][] = __('validation.email_taken');
         }
 
+        if ($timezone === '') {
+            $timezone = default_timezone();
+        } elseif (!is_valid_timezone($timezone)) {
+            $errors['timezone'][] = __('validation.timezone_invalid');
+        }
+
         if ($errors !== []) {
             throw new ValidationException(__('errors.validation_failed'), $errors);
         }
 
         return [
+            'title_prefix' => $titlePrefix,
             'first_name' => $firstName,
             'last_name' => $lastName,
             'email' => $email,
+            'timezone' => $timezone,
         ];
     }
 

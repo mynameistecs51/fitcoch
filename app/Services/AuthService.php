@@ -271,17 +271,11 @@ class AuthService
             return null;
         }
 
-        $user = $this->userRepo->findByStudentId($this->normalizeStudentId($loginId));
-
-        if ($user !== null) {
-            return $user;
-        }
-
         if (filter_var($loginId, FILTER_VALIDATE_EMAIL)) {
             return $this->userRepo->findByEmail(strtolower($loginId));
         }
 
-        return null;
+        return $this->userRepo->findByStudentId($this->normalizeStudentId($loginId));
     }
 
     private function normalizeStudentId(string $studentId): string

@@ -28,21 +28,26 @@ copy .env.example .env
 **Windows (PowerShell + XAMPP):**
 
 ```powershell
-$migrations = 1..18 | ForEach-Object { '{0:D3}' -f $_ }
+$mysql = 'D:\xamp\mysql\bin\mysql.exe'
+$migrations = 1..20 | ForEach-Object { '{0:D3}' -f $_ }
 foreach ($n in $migrations) {
     Get-ChildItem "database\migrations\${n}_*.sql" | ForEach-Object {
         Write-Host "Running $($_.Name)..."
-        Get-Content $_.FullName -Raw | D:\xamp\mysql\bin\mysql.exe -u root
+        cmd /c "`"$mysql`" -u root --default-character-set=utf8mb4 < `"$($_.FullName)`""
     }
 }
 ```
 
-Or run files individually, for example:
+Or use the helper script (recommended for Thai text):
 
 ```powershell
-Get-Content database\migrations\001_create_users_table.sql -Raw | D:\xamp\mysql\bin\mysql.exe -u root
-# ... through ...
-Get-Content database\migrations\018_create_discussion_reads.sql -Raw | D:\xamp\mysql\bin\mysql.exe -u root
+.\scripts\run-sql.ps1 database\migrations\020_seed_demo_users.sql
+```
+
+If Thai text in seeded data shows as `?`, re-apply demo names:
+
+```powershell
+.\scripts\run-sql.ps1 database\fixes\003_fix_demo_user_names.sql
 ```
 
 **Linux / macOS:**

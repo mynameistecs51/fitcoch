@@ -231,9 +231,11 @@ class AdminController
     private function profileFormData(Request $request, \App\Models\User $user): array
     {
         $form = [
+            'title_prefix' => (string) $request->input('title_prefix', $user->titlePrefix),
             'first_name' => (string) $request->input('first_name', $user->firstName),
             'last_name' => (string) $request->input('last_name', $user->lastName),
             'email' => (string) $request->input('email', $user->email),
+            'timezone' => (string) $request->input('timezone', $user->timezone !== '' ? $user->timezone : default_timezone()),
         ];
 
         return $form;

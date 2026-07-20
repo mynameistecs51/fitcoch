@@ -7,10 +7,30 @@ $error = $error ?? null;
 $success = $success ?? null;
 
 $inputClass = 'w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-200 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20';
+$readonlyClass = 'w-full px-4 py-3 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/80 text-slate-600 dark:text-slate-400 cursor-not-allowed';
 $labelClass = 'block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1';
 $cardClass = 'bg-white dark:bg-slate-900 p-6 md:p-8 rounded-3xl border border-slate-200 dark:border-slate-800';
 $thClass = 'px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase';
 $tdClass = 'px-4 py-3 text-sm text-slate-700 dark:text-slate-300';
+
+$timezoneOptions = timezone_options();
+$currentTimezone = $form['timezone'] ?? ($user->timezone !== '' ? $user->timezone : default_timezone());
+
+$formatDateTime = static function (string $value): string {
+    if ($value === '') {
+        return '—';
+    }
+
+    try {
+        return (new DateTimeImmutable($value))->format('d/m/Y H:i');
+    } catch (Exception) {
+        return $value;
+    }
+};
+
+$metaRowClass = 'flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 py-3 border-b border-slate-100 dark:border-slate-800 last:border-0';
+$metaLabelClass = 'text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400';
+$metaValueClass = 'text-sm font-medium text-slate-900 dark:text-slate-100 sm:text-right';
 
 $initials = mb_strtoupper(mb_substr($user->firstName, 0, 1) . mb_substr($user->lastName, 0, 1));
 $successMessages = [
@@ -29,7 +49,7 @@ ob_start();
             </div>
             <div>
                 <h1 class="text-2xl font-extrabold text-slate-900 dark:text-white flex items-center flex-wrap gap-2">
-                    <span><?= escape($user->firstName . ' ' . $user->lastName) ?></span>
+                    <span><?= escape($user->fullName()) ?></span>
                     <span class="inline-flex px-2.5 py-1 text-xs font-semibold rounded-full <?= $user->status === 'active' ? 'bg-brand-500/10 text-brand-700 dark:text-brand-accent' : 'bg-red-500/10 text-red-600 dark:text-red-400' ?>">
                         <?= escape(__('admin.status.' . $user->status)) ?>
                     </span>
@@ -63,16 +83,66 @@ ob_start();
     <?php endif; ?>
 
     <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        <div class="<?= escape($cardClass) ?>">
-            <div class="flex items-center justify-between gap-3 mb-6">
+        <div class="<?= escape($cardClass) ?> space-y-6">
+            <div class="flex items-center justify-between gap-3">
                 <h2 class="text-lg font-bold text-slate-900 dark:text-white flex items-center">
                     <i class="fa-solid fa-id-card text-brand-500 mr-2"></i>
                     <?= escape(__('admin.account_info')) ?>
                 </h2>
-                <span class="text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
-                    <?= escape(__('admin.edit_account')) ?>
-                </span>
             </div>
+
+            <div class="p-4 md:p-5 rounded-2xl bg-slate-50/80 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800">
+                <h3 class="text-sm font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-database text-brand-500 text-xs"></i>
+                    <?= escape(__('admin.system_meta')) ?>
+                </h3>
+                <dl class="divide-y divide-slate-100 dark:divide-slate-800">
+                    <div class="<?= escape($metaRowClass) ?>">
+                        <dt class="<?= escape($metaLabelClass) ?>"><?= escape(__('admin.fields.user_id')) ?></dt>
+                        <dd class="<?= escape($metaValueClass) ?> font-mono">#<?= escape((string) $user->id) ?></dd>
+                    </div>
+                    <div class="<?= escape($metaRowClass) ?>">
+                        <dt class="<?= escape($metaLabelClass) ?>"><?= escape(__('admin.table.student_id')) ?></dt>
+                        <dd class="<?= escape($metaValueClass) ?> font-mono">
+                            <?= $user->studentId !== null && $user->studentId !== '' ? escape($user->studentId) : escape(__('admin.fields.not_set')) ?>
+                        </dd>
+                    </div>
+                    <div class="<?= escape($metaRowClass) ?>">
+                        <dt class="<?= escape($metaLabelClass) ?>"><?= escape(__('admin.table.email')) ?></dt>
+                        <dd class="<?= escape($metaValueClass) ?> break-all"><?= escape($user->email) ?></dd>
+                    </div>
+                    <div class="<?= escape($metaRowClass) ?>">
+                        <dt class="<?= escape($metaLabelClass) ?>"><?= escape(__('admin.table.roles')) ?></dt>
+                        <dd class="<?= escape($metaValueClass) ?>"><?= escape(translate_roles($roles)) ?></dd>
+                    </div>
+                    <div class="<?= escape($metaRowClass) ?>">
+                        <dt class="<?= escape($metaLabelClass) ?>"><?= escape(__('admin.table.status')) ?></dt>
+                        <dd class="<?= escape($metaValueClass) ?>">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-full <?= $user->status === 'active' ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300' : 'bg-red-500/10 text-red-600 dark:text-red-400' ?>">
+                                <?= escape(__('admin.status.' . $user->status)) ?>
+                            </span>
+                        </dd>
+                    </div>
+                    <div class="<?= escape($metaRowClass) ?>">
+                        <dt class="<?= escape($metaLabelClass) ?>"><?= escape(__('auth.timezone')) ?></dt>
+                        <dd class="<?= escape($metaValueClass) ?>"><?= escape($user->timezone !== '' ? $user->timezone : default_timezone()) ?></dd>
+                    </div>
+                    <div class="<?= escape($metaRowClass) ?>">
+                        <dt class="<?= escape($metaLabelClass) ?>"><?= escape(__('admin.fields.registered_at')) ?></dt>
+                        <dd class="<?= escape($metaValueClass) ?>"><?= escape($formatDateTime($user->createdAt)) ?></dd>
+                    </div>
+                    <div class="<?= escape($metaRowClass) ?>">
+                        <dt class="<?= escape($metaLabelClass) ?>"><?= escape(__('admin.fields.updated_at')) ?></dt>
+                        <dd class="<?= escape($metaValueClass) ?>"><?= escape($formatDateTime($user->updatedAt)) ?></dd>
+                    </div>
+                </dl>
+            </div>
+
+            <div>
+                <h3 class="text-sm font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-pen text-brand-500 text-xs"></i>
+                    <?= escape(__('admin.editable_profile')) ?>
+                </h3>
 
             <form
                 method="POST"
@@ -83,6 +153,32 @@ ob_start();
                 data-progress-processing="<?= escape(__('progress.processing')) ?>"
             >
                 <input type="hidden" name="csrf_token" value="<?= escape(csrf_token()) ?>">
+
+                <div>
+                    <label for="student_id_display" class="<?= escape($labelClass) ?>"><?= escape(__('auth.student_id')) ?></label>
+                    <input
+                        type="text"
+                        id="student_id_display"
+                        value="<?= escape($user->studentId ?? '') ?>"
+                        readonly
+                        class="<?= escape($readonlyClass) ?>"
+                    >
+                </div>
+
+                <div>
+                    <label for="title_prefix" class="<?= escape($labelClass) ?>"><?= escape(__('auth.title_prefix')) ?></label>
+                    <input
+                        type="text"
+                        id="title_prefix"
+                        name="title_prefix"
+                        value="<?= escape($form['title_prefix'] ?? $user->titlePrefix) ?>"
+                        required
+                        class="<?= escape($inputClass) ?>"
+                    >
+                    <?php if (!empty($errors['title_prefix'])): ?>
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400"><?= escape($errors['title_prefix'][0]) ?></p>
+                    <?php endif; ?>
+                </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
@@ -130,11 +226,29 @@ ob_start();
                     <?php endif; ?>
                 </div>
 
+                <div>
+                    <label for="timezone" class="<?= escape($labelClass) ?>"><?= escape(__('auth.timezone')) ?></label>
+                    <select id="timezone" name="timezone" class="<?= escape($inputClass) ?>">
+                        <?php if (!isset($timezoneOptions[$currentTimezone])): ?>
+                            <option value="<?= escape($currentTimezone) ?>" selected><?= escape($currentTimezone) ?></option>
+                        <?php endif; ?>
+                        <?php foreach ($timezoneOptions as $value => $label): ?>
+                            <option value="<?= escape($value) ?>" <?= $currentTimezone === $value ? 'selected' : '' ?>>
+                                <?= escape($label) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <?php if (!empty($errors['timezone'])): ?>
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400"><?= escape($errors['timezone'][0]) ?></p>
+                    <?php endif; ?>
+                </div>
+
                 <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-brand-500 text-slate-950 font-bold rounded-xl hover:bg-brand-accent transition duration-200 shadow-lg shadow-brand-500/20">
                     <i class="fa-solid fa-floppy-disk"></i>
                     <?= escape(__('admin.save_profile')) ?>
                 </button>
             </form>
+            </div>
         </div>
 
         <div class="space-y-6">
