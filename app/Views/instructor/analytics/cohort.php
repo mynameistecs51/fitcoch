@@ -2,40 +2,40 @@
 
 $thClass = 'px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase';
 $tdClass = 'px-4 py-3 text-sm text-slate-700 dark:text-slate-300';
+$instructorQuickLinkClass = 'inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:border-brand-500/30 hover:text-brand-600 dark:hover:text-brand-accent transition';
 $metrics = $metrics ?? [];
 $readinessPct = (int) ($metrics['readiness_pct'] ?? 0);
 $alertTriggered = (bool) ($metrics['alert_triggered'] ?? false);
 
+$heroTitle = __('analytics.instructor.title');
+$heroSubtitle = $course->title . ' · ' . $cohort->name . ' · ' . $selectedModule->title;
+$heroBadgeIcon = 'fa-chart-pie';
 ob_start();
 ?>
-<section class="space-y-6">
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div>
-            <h1 class="text-2xl font-extrabold text-slate-900 dark:text-white flex items-center gap-3">
-                <i class="fa-solid fa-chart-pie text-brand-500"></i>
-                <?= escape(__('analytics.instructor.title')) ?>
-            </h1>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                <?= escape($course->title) ?> · <?= escape($cohort->name) ?> · <?= escape($selectedModule->title) ?>
-            </p>
-        </div>
-        <div class="flex flex-wrap items-center gap-3">
-            <a href="<?= escape(url('/instructor/courses/' . $course->id . '/cohorts')) ?>" class="text-sm text-brand-600 dark:text-brand-500 hover:text-brand-accent font-semibold">
-                <?= escape(__('cohorts.instructor.manage')) ?>
-            </a>
-            <a href="<?= escape(url('/instructor/courses/' . $course->id . '/progress')) ?>" class="text-sm text-brand-600 dark:text-brand-500 hover:text-brand-accent">
-                <?= escape(__('courses.instructor.progress_title')) ?>
-            </a>
-            <a href="<?= escape(url('/instructor/courses')) ?>" class="text-sm text-slate-500 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-500">
-                <?= escape(__('courses.instructor.back')) ?>
-            </a>
-        </div>
-    </div>
+<a href="<?= escape(url('/instructor/courses/' . $course->id . '/cohorts')) ?>" class="<?= escape($instructorQuickLinkClass) ?>">
+    <i class="fa-solid fa-user-group text-sky-500"></i>
+    <?= escape(__('cohorts.instructor.manage')) ?>
+</a>
+<a href="<?= escape(url('/instructor/courses/' . $course->id . '/progress')) ?>" class="<?= escape($instructorQuickLinkClass) ?>">
+    <i class="fa-solid fa-chart-line text-brand-500"></i>
+    <?= escape(__('courses.instructor.progress_title')) ?>
+</a>
+<a href="<?= escape(url('/instructor/courses')) ?>" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/80 transition">
+    <i class="fa-solid fa-arrow-left text-xs"></i>
+    <?= escape(__('courses.instructor.back')) ?>
+</a>
+<?php
+$heroActions = ob_get_clean();
 
-    <form method="GET" action="<?= escape(url('/instructor/analytics/cohort/' . $cohort->id)) ?>" class="bg-white dark:bg-slate-900 p-4 md:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row gap-3 sm:items-end">
+ob_start();
+?>
+<section class="space-y-8">
+    <?php require base_path('app/Views/partials/instructor-page-hero.php'); ?>
+
+    <form method="GET" action="<?= escape(url('/instructor/analytics/cohort/' . $cohort->id)) ?>" class="ux-card p-5 md:p-6 flex flex-col sm:flex-row gap-3 sm:items-end">
         <div class="flex-1">
-            <label for="module" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"><?= escape(__('analytics.instructor.select_module')) ?></label>
-            <select id="module" name="module" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-200" onchange="this.form.submit()">
+            <label for="module" class="ux-label"><?= escape(__('analytics.instructor.select_module')) ?></label>
+            <select id="module" name="module" class="ux-input" onchange="this.form.submit()">
                 <?php foreach ($modules as $module): ?>
                     <option value="<?= escape((string) $module->id) ?>" <?= $module->id === $selectedModule->id ? 'selected' : '' ?>>
                         <?= escape($module->title) ?>
@@ -63,25 +63,34 @@ ob_start();
         </div>
     <?php endif; ?>
 
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
-            <p class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400"><?= escape(__('analytics.instructor.total_enrolled')) ?></p>
-            <p class="text-3xl font-extrabold text-brand-600 dark:text-brand-accent mt-2"><?= escape((string) ($metrics['total_enrolled'] ?? 0)) ?></p>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6">
+        <div class="ux-stat-card ux-card p-5 md:p-6">
+            <div class="ux-stat-icon bg-brand-500/10 text-brand-600 dark:text-brand-accent">
+                <i class="fa-solid fa-users"></i>
+            </div>
+            <p class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold"><?= escape(__('analytics.instructor.total_enrolled')) ?></p>
+            <p class="text-3xl md:text-4xl font-extrabold text-brand-600 dark:text-brand-accent mt-1"><?= escape((string) ($metrics['total_enrolled'] ?? 0)) ?></p>
         </div>
-        <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
-            <p class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400"><?= escape(__('analytics.instructor.completed_prep')) ?></p>
-            <p class="text-3xl font-extrabold text-brand-600 dark:text-brand-accent mt-2"><?= escape((string) ($metrics['completed_prep'] ?? 0)) ?></p>
+        <div class="ux-stat-card ux-card p-5 md:p-6">
+            <div class="ux-stat-icon bg-sky-500/10 text-sky-600 dark:text-sky-400">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <p class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold"><?= escape(__('analytics.instructor.completed_prep')) ?></p>
+            <p class="text-3xl md:text-4xl font-extrabold text-brand-600 dark:text-brand-accent mt-1"><?= escape((string) ($metrics['completed_prep'] ?? 0)) ?></p>
         </div>
-        <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
-            <p class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400"><?= escape(__('analytics.instructor.readiness_index')) ?></p>
-            <p class="text-3xl font-extrabold <?= $alertTriggered ? 'text-red-600 dark:text-red-400' : 'text-brand-600 dark:text-brand-accent' ?> mt-2">
+        <div class="ux-stat-card ux-card p-5 md:p-6 <?= $alertTriggered ? 'border-red-500/25 bg-gradient-to-br from-red-500/8 to-transparent' : '' ?>">
+            <div class="ux-stat-icon bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                <i class="fa-solid fa-gauge-high"></i>
+            </div>
+            <p class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400 font-semibold"><?= escape(__('analytics.instructor.readiness_index')) ?></p>
+            <p class="text-3xl md:text-4xl font-extrabold <?= $alertTriggered ? 'text-red-600 dark:text-red-400' : 'text-brand-600 dark:text-brand-accent' ?> mt-1">
                 <?= escape((string) $readinessPct) ?>%
             </p>
         </div>
     </div>
 
-    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 space-y-4">
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 lg:gap-8">
+        <div class="ux-card p-6 md:p-8 space-y-4">
             <h2 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
                 <i class="fa-solid fa-triangle-exclamation text-amber-500"></i>
                 <?= escape(__('analytics.instructor.misconceptions_title')) ?>
@@ -106,7 +115,7 @@ ob_start();
             <?php endif; ?>
         </div>
 
-        <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 space-y-4">
+        <div class="ux-card p-6 md:p-8 space-y-4">
             <h2 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
                 <i class="fa-solid fa-user-clock text-red-500"></i>
                 <?= escape(__('analytics.instructor.at_risk_title')) ?>
@@ -133,8 +142,11 @@ ob_start();
         </div>
     </div>
 
-    <div class="bg-white dark:bg-slate-900 p-6 md:p-8 rounded-3xl border border-slate-200 dark:border-slate-800 space-y-4">
-        <h2 class="text-lg font-bold text-slate-900 dark:text-white"><?= escape(__('analytics.instructor.learners_title')) ?></h2>
+    <div class="ux-card p-6 md:p-8 space-y-4">
+        <h2 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <i class="fa-solid fa-users text-brand-500"></i>
+            <?= escape(__('analytics.instructor.learners_title')) ?>
+        </h2>
 
         <?php if ($quiz === null): ?>
             <p class="text-sm text-slate-500 dark:text-slate-400"><?= escape(__('analytics.instructor.no_quiz')) ?></p>

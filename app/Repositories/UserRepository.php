@@ -120,22 +120,26 @@ class UserRepository implements RepositoryInterface
         return $user;
     }
 
-    /** @param array{first_name: string, last_name: string, email: string} $data */
+    /** @param array{title_prefix: string, first_name: string, last_name: string, email: string, timezone: string} $data */
     public function updateAccount(int $userId, array $data): User
     {
         $stmt = $this->db->prepare(
             'UPDATE users
-             SET first_name = :first_name,
+             SET title_prefix = :title_prefix,
+                 first_name = :first_name,
                  last_name = :last_name,
-                 email = :email
+                 email = :email,
+                 timezone = :timezone
              WHERE id = :id'
         );
 
         $stmt->execute([
             'id' => $userId,
+            'title_prefix' => $data['title_prefix'],
             'first_name' => $data['first_name'],
             'last_name' => $data['last_name'],
             'email' => $data['email'],
+            'timezone' => $data['timezone'],
         ]);
 
         $user = $this->findById($userId);

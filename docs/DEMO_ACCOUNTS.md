@@ -2,10 +2,16 @@
 
 รหัสผ่านทุกบัญชี: **`Password123!`**
 
-รัน seed ด้วย migration `020_seed_demo_users.sql` (หลัง `019`):
+รัน seed ด้วย migration `020_seed_demo_users.sql` (หลัง `019`) — **ต้องใช้ UTF-8**:
 
-```bash
-mysql -u root fitcoch < database/migrations/020_seed_demo_users.sql
+```powershell
+.\scripts\run-sql.ps1 database\migrations\020_seed_demo_users.sql
+```
+
+หากชื่อในตารางผู้ใช้เป็น `?` ให้รัน:
+
+```powershell
+.\scripts\run-sql.ps1 database\fixes\003_fix_demo_user_names.sql
 ```
 
 | บทบาท | รหัสนักศึกษา | อีเมล | ชื่อ |

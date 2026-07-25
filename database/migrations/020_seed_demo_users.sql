@@ -5,6 +5,8 @@
 
 USE fitcoch;
 
+SET NAMES utf8mb4;
+
 SET @demo_password = '$argon2id$v=19$m=65536,t=4,p=1$RExyZHpyd0ZNRU1jblRuOA$CeG39GTkhToftJ99977iyAgGAfwO7LTYBjpJK1z/0bQ';
 
 INSERT INTO users (student_id, title_prefix, email, password_hash, first_name, last_name, timezone, status)

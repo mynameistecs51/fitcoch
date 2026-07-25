@@ -39,6 +39,7 @@
 - [x] **นำเข้าผู้ใช้ Excel** — อัปเดตเทมเพลตคอลัมน์ (รหัสนักศึกษา, คำนำหน้า, ชื่อ, นามสกุล, รหัสผ่าน, role)
 - [x] **หน้าภาพรวมทบทวน** — ออกแบบ `/review/dashboard` ใหม่ กระจายพื้นที่เต็มความกว้าง + hero/stat cards
 - [x] **Demo users** — migration `020_seed_demo_users.sql` + เอกสาร `docs/DEMO_ACCOUNTS.md`
+- [x] **UI ผู้สอนย่อย** — ความคืบหน้า, จัดการรุ่น, analytics, แนวคิดทบทวน (design system ครบชุด)
 
 ### ตัดออกจากแผน (Removed)
 
